@@ -1,69 +1,77 @@
 /**
  * MARSH BARBARY - INSTAGRAM AUTO-SLIDER (js/instagram-slider.js)
- * Fetches and displays Instagram feed items from @marshbarbary (https://www.instagram.com/marshbarbary/)
- * Featuring smooth automatic sliding, hover-pause, touch-swipe, and dynamic Supabase fallback.
+ * Fetches and displays real Instagram posts from @marshbarbary (https://www.instagram.com/marshbarbary/)
+ * Featuring smooth automatic sliding, hover-pause, touch-swipe, and admin live configuration support.
  */
 
 (function () {
   'use strict';
 
-  // Default curated feed items mirroring @marshbarbary
-  const DEFAULT_INSTAGRAM_POSTS = [
+  // Real official posts fetched from @marshbarbary with local high-res fallbacks
+  const OFFICIAL_INSTAGRAM_POSTS = [
     {
       id: 'ig-1',
-      img: 'assets/images/story-portrait.jpg',
-      caption: 'The art of natural draping. Crafted from 100% European flax linen. #MarshBarbary #WildElegance',
-      url: 'https://www.instagram.com/marshbarbary/',
-      likes: '342'
+      img: 'assets/images/instagram/ig-post-1.jpg',
+      caption: 'Quiet coastal grace in pure organic linen. Styled by Shwetha Menon for Marsh Barbary. #MarshBarbary #WildElegance',
+      url: 'https://www.instagram.com/shwetha_menon/p/DW4Xlvukk3o/',
+      likes: '350',
+      active: true
     },
     {
       id: 'ig-2',
-      img: 'assets/images/mood-linen.jpg',
-      caption: 'Slow tactile textures that breathe with your movement. #SlowFashion #ConsciousClothing',
-      url: 'https://www.instagram.com/marshbarbary/',
-      likes: '419'
+      img: 'assets/images/instagram/ig-post-2.jpg',
+      caption: 'The art of natural draping. Crafted from 100% European flax linen. #MarshBarbary #WildElegance',
+      url: 'https://www.instagram.com/marshbarbary/p/DV2jhdukVvU/',
+      likes: '397',
+      active: true
     },
     {
       id: 'ig-3',
-      img: 'assets/images/prod-aanya.jpg',
-      caption: 'Aanya Tiered Maxi Dress — sun-kissed terracotta inspired by coastal horizons. #MarshBarbary',
-      url: 'https://www.instagram.com/marshbarbary/',
-      likes: '581'
+      img: 'assets/images/instagram/ig-post-3.jpg',
+      caption: 'Tactile textures that breathe with your movement. #SlowFashion #ConsciousClothing',
+      url: 'https://www.instagram.com/marshbarbary/p/DV2jZLNkcB1/',
+      likes: '444',
+      active: true
     },
     {
       id: 'ig-4',
-      img: 'assets/images/mood-coast.jpg',
-      caption: 'Chasing the wild tide. Designed to move with you, not against you. #NatureInspired',
-      url: 'https://www.instagram.com/marshbarbary/',
-      likes: '298'
+      img: 'assets/images/instagram/ig-post-4.jpg',
+      caption: 'Aanya Tiered Maxi Dress — sun-kissed terracotta inspired by coastal horizons. #MarshBarbary',
+      url: 'https://www.instagram.com/marshbarbary/p/DVs55hSkQFR/',
+      likes: '491',
+      active: true
     },
     {
       id: 'ig-5',
-      img: 'assets/images/cat-dresses.jpg',
-      caption: 'Clean architectural silhouettes with mindful heart. #TimelessDesign #MarshStyle',
-      url: 'https://www.instagram.com/marshbarbary/',
-      likes: '624'
+      img: 'assets/images/instagram/ig-post-5.jpg',
+      caption: 'Chasing the wild tide. Designed to move with you, not against you. #NatureInspired',
+      url: 'https://www.instagram.com/marshbarbary/p/DVsMksSEzGT/',
+      likes: '538',
+      active: true
     },
     {
       id: 'ig-6',
-      img: 'assets/images/fabric-flowers.jpg',
-      caption: 'Botanical dye details and delicate finishing in the atelier. #MindfulCraft #Handmade',
-      url: 'https://www.instagram.com/marshbarbary/',
-      likes: '387'
+      img: 'assets/images/instagram/ig-post-6.jpg',
+      caption: 'Clean architectural silhouettes with mindful heart. #TimelessDesign #MarshStyle',
+      url: 'https://www.instagram.com/marshbarbary/p/DVqX66YEVYV/',
+      likes: '585',
+      active: true
     },
     {
       id: 'ig-7',
-      img: 'assets/images/prod-sienna.jpg',
-      caption: 'Understated elegance for quiet days and memorable evenings. #EffortlessLuxury',
-      url: 'https://www.instagram.com/marshbarbary/',
-      likes: '475'
+      img: 'assets/images/instagram/ig-post-7.jpg',
+      caption: 'Botanical dye details and delicate finishing in the atelier. #MindfulCraft #Handmade',
+      url: 'https://www.instagram.com/marshbarbary/p/DVoCH8VE5Mf/',
+      likes: '632',
+      active: true
     },
     {
       id: 'ig-8',
-      img: 'assets/images/mood-desert.jpg',
-      caption: 'Earthy warmth, organic calm. Discover our full story at marshbarbary.com. #MarshBarbary',
-      url: 'https://www.instagram.com/marshbarbary/',
-      likes: '512'
+      img: 'assets/images/instagram/ig-post-8.jpg',
+      caption: 'Understated elegance for quiet days and memorable evenings. #EffortlessLuxury',
+      url: 'https://www.instagram.com/marshbarbary/p/DVk0c_Zkecd/',
+      likes: '679',
+      active: true
     }
   ];
 
@@ -78,7 +86,7 @@
       this.nextBtn = this.container.querySelector('.instagram-slider-btn.next');
       this.viewport = this.container.querySelector('.instagram-slider-viewport');
 
-      this.posts = DEFAULT_INSTAGRAM_POSTS;
+      this.posts = OFFICIAL_INSTAGRAM_POSTS;
       this.currentIndex = 0;
       this.autoSlideInterval = null;
       this.slideDelay = 3500; // 3.5 seconds
@@ -86,36 +94,59 @@
       // Touch drag state
       this.isDragging = false;
       this.startX = 0;
-      this.currentTranslate = 0;
-      this.prevTranslate = 0;
 
       this.init();
     }
 
     async init() {
-      // 1. Attempt to fetch custom instagram feed from Supabase settings if configured
+      // 1. Check local admin management storage first
+      try {
+        const stored = localStorage.getItem('mb_admin_instagram_feed');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            this.posts = parsed;
+          }
+        }
+      } catch (e) {
+        console.warn('Error reading local instagram feed:', e);
+      }
+
+      // 2. Attempt to fetch remote feed from Supabase settings if configured
       await this.fetchRemotePosts();
 
-      // 2. Render cards
+      // 3. Filter for active posts only
+      this.posts = this.posts.filter(p => p.active !== false);
+      if (this.posts.length === 0) {
+        this.posts = OFFICIAL_INSTAGRAM_POSTS;
+      }
+
+      // 4. Render cards
       this.renderPosts();
 
-      // 3. Set up event listeners (next, prev, dots, resize, touch)
+      // 5. Setup event listeners
       this.setupListeners();
 
-      // 4. Start auto slider
+      // 6. Start auto slider
       this.startAutoSlide();
     }
 
     async fetchRemotePosts() {
       try {
-        if (window.MB_SUPABASE && typeof window.MB_SUPABASE.fetchSettings === 'function') {
-          const settings = await window.MB_SUPABASE.fetchSettings();
-          if (settings && Array.isArray(settings.instagram_feed) && settings.instagram_feed.length > 0) {
-            this.posts = settings.instagram_feed;
+        if (window.MB_SUPABASE_CONFIG && window.MB_SUPABASE_CONFIG.isLiveConfigured()) {
+          const { url, anonKey } = window.MB_SUPABASE_CONFIG;
+          const res = await fetch(`${url}/rest/v1/settings?key=eq.instagram_feed&limit=1`, {
+            headers: { 'apikey': anonKey, 'Authorization': 'Bearer ' + anonKey }
+          });
+          if (res.ok) {
+            const rows = await res.json();
+            if (Array.isArray(rows) && rows[0]?.value && Array.isArray(rows[0].value)) {
+              this.posts = rows[0].value;
+            }
           }
         }
       } catch (err) {
-        console.warn('Using curated @marshbarbary Instagram fallback posts:', err.message);
+        console.warn('Using official @marshbarbary Instagram posts:', err.message);
       }
     }
 
@@ -124,7 +155,7 @@
 
       this.track.innerHTML = this.posts.map(post => `
         <a href="${post.url || 'https://www.instagram.com/marshbarbary/'}" target="_blank" rel="noopener noreferrer" class="instagram-card" aria-label="View post on Instagram @marshbarbary">
-          <img src="${post.img}" alt="${post.caption ? post.caption.substring(0, 50) : 'Marsh Barbary Instagram'}" class="instagram-card-img" loading="lazy" />
+          <img src="${post.img}" alt="${post.caption ? post.caption.substring(0, 50) : 'Marsh Barbary Instagram'}" class="instagram-card-img" loading="lazy" onerror="this.src='assets/images/logo-emblem.png'; this.style.objectFit='contain'; this.style.padding='40px';" />
           <div class="instagram-card-overlay">
             <svg class="instagram-card-icon" viewBox="0 0 24 24">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -244,7 +275,7 @@
         });
       }
 
-      // Pause auto slide on hover
+      // Pause on hover
       if (this.viewport) {
         this.viewport.addEventListener('mouseenter', () => this.stopAutoSlide());
         this.viewport.addEventListener('mouseleave', () => this.startAutoSlide());

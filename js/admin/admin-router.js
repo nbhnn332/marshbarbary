@@ -30,6 +30,7 @@ window.MB_ADMIN_ROUTER = (() => {
     // Marketing & Store
     { pattern: /^#\/coupons\/?$/, viewName: 'coupons', params: () => ({}) },
     { pattern: /^#\/homepage\/?$/, viewName: 'homepage', params: () => ({}) },
+    { pattern: /^#\/instagram-feed\/?$/, viewName: 'instagram-feed', params: () => ({}) },
 
     // Settings & Security
     { pattern: /^#\/admin-users\/?$/, viewName: 'admin-users', params: () => ({}) },
@@ -83,6 +84,7 @@ window.MB_ADMIN_ROUTER = (() => {
       'return-detail': 'returns',
       'coupons': 'coupons',
       'homepage': 'homepage',
+      'instagram-feed': 'homepage',
       'admin-users': 'admin_users',
       'settings': 'settings',
       'audit-logs': 'audit_logs'

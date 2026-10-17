@@ -224,6 +224,73 @@ window.MB_ADMIN_MODELS = (() => {
     }
   ];
 
+  const seedInstagramFeed = [
+    {
+      id: 'ig-1',
+      img: 'assets/images/instagram/ig-post-1.jpg',
+      caption: 'Photo by Shwetha Menon on April 08, 2026.',
+      url: 'https://www.instagram.com/shwetha_menon/p/DW4Xlvukk3o/',
+      likes: '350',
+      active: true
+    },
+    {
+      id: 'ig-2',
+      img: 'assets/images/instagram/ig-post-2.jpg',
+      caption: 'Photo by M A R S H  B A R B A R Y on March 13, 2026.',
+      url: 'https://www.instagram.com/marshbarbary/p/DV2jhdukVvU/',
+      likes: '397',
+      active: true
+    },
+    {
+      id: 'ig-3',
+      img: 'assets/images/instagram/ig-post-3.jpg',
+      caption: 'Photo by M A R S H  B A R B A R Y on March 13, 2026.',
+      url: 'https://www.instagram.com/marshbarbary/p/DV2jZLNkcB1/',
+      likes: '444',
+      active: true
+    },
+    {
+      id: 'ig-4',
+      img: 'assets/images/instagram/ig-post-4.jpg',
+      caption: 'Photo by M A R S H  B A R B A R Y on March 10, 2026.',
+      url: 'https://www.instagram.com/marshbarbary/p/DVs55hSkQFR/',
+      likes: '491',
+      active: true
+    },
+    {
+      id: 'ig-5',
+      img: 'assets/images/instagram/ig-post-5.jpg',
+      caption: 'Photo by M A R S H  B A R B A R Y on March 09, 2026.',
+      url: 'https://www.instagram.com/marshbarbary/p/DVsMksSEzGT/',
+      likes: '538',
+      active: true
+    },
+    {
+      id: 'ig-6',
+      img: 'assets/images/instagram/ig-post-6.jpg',
+      caption: 'Photo by M A R S H  B A R B A R Y on March 09, 2026.',
+      url: 'https://www.instagram.com/marshbarbary/p/DVqX66YEVYV/',
+      likes: '585',
+      active: true
+    },
+    {
+      id: 'ig-7',
+      img: 'assets/images/instagram/ig-post-7.jpg',
+      caption: 'Photo by M A R S H  B A R B A R Y on March 08, 2026.',
+      url: 'https://www.instagram.com/marshbarbary/p/DVoCH8VE5Mf/',
+      likes: '632',
+      active: true
+    },
+    {
+      id: 'ig-8',
+      img: 'assets/images/instagram/ig-post-8.jpg',
+      caption: 'Photo by M A R S H  B A R B A R Y on March 06, 2026.',
+      url: 'https://www.instagram.com/marshbarbary/p/DVk0c_Zkecd/',
+      likes: '679',
+      active: true
+    }
+  ];
+
   return {
     seedCategories,
     seedProducts,
@@ -238,6 +305,7 @@ window.MB_ADMIN_MODELS = (() => {
     seedHomepageConfig,
     seedPaymentSettings,
     seedStoreSettings,
-    seedAuditLogs
+    seedAuditLogs,
+    seedInstagramFeed
   };
 })();

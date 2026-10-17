@@ -16,7 +16,8 @@ window.MB_ADMIN_SERVICE = (() => {
     HOMEPAGE: 'mb_admin_homepage',
     PAYMENTS: 'mb_admin_payments',
     SETTINGS: 'mb_admin_settings',
-    AUDIT_LOGS: 'mb_admin_audit_logs'
+    AUDIT_LOGS: 'mb_admin_audit_logs',
+    INSTAGRAM_FEED: 'mb_admin_instagram_feed'
   };
 
   // Helper to get or initialize collection
@@ -1289,6 +1290,37 @@ window.MB_ADMIN_SERVICE = (() => {
     return config;
   }
 
+  // INSTAGRAM FEED MANAGEMENT
+  async function getInstagramFeed() {
+    return getCollection(STORAGE_KEYS.INSTAGRAM_FEED, window.MB_ADMIN_MODELS?.seedInstagramFeed);
+  }
+
+  async function saveInstagramFeed(posts) {
+    if (!Array.isArray(posts)) throw new Error('Instagram feed must be an array of posts');
+    setCollection(STORAGE_KEYS.INSTAGRAM_FEED, posts);
+
+    // Sync with Supabase if available
+    if (window.MB_SUPABASE_CONFIG && window.MB_SUPABASE_CONFIG.isLiveConfigured()) {
+      try {
+        const { url, anonKey } = window.MB_SUPABASE_CONFIG;
+        await fetch(`${url}/rest/v1/settings?key=eq.instagram_feed`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': anonKey,
+            'Authorization': 'Bearer ' + anonKey,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ value: posts, updated_at: new Date().toISOString() })
+        });
+      } catch (err) {
+        console.warn('[AdminService] Supabase instagram_feed sync error:', err);
+      }
+    }
+
+    logAction('INSTAGRAM_FEED_UPDATED', 'Content', 'instagram-feed', `Updated ${posts.length} Instagram feed posts`);
+    return posts;
+  }
+
   // Helper for server-style authorization check on admin management
   function requireSuperAdmin(actionName) {
     const currentUser = window.MB_ADMIN_AUTH?.getCurrentUser();
@@ -1457,6 +1489,8 @@ window.MB_ADMIN_SERVICE = (() => {
     deleteCoupon,
     getHomepageConfig,
     saveHomepageConfig,
+    getInstagramFeed,
+    saveInstagramFeed,
     getAdminUsers,
     saveAdminUser,
     toggleAdminUserStatus,
