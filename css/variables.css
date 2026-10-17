@@ -1,0 +1,69 @@
+/* ==========================================================================
+   MARSH BARBARY DESIGN SYSTEM - VARIABLES & TOKENS
+   Warm ivory, cream, peach, terracotta, earthy brown, deep espresso
+   ========================================================================== */
+
+:root {
+  /* Color Palette */
+  --color-bg-primary: #F9F5F0;       /* Warm oat / sand page backdrop */
+  --color-bg-secondary: #F3ECE3;     /* Muted almond warm surface */
+  --color-bg-card: #FAF7F3;          /* Soft ivory card background */
+  --color-bg-card-hover: #FFFFFF;    /* Pure crisp white card surface */
+  --color-bg-terracotta-tint: #F6EEE7;
+  
+  /* Text & Inks */
+  --color-text-primary: #26201D;     /* Deep warm espresso charcoal */
+  --color-text-secondary: #706660;   /* Muted warm taupe / earth stone */
+  --color-text-muted: #9E938B;       /* Light stone for captions & borders */
+  --color-text-on-dark: #FFFFFF;
+  
+  /* Brand Accents */
+  --color-accent-terracotta: #B47154;/* Warm earthy terracotta */
+  --color-accent-terracotta-dark: #98583E;
+  --color-accent-clay: #C58B70;      /* Soft clay peach */
+  --color-accent-gold: #9C816A;      /* Warm taupe gold */
+  
+  /* UI Borders & Lines */
+  --color-border-subtle: #E8DFD5;    /* Delicate warm outline */
+  --color-border-medium: #D5C8BC;
+  --color-border-dark: #26201D;
+  
+  /* Typography */
+  --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-script: 'Alex Brush', cursive;
+  
+  /* Spacing Scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+  
+  /* Container Widths */
+  --container-max: 1400px;
+  --container-desktop: 1240px;
+  --container-padding: 32px;
+  --container-padding-mobile: 20px;
+  
+  /* Radius */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-pill: 9999px;
+  
+  /* Transitions */
+  --transition-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* Z-Index Hierarchy */
+  --z-base: 1;
+  --z-sticky: 100;
+  --z-drawer: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+}

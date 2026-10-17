@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operations Portal | MARSH BARBARY Atelier Admin</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="icon" type="image/png" href="../assets/images/logo-emblem.png">
+  <link rel="stylesheet" href="../css/admin.css">
+
+  <!-- Immediate Authentication Guard -->
+  <script>
+    (function() {
+      try {
+        var session = sessionStorage.getItem('mb_admin_session') || localStorage.getItem('mb_admin_session');
+        if (!session) {
+          window.location.replace('login.html');
+        }
+      } catch (e) {
+        window.location.replace('login.html');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <div class="admin-layout">
+    <!-- Persistent Left Sidebar -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="admin-sidebar-header">
+        <a href="#/dashboard" class="admin-brand-link" aria-label="Marsh Barbary Operations Portal">
+          <img src="../assets/images/logo-horizontal.png" alt="MARSH BARBARY" class="admin-brand-logo">
+          <span class="admin-brand-tag">PORTAL</span>
+        </a>
+      </div>
+      <div style="padding: 24px; color: var(--mb-admin-muted); font-size: 12px;">Loading navigation...</div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <div class="admin-main">
+      <!-- Topbar Header -->
+      <header class="admin-topbar" id="admin-topbar"></header>
+
+      <!-- Dynamic View Container -->
+      <main class="admin-content" id="admin-content-mount">
+        <div style="padding: 48px; text-align: center; color: var(--mb-admin-muted);">
+          Loading Atelier Operations Console...
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Supabase & Configuration -->
+  <script src="../js/lib/supabase.js"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/supabase-client.js"></script>
+
+  <!-- Models & Services -->
+  <script src="../js/admin/admin-models.js"></script>
+  <script src="../js/admin/admin-service.js"></script>
+  <script src="../js/admin/admin-auth.js"></script>
+  <script src="../js/admin/admin-shell.js"></script>
+  <script src="../js/admin/admin-image-source.js"></script>
+
+  <!-- Views -->
+  <script src="../js/admin/views/dashboard.js"></script>
+  <script src="../js/admin/views/products.js"></script>
+  <script src="../js/admin/views/product-edit.js"></script>
+  <script src="../js/admin/views/categories.js"></script>
+  <script src="../js/admin/views/orders.js"></script>
+  <script src="../js/admin/views/order-detail.js"></script>
+  <script src="../js/admin/views/customers.js"></script>
+  <script src="../js/admin/views/returns.js"></script>
+  <script src="../js/admin/views/coupons.js"></script>
+  <script src="../js/admin/views/homepage.js"></script>
+  <script src="../js/admin/views/admin-users.js"></script>
+  <script src="../js/admin/views/payment-settings.js"></script>
+  <script src="../js/admin/views/settings.js"></script>
+  <script src="../js/admin/views/audit-logs.js"></script>
+
+  <!-- Router Initialization -->
+  <script src="../js/admin/admin-router.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      window.MB_ADMIN_ROUTER.init();
+    });
+  </script>
+</body>
+</html>

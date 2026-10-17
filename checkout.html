@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — MARSH BARBARY</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/account-checkout.css" />
+  <link rel="icon" type="image/png" href="assets/images/logo-emblem.png" />
+</head>
+<body class="auth-page">
+
+  <!-- Checkout Header -->
+  <header class="auth-header">
+    <a href="index.html" class="auth-header-logo">
+      <img src="assets/images/logo-horizontal.png" alt="MARSH BARBARY" />
+    </a>
+
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #8C827A;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        <span>Secure Checkout</span>
+      </div>
+      <a href="cart.html" class="auth-back-link">
+        &larr; Return to Bag
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Checkout Area -->
+  <main class="account-page-section" style="flex: 1;" id="checkout-main-content">
+    <div class="container-wide" style="max-width: 1180px; margin: 0 auto; padding: 0 20px;">
+      
+      <div class="checkout-layout">
+        
+        <!-- Left Wizard Column -->
+        <div class="checkout-wizard-col">
+
+          <!-- Stepper -->
+          <div class="checkout-stepper" id="checkout-stepper-bar">
+            <div class="checkout-step-item active" id="stepper-item-1">
+              <span class="checkout-step-num">1</span>
+              <span>1. Address</span>
+            </div>
+            <span class="checkout-step-arrow">&rarr;</span>
+            <div class="checkout-step-item" id="stepper-item-2">
+              <span class="checkout-step-num">2</span>
+              <span>2. Delivery</span>
+            </div>
+            <span class="checkout-step-arrow">&rarr;</span>
+            <div class="checkout-step-item" id="stepper-item-3">
+              <span class="checkout-step-num">3</span>
+              <span>3. Payment</span>
+            </div>
+          </div>
+
+          <!-- STEP 1: Address Panel -->
+          <div class="checkout-step-panel is-active" id="checkout-panel-step1">
+            <div class="account-card">
+              <div class="address-top-actions">
+                <div>
+                  <span class="auth-kicker">STEP 1 OF 3</span>
+                  <h2 class="account-section-title">Shipping Destination</h2>
+                  <p class="account-section-desc">
+                    Choose the delivery destination for your order or add a new address.
+                  </p>
+                </div>
+                <button type="button" class="auth-btn-secondary" id="btn-checkout-add-address">
+                  + Add New Address
+                </button>
+              </div>
+
+              <!-- Address List -->
+              <div id="checkout-addresses-list">
+                <div style="text-align: center; padding: 30px; color: #8C827A;">
+                  Loading saved destinations...
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; margin-top: 24px; padding-top: 16px; border-top: 1px solid #EFEAE4;">
+                <button type="button" class="auth-btn-primary" id="btn-step1-continue" style="padding: 14px 28px;">
+                  <span>Continue to Delivery &rarr;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: Delivery Options Panel -->
+          <div class="checkout-step-panel" id="checkout-panel-step2">
+            <div class="account-card">
+              <!-- Selected Address Preview -->
+              <div class="checkout-completed-summary">
+                <div class="checkout-completed-info">
+                  <h4>Delivery Address</h4>
+                  <p id="step2-address-summary">Loading...</p>
+                </div>
+                <button type="button" class="checkout-change-btn btn-change-address">Change</button>
+              </div>
+
+              <div class="account-section-header">
+                <span class="auth-kicker">STEP 2 OF 3</span>
+                <h2 class="account-section-title">Delivery Method</h2>
+                <p class="account-section-desc">
+                  Each MARSH BARBARY piece is carefully protected and hand-inspected before dispatch.
+                </p>
+              </div>
+
+              <div class="delivery-options-list">
+                <div class="delivery-option-item selected" data-method="EXPRESS">
+                  <div class="delivery-option-left">
+                    <div class="checkout-radio-indicator"></div>
+                    <div>
+                      <div class="delivery-option-title">Standard Atelier Express Delivery</div>
+                      <div class="delivery-option-meta">Estimated delivery in 3–7 business days across India</div>
+                    </div>
+                  </div>
+                  <div class="delivery-option-price" id="delivery-price-label">Complimentary</div>
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #EFEAE4;">
+                <button type="button" class="auth-btn-secondary btn-change-address">
+                  &larr; Back to Address
+                </button>
+                <button type="button" class="auth-btn-primary" id="btn-step2-continue" style="padding: 14px 28px;">
+                  <span>Continue to Payment &rarr;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: Payment Panel -->
+          <div class="checkout-step-panel" id="checkout-panel-step3">
+            <div class="account-card">
+              <!-- Summaries of Completed Steps -->
+              <div class="checkout-completed-summary">
+                <div class="checkout-completed-info">
+                  <h4>Delivery Address & Method</h4>
+                  <p id="step3-address-summary">Loading...</p>
+                  <p style="color: #8C827A; font-size: 12px; margin-top: 2px;">Method: Express Atelier Delivery (3–7 business days)</p>
+                </div>
+                <button type="button" class="checkout-change-btn btn-change-address">Change</button>
+              </div>
+
+              <div class="account-section-header">
+                <span class="auth-kicker">STEP 3 OF 3</span>
+                <h2 class="account-section-title">Payment Method</h2>
+                <p class="account-section-desc">
+                  Select your preferred secure payment channel to place your acquisition.
+                </p>
+              </div>
+
+              <div class="payment-methods-list">
+                <!-- COD Option -->
+                <div class="payment-method-item selected" data-method="COD">
+                  <div class="payment-method-left">
+                    <div class="checkout-radio-indicator"></div>
+                    <div>
+                      <div class="payment-method-title">Cash on Delivery (COD)</div>
+                      <div class="payment-method-sub">Pay via cash, UPI, or card upon physical delivery</div>
+                    </div>
+                  </div>
+                  <span class="payment-badge-pill">COD</span>
+                </div>
+
+                <!-- Razorpay Option -->
+                <div class="payment-method-item" data-method="RAZORPAY">
+                  <div class="payment-method-left">
+                    <div class="checkout-radio-indicator"></div>
+                    <div>
+                      <div class="payment-method-title">Online Payment (Razorpay)</div>
+                      <div class="payment-method-sub">Credit/Debit Cards, UPI, NetBanking, and Wallets</div>
+                    </div>
+                  </div>
+                  <div class="payment-badges-row">
+                    <span class="payment-badge-pill">UPI</span>
+                    <span class="payment-badge-pill">Cards</span>
+                  </div>
+                </div>
+
+                <!-- PhonePe Option -->
+                <div class="payment-method-item" data-method="PHONEPE">
+                  <div class="payment-method-left">
+                    <div class="checkout-radio-indicator"></div>
+                    <div>
+                      <div class="payment-method-title">PhonePe Payment Gateway</div>
+                      <div class="payment-method-sub">Direct UPI Intent, QR, and Saved PhonePe instruments</div>
+                    </div>
+                  </div>
+                  <span class="payment-badge-pill">PhonePe</span>
+                </div>
+              </div>
+
+              <p style="font-size: 11px; color: #8C827A; margin-bottom: 24px;">
+                By placing your order, you agree to MARSH BARBARY's <a href="terms.html" target="_blank" style="color: #26201D; text-decoration: underline;">Terms of Service</a> and <a href="privacy.html" target="_blank" style="color: #26201D; text-decoration: underline;">Privacy Policy</a>.
+              </p>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #EFEAE4;">
+                <button type="button" class="auth-btn-secondary" onclick="MB_CHECKOUT.updateStepView ? MB_CHECKOUT.updateStepView(2) : history.back()">
+                  &larr; Back to Delivery
+                </button>
+                <button type="button" class="auth-btn-primary" id="btn-place-order" style="padding: 14px 32px;">
+                  <span>Place Order &rarr;</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4: Order Confirmation Panel -->
+          <div class="checkout-step-panel" id="checkout-panel-step4">
+            <div id="order-confirmation-content"></div>
+          </div>
+
+        </div>
+
+        <!-- Right Order Summary Column -->
+        <aside class="checkout-summary-card" id="checkout-sidebar-summary" aria-label="Order Financial Summary">
+          <h3 class="checkout-summary-title">Order Summary</h3>
+
+          <div class="checkout-items-list" id="checkout-items-summary">
+            <!-- Dynamic cart items -->
+          </div>
+
+          <div class="checkout-totals-block">
+            <div class="checkout-total-row">
+              <span>Subtotal</span>
+              <span id="summary-subtotal">₹0</span>
+            </div>
+            <div class="checkout-total-row">
+              <span>Atelier Delivery</span>
+              <span id="summary-shipping">Complimentary</span>
+            </div>
+            <div class="checkout-total-row grand-total">
+              <span>Total Amount</span>
+              <span id="summary-total">₹0</span>
+            </div>
+          </div>
+
+          <div class="checkout-assurances">
+            <div class="checkout-assurance-line">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <span>100% Certified Authentic Fabrics</span>
+            </div>
+            <div class="checkout-assurance-line">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle></svg>
+              <span>Complimentary 14-Day Exchanges</span>
+            </div>
+            <div class="checkout-assurance-line">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <span>Encrypted 256-Bit SSL Checkout</span>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Add Address Modal for Checkout -->
+  <div class="auth-modal-overlay" id="checkout-address-modal" aria-hidden="true" role="dialog">
+    <div class="auth-modal-dialog">
+      <div class="auth-modal-header">
+        <h2 class="auth-modal-title">Add Delivery Address</h2>
+        <button type="button" class="auth-modal-close" id="btn-close-checkout-modal" aria-label="Close dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div id="checkout-modal-alert" class="auth-alert" role="alert" style="margin-bottom: 16px;"></div>
+
+      <form id="checkout-address-form" novalidate>
+        <div class="address-type-selector">
+          <button type="button" class="address-type-btn active" data-type="Home">Home</button>
+          <button type="button" class="address-type-btn" data-type="Work">Work</button>
+          <button type="button" class="address-type-btn" data-type="Other">Other</button>
+        </div>
+        <input type="hidden" id="checkout-addr-label" value="Home" />
+
+        <div class="auth-form-row">
+          <div class="auth-form-group">
+            <label class="auth-label" for="checkout-addr-fullname">Recipient Full Name *</label>
+            <input type="text" id="checkout-addr-fullname" class="auth-input" placeholder="e.g. Eleanor Vance" required />
+          </div>
+          <div class="auth-form-group">
+            <label class="auth-label" for="checkout-addr-phone">Contact Phone Number *</label>
+            <input type="tel" id="checkout-addr-phone" class="auth-input" placeholder="10-digit mobile number" required />
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-label" for="checkout-addr-line1">Address Line 1 (Flat, House, Street) *</label>
+          <input type="text" id="checkout-addr-line1" class="auth-input" placeholder="e.g. 402, Lotus Grand Residences, 12th Main" required />
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-label" for="checkout-addr-line2">Address Line 2 (Area, Colony, Sector)</label>
+          <input type="text" id="checkout-addr-line2" class="auth-input" placeholder="e.g. Indiranagar, 2nd Stage" />
+        </div>
+
+        <div class="auth-form-group">
+          <label class="auth-label" for="checkout-addr-landmark">Landmark (Optional)</label>
+          <input type="text" id="checkout-addr-landmark" class="auth-input" placeholder="e.g. Near Defense Colony Club" />
+        </div>
+
+        <div class="auth-form-row">
+          <div class="auth-form-group">
+            <label class="auth-label" for="checkout-addr-city">City *</label>
+            <input type="text" id="checkout-addr-city" class="auth-input" placeholder="e.g. Bengaluru" required />
+          </div>
+          <div class="auth-form-group">
+            <label class="auth-label" for="checkout-addr-state">State / Union Territory *</label>
+            <select id="checkout-addr-state" class="auth-input auth-select" required aria-label="State or Union Territory">
+              <option value="" disabled selected>Select State / Union Territory</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="auth-form-row">
+          <div class="auth-form-group">
+            <label class="auth-label" for="checkout-addr-postal">PIN / Postal Code (6 Digits) *</label>
+            <input type="text" id="checkout-addr-postal" class="auth-input" placeholder="e.g. 560038" inputmode="numeric" pattern="[1-9][0-9]{5}" maxlength="6" required />
+          </div>
+          <div class="auth-form-group">
+            <label class="auth-label" for="checkout-addr-country">Country</label>
+            <select id="checkout-addr-country" class="auth-input auth-select" disabled aria-label="Country">
+              <option value="India" selected>India</option>
+            </select>
+          </div>
+        </div>
+
+        <label class="address-checkbox-label">
+          <input type="checkbox" id="checkout-addr-default" checked />
+          <span>Save as primary delivery address</span>
+        </label>
+
+        <div class="address-modal-actions">
+          <button type="button" class="auth-btn-secondary" id="btn-cancel-checkout-modal">Cancel</button>
+          <button type="submit" class="auth-btn-primary" id="btn-save-checkout-address">
+            <span>Save & Use Address</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="auth-footer">
+    &copy; 2026 MARSH BARBARY. All rights reserved. &bull; Modest Luxury &bull; Secure Checkout
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/lib/supabase.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/customer-auth.js"></script>
+  <script src="js/india-states.js"></script>
+  <script src="js/customer-addresses.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/checkout.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // 1. Initialize checkout controller
+      await window.MB_CHECKOUT.init();
+
+      // 2. Setup checkout modal listeners
+      const modal = document.getElementById('checkout-address-modal');
+      const form = document.getElementById('checkout-address-form');
+      const labelInput = document.getElementById('checkout-addr-label');
+      const modalAlertEl = document.getElementById('checkout-modal-alert');
+      const typeBtns = modal.querySelectorAll('.address-type-btn');
+
+      typeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          typeBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          labelInput.value = btn.dataset.type;
+        });
+      });
+
+      function closeModal() {
+        modal.classList.remove('is-active');
+        modalAlertEl.style.display = 'none';
+        modalAlertEl.textContent = '';
+      }
+
+      document.getElementById('btn-close-checkout-modal').addEventListener('click', closeModal);
+      document.getElementById('btn-cancel-checkout-modal').addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        modalAlertEl.style.display = 'none';
+        const submitBtn = document.getElementById('btn-save-checkout-address');
+
+        const payload = {
+          address_label: labelInput.value,
+          full_name: document.getElementById('checkout-addr-fullname').value,
+          phone: document.getElementById('checkout-addr-phone').value,
+          address_line_1: document.getElementById('checkout-addr-line1').value,
+          address_line_2: document.getElementById('checkout-addr-line2').value,
+          landmark: document.getElementById('checkout-addr-landmark').value,
+          city: document.getElementById('checkout-addr-city').value,
+          state: document.getElementById('checkout-addr-state').value,
+          postal_code: document.getElementById('checkout-addr-postal').value,
+          country: document.getElementById('checkout-addr-country').value || 'India',
+          is_default: document.getElementById('checkout-addr-default').checked
+        };
+
+        try {
+          submitBtn.disabled = true;
+          submitBtn.querySelector('span').textContent = 'Saving...';
+
+          const created = await window.MB_ADDRESSES.addAddress(payload);
+          closeModal();
+          // Reload addresses and select newly created
+          window.MB_CHECKOUT.getState().selectedAddressId = created.id;
+          window.MB_CHECKOUT.getState().selectedAddress = created;
+          await window.MB_CHECKOUT.loadAndRenderAddresses();
+        } catch (err) {
+          modalAlertEl.textContent = err.message || 'Failed to save address.';
+          modalAlertEl.className = 'auth-alert error';
+          modalAlertEl.style.display = 'block';
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.querySelector('span').textContent = 'Save & Use Address';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

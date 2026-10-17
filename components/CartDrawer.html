@@ -1,0 +1,32 @@
+<!-- ==========================================
+     COMPONENT: Cart Drawer Visual Shell
+     ========================================== -->
+<div class="cart-drawer-overlay"></div>
+<aside class="cart-drawer" aria-label="Shopping Bag">
+  
+  <!-- Header -->
+  <div class="cart-drawer-header">
+    <h3 class="cart-drawer-title">Shopping Bag (<span class="cart-badge">1</span>)</h3>
+    <button type="button" class="cart-drawer-close icon-btn" aria-label="Close Shopping Bag">&times;</button>
+  </div>
+
+  <!-- Items Container -->
+  <div class="cart-items-container">
+    <!-- Rendered via js/cart.js -->
+  </div>
+
+  <!-- Footer -->
+  <div class="cart-drawer-footer">
+    <div class="cart-subtotal-row">
+      <span>Subtotal</span>
+      <span class="cart-subtotal-amount">₹3,499</span>
+    </div>
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 14px;">
+      Complimentary standard shipping on all orders.
+    </p>
+    <button type="button" class="btn btn-dark" style="width: 100%;" onclick="MB_CART.showToast('Visual Shell: Proceeding to Checkout in Phase 2')">
+      Checkout &rarr;
+    </button>
+  </div>
+
+</aside>

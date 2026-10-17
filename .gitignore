@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Temporary & Chrome browser profiles
+.chrome-tmp/
+scratch/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+*.log
+
+# Environment
+.env
+.env.local
+
+# Root visual QA testing screenshots
+/*.png
+/clean-cat-*.jpg

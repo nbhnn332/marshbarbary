@@ -1,0 +1,32 @@
+<!-- ==========================================
+     COMPONENT: Product Quick View Modal Shell
+     ========================================== -->
+<div class="modal-overlay product-modal-overlay" aria-modal="true" role="dialog">
+  <div class="product-modal-card">
+    <button type="button" class="modal-close-btn product-modal-close" aria-label="Close dialog">&times;</button>
+    
+    <!-- Image Preview -->
+    <div class="modal-product-image-wrap">
+      <img src="" alt="" class="modal-product-image" />
+    </div>
+
+    <!-- Product Details -->
+    <div class="modal-product-details">
+      <div>
+        <span class="heading-sub" style="display: block; margin-bottom: 6px;">MARSH BARBARY</span>
+        <h3 class="modal-product-title">Product Name</h3>
+        <div class="modal-product-price" style="margin: 8px 0 14px 0;">₹0</div>
+        <p class="modal-product-desc">Product description goes here.</p>
+      </div>
+
+      <div class="modal-swatches-box"></div>
+      <div class="modal-sizes-box"></div>
+
+      <div style="display: flex; gap: 12px; margin-top: 12px;">
+        <button type="button" class="btn btn-dark" style="flex-grow: 1;" onclick="MB_MODAL.addActiveToCart()">
+          Add to Bag &rarr;
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

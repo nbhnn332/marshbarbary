@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Portal Login | MARSH BARBARY</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="icon" type="image/png" href="../assets/images/logo-emblem.png">
+  <link rel="stylesheet" href="../css/admin.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: var(--mb-admin-bg);
+      background-image: radial-gradient(#EFE9E0 1px, transparent 1px);
+      background-size: 24px 24px;
+      padding: var(--mb-space-4);
+      margin: 0;
+    }
+    .admin-login-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--mb-admin-surface);
+      border: 1px solid var(--mb-admin-border);
+      border-radius: var(--mb-radius-lg);
+      padding: 40px;
+      box-shadow: 0 12px 32px rgba(38, 32, 29, 0.05);
+    }
+    .admin-login-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .admin-login-logo {
+      font-family: var(--font-serif);
+      font-size: 26px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 500;
+      color: var(--mb-admin-text);
+      display: block;
+      margin-bottom: 8px;
+    }
+    .admin-login-subtitle {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--mb-admin-muted);
+    }
+    .demo-credentials {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--mb-admin-border);
+    }
+    .demo-pill-group {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .demo-pill {
+      flex: 1;
+      padding: 6px 4px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--mb-admin-bg);
+      border: 1px solid var(--mb-admin-border);
+      border-radius: var(--mb-radius-sm);
+      cursor: pointer;
+      color: var(--mb-admin-text);
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .demo-pill:hover {
+      border-color: var(--mb-admin-accent);
+      color: var(--mb-admin-accent);
+    }
+    .back-store {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--mb-admin-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-store:hover {
+      color: var(--mb-admin-accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-login-card">
+    <div class="admin-login-header">
+      <div class="admin-login-logo">
+        <a href="../index.html" aria-label="Marsh Barbary Storefront">
+          <img src="../assets/images/logo-horizontal.png" alt="MARSH BARBARY" style="height: 32px; width: auto; display: block; margin: 0 auto;">
+        </a>
+      </div>
+      <div style="display: flex; justify-content: center; margin-bottom: 8px;">
+        <span class="admin-brand-tag" style="font-size: 10px; padding: 3px 8px;">OPERATIONS PORTAL</span>
+      </div>
+      <span class="admin-login-subtitle" style="display: block;">Atelier Operations & Storefront Console</span>
+    </div>
+
+    <div id="login-error" class="admin-badge admin-badge-danger" style="display:none; width: 100%; margin-bottom: 16px; padding: 10px 14px; font-size: 12px; border-radius: var(--mb-radius-sm); line-height: 1.4;">
+    </div>
+
+    <form id="login-form">
+      <div class="admin-form-group">
+        <label class="admin-label" for="login-email">Staff Email Address</label>
+        <input type="email" id="login-email" class="admin-input" required placeholder="admin@marshbarbary.com" autocomplete="username">
+      </div>
+
+      <div class="admin-form-group">
+        <label class="admin-label" for="login-password">Access Password</label>
+        <input type="password" id="login-password" class="admin-input" required placeholder="••••••••" autocomplete="current-password">
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+        <label style="display:flex; align-items:center; gap: 8px; font-size: 12px; color: var(--mb-admin-text-sub); cursor:pointer;">
+          <input type="checkbox" id="remember-me" checked> Remember session
+        </label>
+      </div>
+
+      <button type="submit" class="admin-btn admin-btn-primary" style="width: 100%; justify-content: center; padding: 12px;">
+        Enter Admin Console
+      </button>
+    </form>
+
+    <div class="demo-credentials">
+      <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--mb-admin-muted); text-align: center;">
+        Quick Role Selection (Development)
+      </div>
+      <div class="demo-pill-group">
+        <button type="button" class="demo-pill" onclick="fillCreds('superadmin@marshbarbary.com')">Super Admin</button>
+        <button type="button" class="demo-pill" onclick="fillCreds('admin@marshbarbary.com')">Store Admin</button>
+        <button type="button" class="demo-pill" onclick="fillCreds('staff@marshbarbary.com')">Staff</button>
+      </div>
+    </div>
+
+    <a href="../index.html" class="back-store">← Return to Customer Storefront</a>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../js/admin/admin-models.js"></script>
+  <script src="../js/admin/admin-service.js"></script>
+  <script src="../js/admin/admin-auth.js"></script>
+  <script>
+    // If already authenticated with a valid session, redirect to dashboard
+    if (window.MB_ADMIN_AUTH && window.MB_ADMIN_AUTH.isAuthenticated()) {
+      window.location.replace('index.html#/dashboard');
+    }
+
+    function fillCreds(email) {
+      document.getElementById('login-email').value = email;
+      document.getElementById('login-password').value = 'admin123';
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errBox = document.getElementById('login-error');
+      errBox.style.display = 'none';
+
+      const email = document.getElementById('login-email').value;
+      const pass = document.getElementById('login-password').value;
+      const remember = document.getElementById('remember-me').checked;
+
+      try {
+        await window.MB_ADMIN_AUTH.login(email, pass, remember);
+        window.location.href = 'index.html#/dashboard';
+      } catch (err) {
+        errBox.textContent = err.message || 'Login failed';
+        errBox.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

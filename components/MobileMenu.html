@@ -1,0 +1,73 @@
+<!-- ==========================================
+     COMPONENT: Mobile Navigation Drawer
+     ========================================== -->
+<div class="mobile-drawer-overlay"></div>
+<aside class="mobile-drawer" aria-label="Mobile Navigation Menu">
+  <div>
+    <!-- Drawer Top Bar -->
+    <div class="mobile-drawer-header">
+      <a href="index.html" class="brand-logo">
+        <img src="assets/images/logo-horizontal.png" alt="MARSH BARBARY" style="height: 28px;" />
+      </a>
+      <button type="button" class="mobile-drawer-close" aria-label="Close menu">&times;</button>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="mobile-drawer-links">
+      <a href="shop.html" class="mobile-drawer-link">
+        <span>Shop</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+      <a href="#collections" class="mobile-drawer-link">
+        <span>Collections</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+      <a href="#story" class="mobile-drawer-link">
+        <span>About</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+      <a href="#values" class="mobile-drawer-link">
+        <span>Sustainability</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+      <a href="#footer" class="mobile-drawer-link">
+        <span>Contact</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </a>
+    </nav>
+
+    <!-- Quick Utilities -->
+    <div class="mobile-drawer-actions">
+      <a href="shop.html" class="mobile-action-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <span>Search</span>
+      </a>
+      <a href="#" class="mobile-action-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>Account</span>
+      </a>
+      <a href="#" class="mobile-action-item" data-action="open-cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+        <span>Bag (<span class="cart-badge-text">1</span>)</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Social Icons in Mobile Drawer -->
+  <div class="mobile-drawer-footer">
+    <div class="mobile-drawer-socials">
+      <a href="#" class="social-icon-link" aria-label="Instagram">
+        <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+      </a>
+      <a href="#" class="social-icon-link" aria-label="Facebook">
+        <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+      </a>
+      <a href="#" class="social-icon-link" aria-label="Pinterest">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-3.6 19.33c-.04-.84-.07-2.14.02-3.06.07-.84.47-5.36.47-5.36s-.12-.24-.12-.6c0-.56.32-.98.73-.98.34 0 .5.26.5.57 0 .35-.22.87-.34 1.35-.1.4.19.72.58.72.7 0 1.24-.74 1.24-1.8 0-.94-.68-1.6-1.65-1.6-1.2 0-1.9 1-1.9 1.83 0 .36.14.75.31.96.03.04.04.07.03.12-.03.13-.1.4-.12.45-.02.08-.06.1-.14.06-.5-.23-.81-.96-.81-1.54 0-1.25.91-2.4 2.63-2.4 1.4 0 2.49 1 2.49 2.33 0 1.39-.88 2.51-2.1 2.51-.41 0-.8-.21-.93-.46l-.25.97c-.09.35-.33.79-.49 1.05A10 10 0 1 0 12 2z"></path></svg>
+      </a>
+      <a href="#" class="social-icon-link" aria-label="YouTube">
+        <svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
+      </a>
+    </div>
+  </div>
+</aside>

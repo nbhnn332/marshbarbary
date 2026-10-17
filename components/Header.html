@@ -1,0 +1,63 @@
+<!-- ==========================================
+     COMPONENT: Header (Sticky Navigation)
+     ========================================== -->
+<header class="site-header">
+  <div class="container-wide">
+    <div class="header-inner">
+      
+      <!-- Mobile Hamburger Toggle -->
+      <button type="button" class="mobile-menu-toggle" aria-label="Open Navigation Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- Brand Logo -->
+      <a href="index.html" class="brand-logo" aria-label="Marsh Barbary Home">
+        <img src="assets/images/logo-horizontal.png" alt="MARSH BARBARY" class="brand-logo-img" />
+      </a>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="desktop-nav" aria-label="Main Navigation">
+        <a href="shop.html" class="nav-link">Shop</a>
+        <a href="#collections" class="nav-link">Collections</a>
+        <a href="#story" class="nav-link">About</a>
+        <a href="#values" class="nav-link">Sustainability</a>
+        <a href="#footer" class="nav-link">Contact</a>
+      </nav>
+
+      <!-- Header Utilities (Search, Profile, Bag) -->
+      <div class="header-actions">
+        
+        <!-- Search Input -->
+        <div class="header-search">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="search" placeholder="Search products..." class="header-search-input" aria-label="Search products" />
+        </div>
+
+        <!-- Account Profile Icon -->
+        <button type="button" class="icon-btn" aria-label="Customer Account">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </button>
+
+        <!-- Shopping Bag Icon with Counter Badge -->
+        <button type="button" class="icon-btn" aria-label="Shopping Bag" data-action="open-cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+          <span class="cart-badge">1</span>
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+</header>
