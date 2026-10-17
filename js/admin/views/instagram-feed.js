@@ -65,10 +65,10 @@ window.MB_ADMIN_VIEWS['instagram-feed'] = {
             <div class="admin-card" data-id="${post.id}" style="background: #FFF; border: 1px solid var(--mb-admin-border, #E5E5E5); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.2s ease;">
               <!-- Thumbnail & Status Header -->
               <div style="position: relative; aspect-ratio: 1 / 1; background: #F5F5F5; overflow: hidden;">
-                <img src="${post.img.startsWith('http') || post.img.startsWith('assets/') ? '../' + post.img.replace(/^\.\.\//, '') : post.img}" 
+                <img src="${post.img && !post.img.includes('assets/images/') ? post.img : 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=85'}" 
                      alt="Post preview" 
                      style="width: 100%; height: 100%; object-fit: cover; opacity: ${post.active === false ? 0.4 : 1};"
-                     onerror="this.src='../assets/images/logo-emblem.png'; this.style.objectFit='contain'; this.style.padding='40px';" />
+                     onerror="this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=85';" />
                 
                 <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.65); color: #FFF; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; backdrop-filter: blur(2px);">
                   #${idx + 1}
@@ -131,9 +131,9 @@ window.MB_ADMIN_VIEWS['instagram-feed'] = {
               <input type="hidden" id="ig-form-id" />
               
               <div style="margin-bottom: 16px;">
-                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #1A1A1A;">Image URL / Path *</label>
-                <input type="text" id="ig-form-img" required placeholder="e.g. assets/images/instagram/ig-post-1.jpg or https://..." style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid #E5E5E5; border-radius: 4px; box-sizing: border-box;" />
-                <span style="font-size: 11px; color: #767676; display: block; margin-top: 4px;">You can paste an external image URL or link to an asset inside assets/images/</span>
+                <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #1A1A1A;">Image URL *</label>
+                <input type="text" id="ig-form-img" required placeholder="https://images.unsplash.com/... or https://..." style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid #E5E5E5; border-radius: 4px; box-sizing: border-box;" />
+                <span style="font-size: 11px; color: #767676; display: block; margin-top: 4px;">Paste an external image CDN URL or direct link</span>
               </div>
 
               <div style="margin-bottom: 16px;">

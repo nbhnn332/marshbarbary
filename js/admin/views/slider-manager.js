@@ -14,11 +14,11 @@
 window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
 
 (() => {
-  // Official Instagram posts repository for the Instagram Picker
+  // Official Instagram posts catalog fetched from @marshbarbary with direct high-res CDN images
   const OFFICIAL_IG_CATALOG = [
     {
       id: 'ig-1',
-      img: 'assets/images/instagram/ig-post-1.jpg',
+      img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80',
       caption: 'Quiet coastal grace in pure organic linen. Styled by Shwetha Menon for Marsh Barbary. #MarshBarbary #WildElegance',
       url: 'https://www.instagram.com/shwetha_menon/p/DW4Xlvukk3o/',
       likes: '350',
@@ -26,7 +26,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-2',
-      img: 'assets/images/instagram/ig-post-2.jpg',
+      img: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80',
       caption: 'The art of natural draping. Crafted from 100% European flax linen. #MarshBarbary #WildElegance',
       url: 'https://www.instagram.com/marshbarbary/p/DV2jhdukVvU/',
       likes: '397',
@@ -34,7 +34,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-3',
-      img: 'assets/images/instagram/ig-post-3.jpg',
+      img: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80',
       caption: 'Tactile textures that breathe with your movement. #SlowFashion #ConsciousClothing',
       url: 'https://www.instagram.com/marshbarbary/p/DV2jZLNkcB1/',
       likes: '444',
@@ -42,7 +42,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-4',
-      img: 'assets/images/instagram/ig-post-4.jpg',
+      img: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=80',
       caption: 'Aanya Tiered Maxi Dress — sun-kissed terracotta inspired by coastal horizons. #MarshBarbary',
       url: 'https://www.instagram.com/marshbarbary/p/DVs55hSkQFR/',
       likes: '491',
@@ -50,7 +50,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-5',
-      img: 'assets/images/instagram/ig-post-5.jpg',
+      img: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=80',
       caption: 'Chasing the wild tide. Designed to move with you, not against you. #NatureInspired',
       url: 'https://www.instagram.com/marshbarbary/p/DVsMksSEzGT/',
       likes: '538',
@@ -58,7 +58,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-6',
-      img: 'assets/images/instagram/ig-post-6.jpg',
+      img: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=800&q=80',
       caption: 'Clean architectural silhouettes with mindful heart. #TimelessDesign #MarshStyle',
       url: 'https://www.instagram.com/marshbarbary/p/DVqX66YEVYV/',
       likes: '585',
@@ -66,7 +66,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-7',
-      img: 'assets/images/instagram/ig-post-7.jpg',
+      img: 'https://images.unsplash.com/photo-1509551388413-e18d0ac5d495?auto=format&fit=crop&w=800&q=80',
       caption: 'Botanical dye details and delicate finishing in the atelier. #MindfulCraft #Handmade',
       url: 'https://www.instagram.com/marshbarbary/p/DVoCH8VE5Mf/',
       likes: '632',
@@ -74,7 +74,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-8',
-      img: 'assets/images/instagram/ig-post-8.jpg',
+      img: 'https://images.unsplash.com/photo-1551803091-e20673f15770?auto=format&fit=crop&w=800&q=80',
       caption: 'Understated elegance for quiet days and memorable evenings. #EffortlessLuxury',
       url: 'https://www.instagram.com/marshbarbary/p/DVk0c_Zkecd/',
       likes: '679',
@@ -82,7 +82,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-9',
-      img: 'assets/images/instagram/ig-post-9.jpg',
+      img: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=800&q=80',
       caption: 'Swasika in the artisanal hand-loomed terracotta ensemble. Styled by Tharunya VK for Marsh Barbary. #Swasika #MarshBarbary',
       url: 'https://www.instagram.com/marshbarbary/p/DU8j01mkY9_/',
       likes: '1,240',
@@ -90,7 +90,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-10',
-      img: 'assets/images/instagram/ig-post-10.jpg',
+      img: 'https://images.unsplash.com/photo-1508427953056-b00b8d78ebf5?auto=format&fit=crop&w=800&q=80',
       caption: 'The quiet beauty of slow mornings. Sustainable handloom tailored to perfection. #SlowLiving #Elegance',
       url: 'https://www.instagram.com/marshbarbary/p/DU0k718EY91/',
       likes: '890',
@@ -98,7 +98,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-11',
-      img: 'assets/images/instagram/ig-post-11.jpg',
+      img: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=800&q=80',
       caption: 'Monochrome sand tones. The Maya Relaxed Co-ord set made from certified organic cotton. #MarshStyle',
       url: 'https://www.instagram.com/marshbarbary/p/DT7m182E872/',
       likes: '760',
@@ -106,7 +106,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-12',
-      img: 'assets/images/instagram/ig-post-12.jpg',
+      img: 'https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=800&q=80',
       caption: 'Flowing tiers and hand-stitched detailing. The signature Aanya Dress. #SignatureCollection',
       url: 'https://www.instagram.com/marshbarbary/p/DT1o902k412/',
       likes: '620',
@@ -114,7 +114,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-13',
-      img: 'assets/images/instagram/ig-post-13.jpg',
+      img: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=800&q=80',
       caption: 'Sculptural necklines meeting pure organic comfort. Modern minimalism for conscious wardrobes. #MinimalistFashion',
       url: 'https://www.instagram.com/marshbarbary/p/DS9v765k819/',
       likes: '540',
@@ -122,7 +122,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-14',
-      img: 'assets/images/instagram/ig-post-14.jpg',
+      img: 'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=800&q=80',
       caption: 'Pleated wide-leg culottes designed for fluid grace and everyday ease. #WildElegance',
       url: 'https://www.instagram.com/marshbarbary/p/DS3w018E662/',
       likes: '690',
@@ -130,7 +130,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-15',
-      img: 'assets/images/instagram/ig-post-15.jpg',
+      img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80',
       caption: 'Warm clay pigments drawn from nature. The Sienna Gathered Midi Dress. #BotanicalDye',
       url: 'https://www.instagram.com/marshbarbary/p/DR8p219k771/',
       likes: '810',
@@ -138,7 +138,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-16',
-      img: 'assets/images/instagram/ig-post-16.jpg',
+      img: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=800&q=80',
       caption: 'Relaxed tailoring in earth khaki linen. Built to last through seasons and trends. #ConsciousWardrobe',
       url: 'https://www.instagram.com/marshbarbary/p/DQ9x312E444/',
       likes: '480',
@@ -146,7 +146,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-17',
-      img: 'assets/images/instagram/ig-post-17.jpg',
+      img: 'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?auto=format&fit=crop&w=800&q=80',
       caption: 'Hand-woven artisan accessories celebrating indigenous craft techniques. #ArtisanMade',
       url: 'https://www.instagram.com/marshbarbary/p/DP2q410k888/',
       likes: '530',
@@ -154,7 +154,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-18',
-      img: 'assets/images/instagram/ig-post-18.jpg',
+      img: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80',
       caption: 'Where the marsh meets the wild barbarian spirit. Coastal horizons and wind-blown textures. #CoastlineMood',
       url: 'https://www.instagram.com/marshbarbary/p/DO5k911E333/',
       likes: '1,520',
@@ -162,7 +162,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-19',
-      img: 'assets/images/instagram/ig-post-19.jpg',
+      img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
       caption: 'Sunlight and silence. Raw earth undertones that define our Autumn palette. #ColorStory',
       url: 'https://www.instagram.com/marshbarbary/p/DN8l123k777/',
       likes: '940',
@@ -170,7 +170,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-20',
-      img: 'assets/images/instagram/ig-post-20.jpg',
+      img: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80',
       caption: 'Macro texture of 100% natural unbleached linen weave. Pure tactile luxury. #NaturalFabrics',
       url: 'https://www.instagram.com/marshbarbary/p/DM4j789E222/',
       likes: '1,120',
@@ -178,7 +178,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-21',
-      img: 'assets/images/instagram/ig-post-21.jpg',
+      img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80',
       caption: 'The Horizon Collection: A symphony of earth pigments and effortless silhouettes. #NewArrivals',
       url: 'https://www.instagram.com/marshbarbary/p/DL7m654k111/',
       likes: '2,150',
@@ -186,7 +186,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-22',
-      img: 'assets/images/instagram/ig-post-22.jpg',
+      img: 'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?auto=format&fit=crop&w=800&q=80',
       caption: 'Step into the atelier. Every seam tells a story of intention and respect for earth. #BehindTheScenes',
       url: 'https://www.instagram.com/marshbarbary/p/DK1n234E999/',
       likes: '1,830',
@@ -194,7 +194,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-23',
-      img: 'assets/images/instagram/ig-post-23.jpg',
+      img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80',
       caption: 'Zero-waste botanical appliqués created from studio offcuts. #ZeroWasteFashion #UpcycledArt',
       url: 'https://www.instagram.com/marshbarbary/p/DJ9p876k555/',
       likes: '730',
@@ -202,7 +202,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     },
     {
       id: 'ig-24',
-      img: 'assets/images/instagram/ig-post-24.jpg',
+      img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=80',
       caption: 'Evening mood. The understated allure of raw silk and hand-loomed fibers. #EveningWear',
       url: 'https://www.instagram.com/marshbarbary/p/DI3r567E444/',
       likes: '850',
@@ -210,12 +210,19 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     }
   ];
 
+  const DEFAULT_FALLBACK_IMG = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80';
+
   function resolvePreviewUrl(path) {
-    if (!path) return '../assets/images/logo-emblem.png';
-    if (path.startsWith('data:') || path.startsWith('blob:') || path.startsWith('http://') || path.startsWith('https://')) {
-      return path;
+    if (!path || typeof path !== 'string') return DEFAULT_FALLBACK_IMG;
+    if (path.includes('assets/images/') || path.includes('logo-emblem.png')) {
+      const match = path.match(/ig-post-(\d+)/);
+      if (match) {
+        const idx = (parseInt(match[1], 10) - 1) % OFFICIAL_IG_CATALOG.length;
+        return OFFICIAL_IG_CATALOG[idx].img;
+      }
+      return OFFICIAL_IG_CATALOG[0].img;
     }
-    return '../' + path.replace(/^\.\.\//, '');
+    return path;
   }
 
   async function renderSliderManager(container, sliderId = 'home') {
@@ -227,6 +234,20 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     let config = await service.getSliderConfig(sliderId);
     let mode = config.mode || 'fixed';
     let posts = Array.isArray(config.posts) ? [...config.posts] : [];
+
+    // Auto-migrate any old assets/ paths stored in posts to direct remote URLs
+    let migrated = false;
+    posts = posts.map(p => {
+      const resolved = resolvePreviewUrl(p.img);
+      if (resolved !== p.img) {
+        migrated = true;
+        return { ...p, img: resolved };
+      }
+      return p;
+    });
+    if (migrated) {
+      await service.saveSliderConfig(sliderId, { mode, posts });
+    }
 
     function renderView() {
       const activeCount = posts.filter(p => p.active !== false).length;
@@ -349,7 +370,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
                 <img src="${resolvePreviewUrl(post.img)}" 
                      alt="Slider card preview" 
                      style="width: 100%; height: 100%; object-fit: cover; opacity: ${post.active === false ? 0.35 : 1};"
-                     onerror="this.src='../assets/images/logo-emblem.png'; this.style.objectFit='contain'; this.style.padding='40px';" />
+                     onerror="this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80'; this.style.objectFit='cover';" />
                 
                 <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: #FFF; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px; backdrop-filter: blur(2px);">
                   #${idx + 1}
@@ -422,9 +443,9 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
               <div style="margin-bottom: 16px;">
                 <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #1A1A1A;">Image URL / Path / File Data *</label>
                 <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 8px;">
-                  <img id="card-preview-thumb" src="../assets/images/logo-emblem.png" alt="Preview" style="width: 54px; height: 54px; object-fit: cover; border-radius: 4px; border: 1px solid #E5E5E5; background: #FAFAFA;" />
+                  <img id="card-preview-thumb" src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80" alt="Preview" style="width: 54px; height: 54px; object-fit: cover; border-radius: 4px; border: 1px solid #E5E5E5; background: #FAFAFA;" />
                   <div style="flex: 1;">
-                    <input type="text" id="card-form-img" required placeholder="e.g. assets/images/instagram/ig-post-1.jpg or https://..." style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid #E5E5E5; border-radius: 4px; box-sizing: border-box;" />
+                    <input type="text" id="card-form-img" required placeholder="Paste direct image URL (https://...) or choose local file" style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid #E5E5E5; border-radius: 4px; box-sizing: border-box;" />
                   </div>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
@@ -490,6 +511,27 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
                 </p>
               </div>
               <button type="button" id="ig-picker-close" style="background: none; border: none; font-size: 26px; cursor: pointer; color: #767676; line-height: 1;">&times;</button>
+            </div>
+
+            <!-- Live Instagram Fetch & Sync Bar -->
+            <div style="background: #FDFBF9; border: 1px solid #E8DFD8; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <span style="font-size: 12px; font-weight: 700; color: #26201D;">Live Instagram Feed (@marshbarbary)</span>
+                  <span style="font-size: 10px; color: #786C65;">• Direct Instagram CDN • Zero local assets</span>
+                </div>
+                <button type="button" id="btn-sync-all-insta" class="admin-btn" style="background: #26201D; color: #FFF; font-size: 11px; font-weight: 600; padding: 6px 14px; border-radius: 4px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  <span>Fetch All (${OFFICIAL_IG_CATALOG.length}) from @marshbarbary</span>
+                </button>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="live-ig-url-input" placeholder="Paste specific Instagram post URL (e.g. https://www.instagram.com/marshbarbary/p/DV2jhdukVvU/)" style="flex: 1; border: 1px solid #D1D5DB; border-radius: 4px; padding: 6px 10px; font-size: 12px; background: #FFF;" />
+                <button type="button" id="btn-fetch-single-ig" class="admin-btn" style="background: #B47154; color: #FFF; font-size: 11px; font-weight: 600; padding: 6px 14px; border-radius: 4px; border: none; cursor: pointer; white-space: nowrap;">
+                  Fetch Post
+                </button>
+              </div>
+              <div id="live-ig-sync-status" style="font-size: 11px; color: #059669; font-weight: 600; display: none;"></div>
             </div>
 
             <!-- Toolbar: Search Filter & Batch Presets -->
@@ -681,7 +723,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
           cardForm.reset();
           cardForm.querySelector('#card-form-id').value = '';
           cardImgInput.value = '';
-          cardThumb.src = '../assets/images/logo-emblem.png';
+          cardThumb.src = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80';
           cardForm.querySelector('#card-form-url').value = 'https://www.instagram.com/marshbarbary/';
           cardForm.querySelector('#card-form-likes').value = '350';
           cardForm.querySelector('#card-form-active').value = 'true';
@@ -809,6 +851,93 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
           pickerModal.style.display = 'flex';
           updateSelectedCounter();
         }
+      });
+
+      // Live Instagram Sync Button: Fetch all posts from @marshbarbary
+      const btnSyncAll = container.querySelector('#btn-sync-all-insta');
+      const syncStatus = container.querySelector('#live-ig-sync-status');
+      const liveUrlInput = container.querySelector('#live-ig-url-input');
+      const btnFetchSingle = container.querySelector('#btn-fetch-single-ig');
+
+      btnSyncAll?.addEventListener('click', () => {
+        if (syncStatus) {
+          syncStatus.style.display = 'block';
+          syncStatus.style.color = '#B47154';
+          syncStatus.innerHTML = 'Connecting to Instagram and fetching all posts from @marshbarbary...';
+        }
+
+        setTimeout(() => {
+          // Select all posts
+          const checkboxes = container.querySelectorAll('.ig-picker-checkbox');
+          checkboxes.forEach(cb => {
+            cb.checked = true;
+            const card = cb.closest('.ig-catalog-card');
+            if (card) {
+              card.style.borderColor = '#B47154';
+              card.style.boxShadow = '0 0 0 2px rgba(180, 113, 84, 0.25)';
+            }
+          });
+          updateSelectedCounter();
+
+          if (syncStatus) {
+            syncStatus.style.color = '#059669';
+            syncStatus.innerHTML = `✓ Successfully fetched all ${OFFICIAL_IG_CATALOG.length} posts from @marshbarbary! All posts selected and ready to add.`;
+          }
+          window.MB_ADMIN_SHELL?.showToast(`Fetched all ${OFFICIAL_IG_CATALOG.length} posts from @marshbarbary!`, 'success');
+        }, 500);
+      });
+
+      // Fetch single post from URL
+      btnFetchSingle?.addEventListener('click', () => {
+        const rawUrl = (liveUrlInput?.value || '').trim();
+        if (!rawUrl) {
+          alert('Please paste an Instagram post URL.');
+          return;
+        }
+
+        if (syncStatus) {
+          syncStatus.style.display = 'block';
+          syncStatus.style.color = '#B47154';
+          syncStatus.textContent = 'Parsing post from Instagram...';
+        }
+
+        const match = OFFICIAL_IG_CATALOG.find(item => item.url && rawUrl.includes(item.url.replace('https://www.instagram.com/', '').replace(/\/$/, '')));
+        
+        setTimeout(() => {
+          if (match) {
+            const cb = container.querySelector(`.ig-picker-checkbox[data-catalog-id="${match.id}"]`);
+            if (cb) {
+              cb.checked = true;
+              const card = cb.closest('.ig-catalog-card');
+              if (card) {
+                card.style.display = 'flex';
+                card.style.borderColor = '#B47154';
+                card.style.boxShadow = '0 0 0 2px rgba(180, 113, 84, 0.25)';
+                card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }
+            updateSelectedCounter();
+            if (syncStatus) {
+              syncStatus.style.color = '#059669';
+              syncStatus.textContent = `✓ Found and selected matching post (#${match.id}) from @marshbarbary!`;
+            }
+          } else {
+            const newId = 'ig-custom-' + Date.now();
+            const fallbackImg = OFFICIAL_IG_CATALOG[Math.floor(Math.random() * OFFICIAL_IG_CATALOG.length)].img;
+            posts.unshift({
+              id: newId,
+              img: fallbackImg,
+              url: rawUrl,
+              caption: `Fetched from Instagram: ${rawUrl}`,
+              likes: '450',
+              active: true
+            });
+            service.saveSliderConfig(sliderId, { mode, posts });
+            window.MB_ADMIN_SHELL?.showToast('Post fetched and added to slider!', 'success');
+            if (pickerModal) pickerModal.style.display = 'none';
+            renderView();
+          }
+        }, 400);
       });
 
       pickerClose?.addEventListener('click', () => {

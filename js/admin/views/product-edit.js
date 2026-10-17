@@ -31,8 +31,8 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
       fabric: '100% Certified Organic European Linen',
       care: 'Hand wash cold or gentle machine cycle. Dry flat.',
       fit: 'Relaxed modest fit.',
-      image: 'assets/images/prod-sienna.jpg',
-      gallery: ['assets/images/prod-sienna.jpg', 'assets/images/cat-dresses.jpg'],
+      image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85',
+      gallery: ['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85', 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=85'],
       variants: [
         { size: 'XS', color: 'Natural', stock: 2, sku: '' },
         { size: 'S', color: 'Natural', stock: 4, sku: '' },
@@ -190,7 +190,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
                           }
                         </div>
                         <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
-                          <input type="url" class="admin-input var-image-url" style="padding: 5px 8px; font-size: 12px;" value="${v.image_url || ''}" placeholder="https://... or assets/images/variant.jpg">
+                          <input type="url" class="admin-input var-image-url" style="padding: 5px 8px; font-size: 12px;" value="${v.image_url || ''}" placeholder="https://... or image URL">
                           <div style="display: flex; gap: 6px; align-items: center;">
                             <label class="admin-btn admin-btn-outline admin-btn-sm" style="cursor:pointer; font-size:11px; display:inline-flex; align-items:center; gap:5px; padding: 4px 10px;">
                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -338,7 +338,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
 
       const initialGallery = (product.gallery && product.gallery.length)
         ? product.gallery
-        : (product.image ? [product.image] : ['assets/images/prod-sienna.jpg']);
+        : (product.image ? [product.image] : ['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85']);
 
       galleryCtrl = window.MB_IMAGE_SOURCE.renderGallery('#pe-gallery-builder-mount', {
         initialImages: initialGallery
@@ -404,7 +404,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
         const reader = new FileReader();
         reader.onload = (ev) => {
           const dataUrl = ev.target.result;
-          if (urlInput) urlInput.value = `assets/images/${file.name}`;
+          if (urlInput) urlInput.value = dataUrl;
           updatePreview(dataUrl);
         };
         reader.readAsDataURL(file);
@@ -455,7 +455,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
                 <div class="var-img-preview-empty" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#9A8678;font-size:18px;">+</div>
               </div>
               <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
-                <input type="url" class="admin-input var-image-url" style="padding: 5px 8px; font-size: 12px;" placeholder="https://... or assets/images/variant.jpg">
+                <input type="url" class="admin-input var-image-url" style="padding: 5px 8px; font-size: 12px;" placeholder="https://... or image URL">
                 <div style="display: flex; gap: 6px; align-items: center;">
                   <label class="admin-btn admin-btn-outline admin-btn-sm" style="cursor:pointer; font-size:11px; display:inline-flex; align-items:center; gap:5px; padding: 4px 10px;">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -508,7 +508,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
       });
 
       // Main image & gallery extraction
-      let mainImage = product.image || 'assets/images/prod-sienna.jpg';
+      let mainImage = product.image || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';
       if (window.MB_IMAGE_SOURCE) {
         const mainVal = window.MB_IMAGE_SOURCE.getValue('#pe-main-img-mount');
         if (mainVal && mainVal.activeValue) {

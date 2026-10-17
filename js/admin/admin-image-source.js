@@ -32,13 +32,17 @@ window.MB_IMAGE_SOURCE = (() => {
     if (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:') || trimmed.startsWith('blob:')) {
       return trimmed;
     }
-    // If it's a relative asset path like "assets/...", prepend "../" for admin views
-    if (trimmed.startsWith('assets/')) {
-      return '../' + trimmed;
+    // If it references legacy assets/images/, map it to clean high-res CDN fallback
+    if (trimmed.includes('assets/images/')) {
+      if (trimmed.includes('banner') || trimmed.includes('hero')) return 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85';
+      if (trimmed.includes('cat-tops')) return 'https://images.unsplash.com/photo-1551803091-e20673f15770?auto=format&fit=crop&w=800&q=85';
+      if (trimmed.includes('cat-bottoms')) return 'https://images.unsplash.com/photo-1509551388413-e18d0ac5d495?auto=format&fit=crop&w=800&q=85';
+      if (trimmed.includes('cat-coords')) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=85';
+      if (trimmed.includes('cat-accessories')) return 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=85';
+      if (trimmed.includes('cat-dresses')) return 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=85';
+      return 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';
     }
-    if (trimmed.startsWith('../')) {
-      return trimmed;
-    }
+    // If it's a relative path, return as is
     return trimmed;
   }
 
@@ -130,7 +134,7 @@ window.MB_IMAGE_SOURCE = (() => {
           </div>
 
           <div id="custom-path-wrap-${id}" style="display: ${state.assetPath && !WORKSPACE_ASSETS.includes(state.assetPath) ? 'block' : 'none'}; margin-bottom: 8px;">
-            <input type="text" class="admin-input image-source-asset-input" id="input-asset-${id}" placeholder="e.g. assets/images/your-photo.jpg" value="${state.assetPath}">
+            <input type="text" class="admin-input image-source-asset-input" id="input-asset-${id}" placeholder="https://... or data:image/..." value="${state.assetPath}">
           </div>
         </div>
 
@@ -342,12 +346,12 @@ window.MB_IMAGE_SOURCE = (() => {
       const reader = new FileReader();
       reader.onload = (event) => {
         const dataUrl = event.target.result;
-        // In dev, store reference as assets/images/filename with live dataUrl preview
-        state.assetPath = `assets/images/${file.name}`;
+        // Store as self-contained dataUrl
+        state.assetPath = dataUrl;
         state.activeValue = dataUrl;
         selectAsset.value = 'custom';
         customPathWrap.style.display = 'block';
-        inputAsset.value = state.assetPath;
+        inputAsset.value = dataUrl;
 
         updatePreview();
         notifyChange();

@@ -5,6 +5,8 @@
 
 window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
 
+const DEFAULT_CAT_IMAGE = 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=85';
+
 window.MB_ADMIN_VIEWS.categories = {
   title: 'Categories & Silhouettes',
 
@@ -64,7 +66,7 @@ window.MB_ADMIN_VIEWS.categories = {
         <tr>
           <td style="font-weight: 600; color: var(--mb-admin-muted);">${c.displayOrder || 1}</td>
           <td>
-            <img src="${window.MB_IMAGE_SOURCE ? window.MB_IMAGE_SOURCE.resolveDisplayUrl(c.image || 'assets/images/cat-dresses.jpg') : '../' + (c.image || 'assets/images/cat-dresses.jpg')}" alt="" style="width: 48px; height: 60px; object-fit: cover; border-radius: 2px; border: 1px solid var(--mb-admin-border);">
+            <img src="${window.MB_IMAGE_SOURCE ? window.MB_IMAGE_SOURCE.resolveDisplayUrl(c.image || DEFAULT_CAT_IMAGE) : (c.image || DEFAULT_CAT_IMAGE)}" alt="" style="width: 48px; height: 60px; object-fit: cover; border-radius: 2px; border: 1px solid var(--mb-admin-border);" onerror="this.src='${DEFAULT_CAT_IMAGE}';">
           </td>
           <td>
             <div style="font-weight: 500; color: var(--mb-admin-text); font-size: 13px;">${c.name}</div>
@@ -140,7 +142,7 @@ window.MB_ADMIN_VIEWS.categories = {
         name: '',
         slug: '',
         description: '',
-        image: 'assets/images/cat-dresses.jpg',
+        image: DEFAULT_CAT_IMAGE,
         displayOrder: 1,
         status: 'active'
       };
@@ -201,7 +203,7 @@ window.MB_ADMIN_VIEWS.categories = {
         window.MB_IMAGE_SOURCE.render('#cat-img-source-mount', {
           id: 'cat-modal-source',
           label: 'Category Silhouette Visual *',
-          initialValue: data.image || 'assets/images/cat-dresses.jpg',
+          initialValue: data.image || DEFAULT_CAT_IMAGE,
           compact: true
         });
       }
@@ -233,7 +235,7 @@ window.MB_ADMIN_VIEWS.categories = {
       document.getElementById('category-modal-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        let catImage = data.image || 'assets/images/cat-dresses.jpg';
+        let catImage = data.image || DEFAULT_CAT_IMAGE;
         if (window.MB_IMAGE_SOURCE) {
           const val = window.MB_IMAGE_SOURCE.getValue('#cat-img-source-mount');
           if (val && val.activeValue) catImage = val.activeValue;
@@ -252,7 +254,7 @@ window.MB_ADMIN_VIEWS.categories = {
           name: nameVal,
           slug: cleanSlug,
           description: document.getElementById('cat-m-desc').value.trim(),
-          image: catImage || 'assets/images/cat-dresses.jpg',
+          image: catImage || DEFAULT_CAT_IMAGE,
           displayOrder: parseInt(document.getElementById('cat-m-order').value, 10) || 1,
           status: document.getElementById('cat-m-status').value
         };

@@ -158,7 +158,7 @@ window.MB_ADMIN_VIEWS['order-detail'] = {
                     ${(order.items || []).map(item => `
                       <tr>
                         <td>
-                          <img src="${window.MB_IMAGE_SOURCE ? window.MB_IMAGE_SOURCE.resolveDisplayUrl(item.image || 'assets/images/prod-sienna.jpg') : '../' + (item.image || 'assets/images/prod-sienna.jpg')}" alt="" style="width: 42px; height: 54px; object-fit: cover; border-radius: 2px; border: 1px solid var(--admin-border-subtle); background: #fdfdfd;">
+                          <img src="${window.MB_IMAGE_SOURCE ? window.MB_IMAGE_SOURCE.resolveDisplayUrl(item.image || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85') : (item.image || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85')}" alt="" style="width: 42px; height: 54px; object-fit: cover; border-radius: 2px; border: 1px solid var(--admin-border-subtle); background: #fdfdfd;" onerror="this.src='https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';">
                         </td>
                         <td>
                           <div style="font-weight: 500; color: var(--admin-text-primary);">${item.title}</div>
@@ -350,7 +350,7 @@ window.MB_ADMIN_VIEWS['order-detail'] = {
           <!-- Bill Header -->
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; border-bottom: 2px solid #222222; padding-bottom: 12px;">
             <div style="display: flex; gap: 14px; align-items: center;">
-              <img src="../assets/images/logo-horizontal.png" alt="MARSH BARBARY" style="height: 44px; width: auto; max-width: 180px; object-fit: contain;" onerror="this.src='/assets/images/logo-horizontal.png';">
+              <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 40'%3E%3Ctext x='50%25' y='28' text-anchor='middle' font-family='Cinzel, serif' font-size='22' font-weight='600' letter-spacing='0.22em' fill='%2326201D'%3EMARSH BARBARY%3C/text%3E%3C/svg%3E" alt="MARSH BARBARY" style="height: 38px; width: auto; max-width: 180px; object-fit: contain;">
               <div style="border-left: 1px solid #D5D0C8; padding-left: 14px;">
                 <div style="font-size: 13pt; font-weight: 700; letter-spacing: 0.12em; font-family: 'Cormorant Garamond', Georgia, serif; text-transform: uppercase;">
                   MARSH BARBARY
