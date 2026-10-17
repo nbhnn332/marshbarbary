@@ -27,10 +27,12 @@ window.MB_ADMIN_ROUTER = (() => {
     { pattern: /^#\/returns\/?$/, viewName: 'returns', params: () => ({}) },
     { pattern: /^#\/returns\/([^/?]+)/, viewName: 'return-detail', params: (m) => ({ id: m[1] }) },
 
-    // Marketing & Store
+    // Marketing & Content
     { pattern: /^#\/coupons\/?$/, viewName: 'coupons', params: () => ({}) },
     { pattern: /^#\/homepage\/?$/, viewName: 'homepage', params: () => ({}) },
-    { pattern: /^#\/instagram-feed\/?$/, viewName: 'instagram-feed', params: () => ({}) },
+    { pattern: /^#\/home-slider\/?$/, viewName: 'home-slider', params: () => ({}) },
+    { pattern: /^#\/about-slider\/?$/, viewName: 'about-slider', params: () => ({}) },
+    { pattern: /^#\/instagram-feed\/?$/, viewName: 'about-slider', params: () => ({}) },
 
     // Settings & Security
     { pattern: /^#\/admin-users\/?$/, viewName: 'admin-users', params: () => ({}) },

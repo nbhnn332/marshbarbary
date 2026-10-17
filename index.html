@@ -208,43 +208,56 @@
        6. OUR STORY (CINEMATIC FULL-IMAGE EDITORIAL BANNER)
        Single continuous visual. No cards, no separate panels.
        ========================================== -->
-  <section id="story" class="story-section site-section">
+  <!-- ==========================================
+       6. HOMEPAGE INSTAGRAM AUTO-SLIDER
+       ========================================== -->
+  <section id="home-instagram-feed" class="instagram-feed-section site-section" aria-label="Instagram Slider">
     <div class="container-wide">
-      <div class="story-banner" aria-label="Our Story Campaign">
-        
-        <img 
-          src="assets/images/story-banner.jpg" 
-          alt="Marsh Barbary - More Than Just Fashion" 
-          class="story-banner-img" 
-          loading="lazy" 
-        />
-        
-        <div class="story-banner-overlay"></div>
+      
+      <div class="instagram-header">
+        <span class="instagram-handle-badge">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          @marshbarbary
+        </span>
+        <h2 class="instagram-title">Curated by Marsh Barbary</h2>
+        <p class="instagram-subtitle">
+          Moments of wild elegance, slow craftsmanship, and timeless style from our Instagram community.
+        </p>
+      </div>
 
-        <div class="story-banner-content">
-          <span class="story-banner-tag">OUR STORY</span>
-          <h2 class="story-banner-headline">
-            More Than<br />
-            Just Fashion
-          </h2>
-          <p class="story-banner-desc">
-            At Marsh Barbary, we believe in clothing that empowers &mdash; 
-            thoughtfully designed, mindfully made, and inspired by 
-            the beauty of everyday life.
-          </p>
-          <a href="about.html" class="story-banner-btn">
-            <span>Discover Our Story</span>
-            <span class="story-banner-btn-arrow">&rarr;</span>
-          </a>
+      <!-- Home Slider Component Container -->
+      <div class="instagram-slider-container" id="home-instagram-slider" data-slider-id="home">
+        
+        <!-- Previous Arrow Button -->
+        <button type="button" class="instagram-slider-btn prev" aria-label="Previous Posts">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+
+        <!-- Viewport & Dynamic Track -->
+        <div class="instagram-slider-viewport">
+          <div class="instagram-slider-track">
+            <!-- Rendered dynamically via js/instagram-slider.js -->
+          </div>
         </div>
 
-        <div class="story-banner-quote-col">
-          <blockquote class="story-banner-quote">
-            &ldquo;A kinder wardrobe for a brighter tomorrow.&rdquo;
-          </blockquote>
-        </div>
+        <!-- Next Arrow Button -->
+        <button type="button" class="instagram-slider-btn next" aria-label="Next Posts">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+
+        <!-- Pagination Dots -->
+        <div class="instagram-slider-dots"></div>
 
       </div>
+
+      <!-- Follow Button CTA -->
+      <div class="instagram-footer-cta">
+        <a href="https://www.instagram.com/marshbarbary/" target="_blank" rel="noopener noreferrer" class="instagram-follow-btn" aria-label="Follow Marsh Barbary on Instagram">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          <span>Follow @marshbarbary on Instagram &rarr;</span>
+        </a>
+      </div>
+
     </div>
   </section>
 
@@ -507,6 +520,7 @@
   <script src="js/product-modal.js"></script>
   <script src="js/newsletter.js"></script>
   <script src="js/video-modal.js"></script>
+  <script src="js/instagram-slider.js"></script>
   <script src="js/main.js"></script>
 
 </body>

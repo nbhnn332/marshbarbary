@@ -17,7 +17,9 @@ window.MB_ADMIN_SERVICE = (() => {
     PAYMENTS: 'mb_admin_payments',
     SETTINGS: 'mb_admin_settings',
     AUDIT_LOGS: 'mb_admin_audit_logs',
-    INSTAGRAM_FEED: 'mb_admin_instagram_feed'
+    INSTAGRAM_FEED: 'mb_admin_instagram_feed',
+    HOME_SLIDER: 'mb_admin_home_slider',
+    ABOUT_SLIDER: 'mb_admin_about_slider'
   };
 
   // Helper to get or initialize collection
@@ -57,6 +59,8 @@ window.MB_ADMIN_SERVICE = (() => {
     getCollection(STORAGE_KEYS.PAYMENTS, models.seedPaymentSettings || {});
     getCollection(STORAGE_KEYS.SETTINGS, models.seedStoreSettings || {});
     getCollection(STORAGE_KEYS.AUDIT_LOGS, models.seedAuditLogs || []);
+    getCollection(STORAGE_KEYS.HOME_SLIDER, models.seedHomeSliderConfig || { mode: 'fixed', posts: models.seedInstagramFeed || [] });
+    getCollection(STORAGE_KEYS.ABOUT_SLIDER, models.seedAboutSliderConfig || { mode: 'fixed', posts: models.seedInstagramFeed || [] });
   }
 
   // Current session helper
@@ -1290,34 +1294,97 @@ window.MB_ADMIN_SERVICE = (() => {
     return config;
   }
 
-  // INSTAGRAM FEED MANAGEMENT
-  async function getInstagramFeed() {
-    return getCollection(STORAGE_KEYS.INSTAGRAM_FEED, window.MB_ADMIN_MODELS?.seedInstagramFeed);
-  }
-
-  async function saveInstagramFeed(posts) {
-    if (!Array.isArray(posts)) throw new Error('Instagram feed must be an array of posts');
-    setCollection(STORAGE_KEYS.INSTAGRAM_FEED, posts);
-
-    // Sync with Supabase if available
+  // INDEPENDENT SLIDER MANAGEMENT (Home Slider & About Slider)
+  async function getSliderConfig(sliderId = 'home') {
+    const isHome = sliderId === 'home';
+    const key = isHome ? STORAGE_KEYS.HOME_SLIDER : STORAGE_KEYS.ABOUT_SLIDER;
+    const models = window.MB_ADMIN_MODELS || {};
+    const defaultSeed = isHome ? models.seedHomeSliderConfig : models.seedAboutSliderConfig;
+    
+    // Check Supabase settings if configured
     if (window.MB_SUPABASE_CONFIG && window.MB_SUPABASE_CONFIG.isLiveConfigured()) {
       try {
         const { url, anonKey } = window.MB_SUPABASE_CONFIG;
-        await fetch(`${url}/rest/v1/settings?key=eq.instagram_feed`, {
+        const settingKey = isHome ? 'home_slider_config' : 'about_slider_config';
+        const res = await fetch(`${url}/rest/v1/settings?key=eq.${settingKey}&limit=1`, {
+          headers: { 'apikey': anonKey, 'Authorization': 'Bearer ' + anonKey }
+        });
+        if (res.ok) {
+          const rows = await res.json();
+          if (Array.isArray(rows) && rows[0]?.value) {
+            const val = rows[0].value;
+            if (val && typeof val === 'object') {
+              setCollection(key, val);
+              return val;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn(`[AdminService] Error fetching ${sliderId} slider config from Supabase:`, err);
+      }
+    }
+
+    let config = getCollection(key, defaultSeed || { mode: 'fixed', posts: [] });
+    // Normalize if array was stored previously
+    if (Array.isArray(config)) {
+      config = { mode: 'fixed', posts: config };
+      setCollection(key, config);
+    }
+    if (!config.mode) config.mode = 'fixed';
+    if (!Array.isArray(config.posts)) config.posts = [];
+    return config;
+  }
+
+  async function saveSliderConfig(sliderId = 'home', config) {
+    if (!config || typeof config !== 'object') throw new Error('Slider configuration must be an object');
+    const isHome = sliderId === 'home';
+    const key = isHome ? STORAGE_KEYS.HOME_SLIDER : STORAGE_KEYS.ABOUT_SLIDER;
+    const normalized = {
+      mode: config.mode === 'non-fixed' ? 'non-fixed' : 'fixed',
+      posts: Array.isArray(config.posts) ? config.posts : []
+    };
+
+    setCollection(key, normalized);
+
+    // Also mirror to legacy INSTAGRAM_FEED for About slider if needed
+    if (!isHome) {
+      setCollection(STORAGE_KEYS.INSTAGRAM_FEED, normalized.posts);
+    }
+
+    // Sync with Supabase settings table
+    if (window.MB_SUPABASE_CONFIG && window.MB_SUPABASE_CONFIG.isLiveConfigured()) {
+      try {
+        const { url, anonKey } = window.MB_SUPABASE_CONFIG;
+        const settingKey = isHome ? 'home_slider_config' : 'about_slider_config';
+        await fetch(`${url}/rest/v1/settings?key=eq.${settingKey}`, {
           method: 'PATCH',
           headers: {
             'apikey': anonKey,
             'Authorization': 'Bearer ' + anonKey,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ value: posts, updated_at: new Date().toISOString() })
+          body: JSON.stringify({ value: normalized, updated_at: new Date().toISOString() })
         });
       } catch (err) {
-        console.warn('[AdminService] Supabase instagram_feed sync error:', err);
+        console.warn(`[AdminService] Supabase ${sliderId} slider sync error:`, err);
       }
     }
 
-    logAction('INSTAGRAM_FEED_UPDATED', 'Content', 'instagram-feed', `Updated ${posts.length} Instagram feed posts`);
+    logAction('SLIDER_CONFIG_UPDATED', 'Content', `${sliderId}-slider`, `Updated ${isHome ? 'Homepage' : 'About'} slider: Mode=${normalized.mode}, ${normalized.posts.length} posts`);
+    return normalized;
+  }
+
+  // INSTAGRAM FEED MANAGEMENT (Backward compatibility mapping to About Slider)
+  async function getInstagramFeed() {
+    const config = await getSliderConfig('about');
+    return config.posts;
+  }
+
+  async function saveInstagramFeed(posts) {
+    if (!Array.isArray(posts)) throw new Error('Instagram feed must be an array of posts');
+    const config = await getSliderConfig('about');
+    config.posts = posts;
+    await saveSliderConfig('about', config);
     return posts;
   }
 
@@ -1489,6 +1556,8 @@ window.MB_ADMIN_SERVICE = (() => {
     deleteCoupon,
     getHomepageConfig,
     saveHomepageConfig,
+    getSliderConfig,
+    saveSliderConfig,
     getInstagramFeed,
     saveInstagramFeed,
     getAdminUsers,

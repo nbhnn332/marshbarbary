@@ -110,16 +110,6 @@ window.MB_ADMIN_MODELS = (() => {
       altText: 'Where Wild Elegance Meets Style',
       enabled: true
     },
-    storyBanner: {
-      tag: 'OUR STORY',
-      headline: 'More Than Just Fashion',
-      description: 'At Marsh Barbary, we believe in clothing that empowers — thoughtfully designed, mindfully made, and inspired by the beauty of everyday life.',
-      ctaText: 'Discover Our Story',
-      ctaLink: 'shop.html',
-      quote: 'A kinder wardrobe for a brighter tomorrow.',
-      image: 'assets/images/story-banner.jpg',
-      enabled: true
-    },
     newArrivals: {
       headline: 'New Arrivals',
       viewAllText: 'View All →',
@@ -291,6 +281,16 @@ window.MB_ADMIN_MODELS = (() => {
     }
   ];
 
+  const seedHomeSliderConfig = {
+    mode: 'fixed', // 'fixed' | 'non-fixed'
+    posts: JSON.parse(JSON.stringify(seedInstagramFeed))
+  };
+
+  const seedAboutSliderConfig = {
+    mode: 'fixed', // 'fixed' | 'non-fixed'
+    posts: JSON.parse(JSON.stringify(seedInstagramFeed))
+  };
+
   return {
     seedCategories,
     seedProducts,
@@ -306,6 +306,8 @@ window.MB_ADMIN_MODELS = (() => {
     seedPaymentSettings,
     seedStoreSettings,
     seedAuditLogs,
-    seedInstagramFeed
+    seedInstagramFeed,
+    seedHomeSliderConfig,
+    seedAboutSliderConfig
   };
 })();

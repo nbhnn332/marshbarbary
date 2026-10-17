@@ -278,6 +278,34 @@
   will-change: transform;
 }
 
+/* Non-Fixed Infinite Marquee Stream Mode */
+.instagram-slider-container.is-non-fixed .instagram-slider-viewport {
+  overflow: hidden;
+}
+
+.instagram-slider-container.is-non-fixed .instagram-slider-track.is-marquee {
+  width: max-content;
+  animation: mbInstagramMarquee 38s linear infinite;
+  transition: none !important;
+}
+
+.instagram-slider-container.is-non-fixed:hover .instagram-slider-track.is-marquee {
+  animation-play-state: paused;
+}
+
+.instagram-slider-container.is-non-fixed .instagram-slider-dots {
+  display: none !important;
+}
+
+@keyframes mbInstagramMarquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-50% - 10px));
+  }
+}
+
 /* Individual Post Card */
 .instagram-card {
   flex: 0 0 calc((100% - 60px) / 4);

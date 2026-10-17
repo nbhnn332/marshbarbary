@@ -1,13 +1,21 @@
 /**
- * MARSH BARBARY - INSTAGRAM AUTO-SLIDER (js/instagram-slider.js)
- * Fetches and displays real Instagram posts from @marshbarbary (https://www.instagram.com/marshbarbary/)
- * Featuring smooth automatic sliding, hover-pause, touch-swipe, and admin live configuration support.
+ * MARSH BARBARY — INSTAGRAM AUTO-SLIDER (js/instagram-slider.js)
+ * Dual independent Instagram slider engine for:
+ * 1. Homepage Slider (#home-instagram-slider, sliderId: "home")
+ * 2. About Page Slider (#about-instagram-slider, sliderId: "about")
+ * 
+ * Supports:
+ * - Independent configuration & post curation per slider
+ * - Fixed Mode: curated paginated carousel with dots and auto-slide
+ * - Non-Fixed Mode: infinite endless stream with continuous marquee & seamless wrap
+ * - Hover pause & mobile touch swiping
+ * - Local fallback to authentic @marshbarbary downloaded assets
  */
 
 (function () {
   'use strict';
 
-  // Real official posts fetched from @marshbarbary with local high-res fallbacks
+  // 8 Official high-res posts fetched from @marshbarbary
   const OFFICIAL_INSTAGRAM_POSTS = [
     {
       id: 'ig-1',
@@ -76,9 +84,15 @@
   ];
 
   class InstagramSlider {
-    constructor(containerSelector) {
-      this.container = document.querySelector(containerSelector);
+    constructor(elementOrSelector) {
+      this.container = typeof elementOrSelector === 'string' 
+        ? document.querySelector(elementOrSelector) 
+        : elementOrSelector;
+
       if (!this.container) return;
+
+      this.sliderId = this.container.dataset.sliderId || 
+                      (this.container.id && this.container.id.includes('home') ? 'home' : 'about');
 
       this.track = this.container.querySelector('.instagram-slider-track');
       this.dotsContainer = this.container.querySelector('.instagram-slider-dots');
@@ -86,10 +100,11 @@
       this.nextBtn = this.container.querySelector('.instagram-slider-btn.next');
       this.viewport = this.container.querySelector('.instagram-slider-viewport');
 
+      this.mode = 'fixed'; // 'fixed' or 'non-fixed'
       this.posts = OFFICIAL_INSTAGRAM_POSTS;
       this.currentIndex = 0;
       this.autoSlideInterval = null;
-      this.slideDelay = 3500; // 3.5 seconds
+      this.slideDelay = 3500;
 
       // Touch drag state
       this.isDragging = false;
@@ -99,63 +114,96 @@
     }
 
     async init() {
-      // 1. Check local admin management storage first
-      try {
-        const stored = localStorage.getItem('mb_admin_instagram_feed');
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            this.posts = parsed;
-          }
-        }
-      } catch (e) {
-        console.warn('Error reading local instagram feed:', e);
-      }
+      // 1. Load local admin configuration
+      this.loadLocalConfig();
 
-      // 2. Attempt to fetch remote feed from Supabase settings if configured
-      await this.fetchRemotePosts();
+      // 2. Fetch remote Supabase config if live
+      await this.fetchRemoteConfig();
 
-      // 3. Filter for active posts only
+      // 3. Filter active posts
       this.posts = this.posts.filter(p => p.active !== false);
       if (this.posts.length === 0) {
         this.posts = OFFICIAL_INSTAGRAM_POSTS;
       }
 
-      // 4. Render cards
-      this.renderPosts();
+      // 4. Update container mode class
+      if (this.mode === 'non-fixed') {
+        this.container.classList.add('is-non-fixed');
+      } else {
+        this.container.classList.remove('is-non-fixed');
+      }
 
-      // 5. Setup event listeners
+      // 5. Render cards
+      this.render();
+
+      // 6. Setup event listeners
       this.setupListeners();
 
-      // 6. Start auto slider
-      this.startAutoSlide();
+      // 7. Start auto slide / stream
+      if (this.mode === 'fixed') {
+        this.startAutoSlide();
+      }
     }
 
-    async fetchRemotePosts() {
+    loadLocalConfig() {
+      try {
+        const storageKey = this.sliderId === 'home' ? 'mb_admin_home_slider' : 'mb_admin_about_slider';
+        let raw = localStorage.getItem(storageKey);
+
+        // Fallback for about slider to legacy key if needed
+        if (!raw && this.sliderId === 'about') {
+          raw = localStorage.getItem('mb_admin_instagram_feed');
+        }
+
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            this.posts = parsed;
+            this.mode = 'fixed';
+          } else if (parsed && typeof parsed === 'object') {
+            this.mode = parsed.mode === 'non-fixed' ? 'non-fixed' : 'fixed';
+            if (Array.isArray(parsed.posts) && parsed.posts.length > 0) {
+              this.posts = parsed.posts;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn(`[InstagramSlider] Error reading local config for ${this.sliderId}:`, e);
+      }
+    }
+
+    async fetchRemoteConfig() {
       try {
         if (window.MB_SUPABASE_CONFIG && window.MB_SUPABASE_CONFIG.isLiveConfigured()) {
           const { url, anonKey } = window.MB_SUPABASE_CONFIG;
-          const res = await fetch(`${url}/rest/v1/settings?key=eq.instagram_feed&limit=1`, {
+          const settingKey = this.sliderId === 'home' ? 'home_slider_config' : 'about_slider_config';
+          const res = await fetch(`${url}/rest/v1/settings?key=eq.${settingKey}&limit=1`, {
             headers: { 'apikey': anonKey, 'Authorization': 'Bearer ' + anonKey }
           });
           if (res.ok) {
             const rows = await res.json();
-            if (Array.isArray(rows) && rows[0]?.value && Array.isArray(rows[0].value)) {
-              this.posts = rows[0].value;
+            if (Array.isArray(rows) && rows[0]?.value) {
+              const val = rows[0].value;
+              if (val.mode) this.mode = val.mode;
+              if (Array.isArray(val.posts) && val.posts.length > 0) {
+                this.posts = val.posts;
+              }
             }
           }
         }
       } catch (err) {
-        console.warn('Using official @marshbarbary Instagram posts:', err.message);
+        console.warn(`[InstagramSlider] Using local posts for ${this.sliderId}:`, err.message);
       }
     }
 
-    renderPosts() {
-      if (!this.track) return;
+    renderCardHTML(post) {
+      const displayImg = post.img.startsWith('data:') || post.img.startsWith('http') 
+        ? post.img 
+        : post.img.replace(/^\.\.\//, '');
 
-      this.track.innerHTML = this.posts.map(post => `
+      return `
         <a href="${post.url || 'https://www.instagram.com/marshbarbary/'}" target="_blank" rel="noopener noreferrer" class="instagram-card" aria-label="View post on Instagram @marshbarbary">
-          <img src="${post.img}" alt="${post.caption ? post.caption.substring(0, 50) : 'Marsh Barbary Instagram'}" class="instagram-card-img" loading="lazy" onerror="this.src='assets/images/logo-emblem.png'; this.style.objectFit='contain'; this.style.padding='40px';" />
+          <img src="${displayImg}" alt="${post.caption ? post.caption.substring(0, 50) : 'Marsh Barbary Instagram'}" class="instagram-card-img" loading="lazy" onerror="this.src='assets/images/logo-emblem.png'; this.style.objectFit='contain'; this.style.padding='40px';" />
           <div class="instagram-card-overlay">
             <svg class="instagram-card-icon" viewBox="0 0 24 24">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -166,14 +214,37 @@
             <span class="instagram-card-action">View on Instagram &rarr;</span>
           </div>
         </a>
-      `).join('');
+      `;
+    }
 
-      this.renderDots();
-      this.updateSlider();
+    render() {
+      if (!this.track) return;
+
+      if (this.mode === 'non-fixed') {
+        // Non-Fixed Endless Loop Mode:
+        // Clone posts to create seamless infinite loop stream
+        const renderList = [...this.posts, ...this.posts];
+        this.track.innerHTML = renderList.map(p => this.renderCardHTML(p)).join('');
+        this.track.classList.add('is-marquee');
+        this.track.style.transform = '';
+        if (this.dotsContainer) this.dotsContainer.innerHTML = '';
+      } else {
+        // Fixed Mode:
+        // Curated carousel loop
+        this.track.classList.remove('is-marquee');
+        this.track.innerHTML = this.posts.map(p => this.renderCardHTML(p)).join('');
+        this.renderDots();
+        this.updateSlider();
+      }
     }
 
     renderDots() {
       if (!this.dotsContainer) return;
+      if (this.mode === 'non-fixed') {
+        this.dotsContainer.innerHTML = '';
+        return;
+      }
+
       const maxIndex = this.getMaxIndex();
       this.dotsContainer.innerHTML = '';
       for (let i = 0; i <= maxIndex; i++) {
@@ -202,7 +273,7 @@
     }
 
     updateSlider() {
-      if (!this.track) return;
+      if (!this.track || this.mode === 'non-fixed') return;
       const card = this.track.querySelector('.instagram-card');
       if (!card) return;
 
@@ -222,6 +293,12 @@
     }
 
     next() {
+      if (this.mode === 'non-fixed') {
+        // In non-fixed, move forward continuously
+        this.shiftTrack(-280);
+        return;
+      }
+
       const max = this.getMaxIndex();
       if (this.currentIndex >= max) {
         this.currentIndex = 0;
@@ -232,6 +309,12 @@
     }
 
     prev() {
+      if (this.mode === 'non-fixed') {
+        // In non-fixed, move backward continuously
+        this.shiftTrack(280);
+        return;
+      }
+
       const max = this.getMaxIndex();
       if (this.currentIndex <= 0) {
         this.currentIndex = max;
@@ -241,7 +324,15 @@
       this.updateSlider();
     }
 
+    shiftTrack(amount) {
+      if (!this.track) return;
+      // Temporarily pause animation and nudge scroll
+      const currentScroll = this.viewport.scrollLeft;
+      this.viewport.scrollBy({ left: -amount, behavior: 'smooth' });
+    }
+
     startAutoSlide() {
+      if (this.mode === 'non-fixed') return;
       this.stopAutoSlide();
       this.autoSlideInterval = setInterval(() => {
         this.next();
@@ -256,6 +347,7 @@
     }
 
     restartAutoSlide() {
+      if (this.mode === 'non-fixed') return;
       this.stopAutoSlide();
       this.startAutoSlide();
     }
@@ -275,12 +367,12 @@
         });
       }
 
-      // Pause on hover
+      // Hover controls
       if (this.viewport) {
         this.viewport.addEventListener('mouseenter', () => this.stopAutoSlide());
         this.viewport.addEventListener('mouseleave', () => this.startAutoSlide());
 
-        // Touch event support for swipe on mobile
+        // Touch swipe support
         this.viewport.addEventListener('touchstart', (e) => {
           this.stopAutoSlide();
           this.startX = e.touches[0].clientX;
@@ -307,18 +399,33 @@
         });
       }
 
-      // Recalculate on window resize
+      // Resize listener
       window.addEventListener('resize', () => {
-        const max = this.getMaxIndex();
-        if (this.currentIndex > max) this.currentIndex = max;
-        this.renderDots();
-        this.updateSlider();
+        if (this.mode === 'fixed') {
+          const max = this.getMaxIndex();
+          if (this.currentIndex > max) this.currentIndex = max;
+          this.renderDots();
+          this.updateSlider();
+        }
       });
     }
   }
 
-  // Initialize once DOM is ready
-  document.addEventListener('DOMContentLoaded', () => {
-    window.mbInstagramSlider = new InstagramSlider('.instagram-slider-container');
-  });
+  // Auto-initialize all slider containers on the page
+  function initAllSliders() {
+    window.MB_SLIDERS = window.MB_SLIDERS || {};
+    const containers = document.querySelectorAll('.instagram-slider-container');
+    containers.forEach((container, idx) => {
+      const id = container.id || `slider-${idx}`;
+      window.MB_SLIDERS[id] = new InstagramSlider(container);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAllSliders);
+  } else {
+    initAllSliders();
+  }
+
+  window.InstagramSlider = InstagramSlider;
 })();

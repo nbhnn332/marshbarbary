@@ -25,17 +25,6 @@ window.MB_ADMIN_VIEWS.homepage = {
       enabled: true
     };
 
-    const story = config.storyBanner || {
-      tag: 'OUR STORY',
-      headline: 'More Than Just Fashion',
-      description: 'At Marsh Barbary, we believe in clothing that empowers — thoughtfully designed, mindfully made, and inspired by the beauty of everyday life.',
-      ctaText: 'Discover Our Story',
-      ctaLink: 'shop.html',
-      quote: 'A kinder wardrobe for a brighter tomorrow.',
-      image: 'assets/images/story-banner.jpg',
-      enabled: true
-    };
-
     const newArrivals = config.newArrivals || {
       headline: 'New Arrivals',
       viewAllText: 'View All →',
@@ -80,7 +69,6 @@ window.MB_ADMIN_VIEWS.homepage = {
         <a href="#section-hero" class="admin-tab-btn active" onclick="event.preventDefault(); document.getElementById('section-hero').scrollIntoView({ behavior: 'smooth' });">1. Hero Section</a>
         <a href="#section-collections" class="admin-tab-btn" onclick="event.preventDefault(); document.getElementById('section-collections').scrollIntoView({ behavior: 'smooth' });">2. Collections</a>
         <a href="#section-arrivals" class="admin-tab-btn" onclick="event.preventDefault(); document.getElementById('section-arrivals').scrollIntoView({ behavior: 'smooth' });">3. New Arrivals</a>
-        <a href="#section-story" class="admin-tab-btn" onclick="event.preventDefault(); document.getElementById('section-story').scrollIntoView({ behavior: 'smooth' });">4. Banner — Our Story</a>
       </div>
 
       <form id="homepage-mgmt-form">
@@ -282,104 +270,11 @@ window.MB_ADMIN_VIEWS.homepage = {
             </div>
           </div>
 
-          <!-- ============================================================
-               4. BANNER — OUR STORY (CAMPAIGN BANNER)
-               ============================================================ -->
-          <div class="admin-card" id="section-story">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--mb-admin-border); padding-bottom: 12px;">
-              <div>
-                <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mb-admin-accent);">Section 4</span>
-                <div style="font-family: var(--font-serif); font-size: 18px; font-weight: 500; color: var(--mb-admin-text); margin-top: 2px;">
-                  Banner &mdash; Our Story (Editorial Campaign)
-                </div>
-                <div style="font-size: 12px; color: var(--mb-admin-muted);">
-                  The single continuous full-image editorial banner with dark overlay, narrative, and quote.
-                </div>
-              </div>
-              <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer;">
-                <input type="checkbox" id="story-enabled" ${story.enabled ? 'checked' : ''}>
-                Section Enabled
-              </label>
-            </div>
-
-            <div class="admin-grid admin-grid-2">
-              <div>
-                <div class="admin-form-group">
-                  <label class="admin-label" for="story-tag">Banner Eyebrow Tag</label>
-                  <input type="text" id="story-tag" class="admin-input" value="${story.tag}">
-                </div>
-
-                <div class="admin-form-group">
-                  <div id="story-img-source-mount"></div>
-                </div>
-
-                <div class="admin-form-group">
-                  <label class="admin-label" for="story-headline">Headline</label>
-                  <input type="text" id="story-headline" class="admin-input" value="${story.headline}">
-                </div>
-
-                <div class="admin-form-group">
-                  <label class="admin-label" for="story-desc">Narrative Description</label>
-                  <textarea id="story-desc" class="admin-textarea" rows="3">${story.description}</textarea>
-                </div>
-
-                <div class="admin-grid admin-grid-2">
-                  <div class="admin-form-group">
-                    <label class="admin-label" for="story-cta-text">Button Label</label>
-                    <input type="text" id="story-cta-text" class="admin-input" value="${story.ctaText}">
-                  </div>
-                  <div class="admin-form-group">
-                    <label class="admin-label" for="story-cta-link">Button Target Link</label>
-                    <input type="text" id="story-cta-link" class="admin-input" value="${story.ctaLink}">
-                  </div>
-                </div>
-
-                <div class="admin-form-group">
-                  <label class="admin-label" for="story-quote">Editorial Quote (Right Column)</label>
-                  <input type="text" id="story-quote" class="admin-input" value="${story.quote}">
-                </div>
-              </div>
-
-              <!-- Live Story Banner Preview -->
-              <div>
-                <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mb-admin-muted); margin-bottom: 8px;">
-                  Live Banner Preview
-                </div>
-                <div style="border: 1px solid var(--mb-admin-border); border-radius: var(--mb-radius-sm); overflow: hidden; background: #26201D; color: #FFFFFF; position: relative;">
-                  <img id="story-prev-img" src="${window.MB_IMAGE_SOURCE ? window.MB_IMAGE_SOURCE.resolveDisplayUrl(story.image || 'assets/images/story-banner.jpg') : '../' + (story.image || 'assets/images/story-banner.jpg')}" alt="" style="width: 100%; height: 260px; object-fit: cover; opacity: 0.45; display: block;">
-                  <div style="position: absolute; inset: 0; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div>
-                      <span id="story-prev-tag" style="font-size: 9px; letter-spacing: 0.15em; color: var(--mb-admin-accent); font-weight: 600;">
-                        ${story.tag}
-                      </span>
-                      <div id="story-prev-head" style="font-family: var(--font-serif); font-size: 18px; line-height: 1.2; margin-top: 4px; font-weight: 500;">
-                        ${story.headline}
-                      </div>
-                      <div id="story-prev-desc" style="font-size: 10px; opacity: 0.85; margin-top: 6px; line-height: 1.4; max-width: 260px;">
-                        ${story.description}
-                      </div>
-                      <div style="margin-top: 10px;">
-                        <span id="story-prev-cta" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; border-radius: 2px;">
-                          ${story.ctaText} &rarr;
-                        </span>
-                      </div>
-                    </div>
-                    <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px;">
-                      <div id="story-prev-quote" style="font-family: var(--font-serif); font-style: italic; font-size: 11px; opacity: 0.9;">
-                        &ldquo;${story.quote}&rdquo;
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </form>
     `;
 
-    // Initialize Global Image Source Controls for Hero & Story Banner
+    // Initialize Global Image Source Controls for Hero
     if (window.MB_IMAGE_SOURCE) {
       window.MB_IMAGE_SOURCE.render('#hero-img-source-mount', {
         id: 'hero-source',
@@ -387,16 +282,6 @@ window.MB_ADMIN_VIEWS.homepage = {
         initialValue: hero.image,
         onChange: (data) => {
           const el = document.getElementById('hero-prev-img');
-          if (el) el.src = window.MB_IMAGE_SOURCE.resolveDisplayUrl(data.activeValue);
-        }
-      });
-
-      window.MB_IMAGE_SOURCE.render('#story-img-source-mount', {
-        id: 'story-source',
-        label: 'Story Banner Photograph *',
-        initialValue: story.image,
-        onChange: (data) => {
-          const el = document.getElementById('story-prev-img');
           if (el) el.src = window.MB_IMAGE_SOURCE.resolveDisplayUrl(data.activeValue);
         }
       });
@@ -425,40 +310,15 @@ window.MB_ADMIN_VIEWS.homepage = {
       if (el) el.textContent = e.target.value;
     });
 
-    document.getElementById('story-tag')?.addEventListener('input', e => {
-      const el = document.getElementById('story-prev-tag');
-      if (el) el.textContent = e.target.value;
-    });
-    document.getElementById('story-headline')?.addEventListener('input', e => {
-      const el = document.getElementById('story-prev-head');
-      if (el) el.textContent = e.target.value;
-    });
-    document.getElementById('story-desc')?.addEventListener('input', e => {
-      const el = document.getElementById('story-prev-desc');
-      if (el) el.textContent = e.target.value;
-    });
-    document.getElementById('story-cta-text')?.addEventListener('input', e => {
-      const el = document.getElementById('story-prev-cta');
-      if (el) el.innerHTML = `${e.target.value} &rarr;`;
-    });
-    document.getElementById('story-quote')?.addEventListener('input', e => {
-      const el = document.getElementById('story-prev-quote');
-      if (el) el.innerHTML = `&ldquo;${e.target.value}&rdquo;`;
-    });
-
     // Save handler
     const saveHandler = async (e) => {
       if (e) e.preventDefault();
 
       let heroImage = hero.image || 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop';
-      let storyImage = story.image || 'assets/images/story-banner.jpg';
 
       if (window.MB_IMAGE_SOURCE) {
         const heroVal = window.MB_IMAGE_SOURCE.getValue('#hero-img-source-mount');
         if (heroVal && heroVal.activeValue) heroImage = heroVal.activeValue;
-
-        const storyVal = window.MB_IMAGE_SOURCE.getValue('#story-img-source-mount');
-        if (storyVal && storyVal.activeValue) storyImage = storyVal.activeValue;
       }
 
       const updated = {
@@ -480,16 +340,6 @@ window.MB_ADMIN_VIEWS.homepage = {
           viewAllLink: document.getElementById('arr-link-url').value.trim(),
           productLimit: 4,
           enabled: document.getElementById('arr-enabled').checked
-        },
-        storyBanner: {
-          tag: document.getElementById('story-tag').value.trim(),
-          headline: document.getElementById('story-headline').value.trim(),
-          description: document.getElementById('story-desc').value.trim(),
-          ctaText: document.getElementById('story-cta-text').value.trim(),
-          ctaLink: document.getElementById('story-cta-link').value.trim(),
-          quote: document.getElementById('story-quote').value.trim(),
-          image: storyImage,
-          enabled: document.getElementById('story-enabled').checked
         }
       };
 

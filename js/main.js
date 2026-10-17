@@ -90,45 +90,6 @@ function hydrateHomepageFromAdmin() {
       }
     }
   }
-
-  // 4. OUR STORY CAMPAIGN BANNER
-  if (config.storyBanner) {
-    const storySection = document.getElementById('story');
-    if (storySection) {
-      storySection.style.display = config.storyBanner.enabled === false ? 'none' : '';
-    }
-    const storyImg = document.querySelector('#story .story-banner-img');
-    if (storyImg && config.storyBanner.image) {
-      storyImg.src = cleanImagePath(config.storyBanner.image);
-    }
-    const storyTag = document.querySelector('#story .story-banner-tag');
-    if (storyTag && config.storyBanner.tag) {
-      storyTag.textContent = config.storyBanner.tag;
-    }
-    const storyHead = document.querySelector('#story .story-banner-headline');
-    if (storyHead && config.storyBanner.headline) {
-      storyHead.innerHTML = config.storyBanner.headline.replace(/\n/g, '<br />');
-    }
-    const storyDesc = document.querySelector('#story .story-banner-desc');
-    if (storyDesc && config.storyBanner.description) {
-      storyDesc.textContent = config.storyBanner.description;
-    }
-    const storyQuote = document.querySelector('#story .story-banner-quote');
-    if (storyQuote && config.storyBanner.quote) {
-      const cleanQuote = config.storyBanner.quote.replace(/^["“]|["”]$/g, '').trim();
-      storyQuote.innerHTML = `&ldquo;${cleanQuote}&rdquo;`;
-    }
-    const storyBtn = document.querySelector('#story .story-banner-btn');
-    if (storyBtn) {
-      if (config.storyBanner.ctaLink) {
-        storyBtn.href = config.storyBanner.ctaLink;
-      }
-      const btnSpan = storyBtn.querySelector('span:first-child');
-      if (btnSpan && config.storyBanner.ctaText) {
-        btnSpan.textContent = config.storyBanner.ctaText;
-      }
-    }
-  }
 }
 
 function renderHomepageDynamicContent() {
