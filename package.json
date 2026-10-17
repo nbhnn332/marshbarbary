@@ -4,7 +4,7 @@
   "description": "Marsh Barbary - Wild Elegance Meets Style",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node build.js",
     "preview": "vite preview"
   },
   "devDependencies": {

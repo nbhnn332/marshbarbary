@@ -16,9 +16,13 @@ window.MB_SUPABASE_CONFIG = (() => {
     return url.trim().replace(/\/rest\/v1\/?$/, '').replace(/\/$/, '');
   }
 
-  const envUrl = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_URL : null;
-  const envAnonKey = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_ANON_KEY : null;
-  const envPublishableKey = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY : null;
+  // Support optional window injected env or overrides
+  const envUrl = (typeof window !== 'undefined' && window.__ENV__ && window.__ENV__.VITE_SUPABASE_URL) ||
+                 (typeof window !== 'undefined' && window.VITE_SUPABASE_URL) || null;
+  const envAnonKey = (typeof window !== 'undefined' && window.__ENV__ && window.__ENV__.VITE_SUPABASE_ANON_KEY) ||
+                     (typeof window !== 'undefined' && window.VITE_SUPABASE_ANON_KEY) || null;
+  const envPublishableKey = (typeof window !== 'undefined' && window.__ENV__ && window.__ENV__.VITE_SUPABASE_PUBLISHABLE_KEY) ||
+                            (typeof window !== 'undefined' && window.VITE_SUPABASE_PUBLISHABLE_KEY) || null;
 
   const storedUrl = typeof localStorage !== 'undefined' ? localStorage.getItem('mb_supabase_url') : null;
   const storedAnonKey = typeof localStorage !== 'undefined' ? localStorage.getItem('mb_supabase_anon_key') : null;
