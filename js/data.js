@@ -103,7 +103,7 @@ window.MB_DATA.loadLiveCatalog = async function() {
           name: c.name,
           slug: c.slug,
           originalSlug: c.slug,
-          image: c.image_url || 'assets/images/cat-dresses.jpg',
+          image: c.image_url || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=85',
           link: `shop.html?category=${c.slug}`,
           description: c.description || '',
           displayOrder: c.display_order || 1,
@@ -119,7 +119,7 @@ window.MB_DATA.loadLiveCatalog = async function() {
         window.MB_DATA.products = liveProds.map(p => {
           // Resolve product images
           const sortedImgs = (p.images || []).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-          const mainImg = sortedImgs[0]?.storage_path || 'assets/images/prod-sienna.jpg';
+          const mainImg = sortedImgs[0]?.storage_path || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';
           const gallery = sortedImgs.map(i => i.storage_path);
           if (!gallery.includes(mainImg)) gallery.unshift(mainImg);
 

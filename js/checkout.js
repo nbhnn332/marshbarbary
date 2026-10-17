@@ -230,7 +230,7 @@ window.MB_CHECKOUT = (() => {
     if (itemsContainer) {
       itemsContainer.innerHTML = items.map(item => `
         <div class="checkout-mini-item">
-          <img src="${item.image || 'assets/images/logo-emblem.png'}" alt="${escapeHtml(item.name)}" />
+          <img src="${item.image && !item.image.includes('assets/images/') ? item.image : 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'}" alt="${escapeHtml(item.name)}" />
           <div class="checkout-mini-details">
             <div class="checkout-mini-name">${escapeHtml(item.name)}</div>
             <div class="checkout-mini-meta">Qty: ${item.quantity || 1} ${item.size ? `&bull; Size: ${escapeHtml(item.size)}` : ''}</div>

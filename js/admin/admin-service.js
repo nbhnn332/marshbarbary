@@ -117,7 +117,7 @@ window.MB_ADMIN_SERVICE = (() => {
 
           const mapped = liveProds.map(p => {
             const sortedImgs = (p.images || []).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-            const mainImg = sortedImgs[0]?.storage_path || 'assets/images/prod-sienna.jpg';
+            const mainImg = sortedImgs[0]?.storage_path || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';
             const gallery = sortedImgs.map(i => i.storage_path);
             const variants = p.variants || [];
             const totalStock = variants.reduce((sum, v) => sum + (v.stock_qty || 0), 0);
@@ -673,7 +673,7 @@ window.MB_ADMIN_SERVICE = (() => {
       title: i.title || i.name || 'Garment',
       price: i.price || 0,
       quantity: i.quantity || i.qty || 1,
-      image: i.image || 'assets/images/prod-sienna.jpg'
+      image: (i.image && !i.image.includes('assets/images/')) ? i.image : 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'
     }));
 
     return {
@@ -758,7 +758,7 @@ window.MB_ADMIN_SERVICE = (() => {
                 size: i.size || '',
                 color: i.color || '',
                 total: Number(i.unit_price || 0) * (i.quantity || 1),
-                image: 'assets/images/logo-emblem.png'
+                image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'
               }));
 
               return {
@@ -842,7 +842,7 @@ window.MB_ADMIN_SERVICE = (() => {
                 title: i.product_name,
                 price: Number(i.unit_price || 0),
                 quantity: i.quantity || 1,
-                image: i.image_url || 'assets/images/logo-emblem.png'
+                image: (i.image_url && !i.image_url.includes('assets/images/')) ? i.image_url : 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'
               })),
               pricing: {
                 subtotal: Number(devO.subtotal || 0),

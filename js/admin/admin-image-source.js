@@ -5,25 +5,19 @@
  */
 
 window.MB_IMAGE_SOURCE = (() => {
-  // Preset repository assets available for quick selection
+  // Preset curated editorial assets available for quick selection
   const WORKSPACE_ASSETS = [
-    'assets/images/story-banner-clean.jpg',
-    'assets/images/hero-model.png',
-    'assets/images/story-banner.jpg',
-    'assets/images/story-portrait.jpg',
-    'assets/images/desk-campaign-full.jpg',
-    'assets/images/cat-dresses.jpg',
-    'assets/images/cat-tops.jpg',
-    'assets/images/cat-bottoms.jpg',
-    'assets/images/cat-coords.jpg',
-    'assets/images/cat-accessories.jpg',
-    'assets/images/prod-sienna.jpg',
-    'assets/images/prod-aanya.jpg',
-    'assets/images/prod-pants.jpg',
-    'assets/images/prod-top.jpg',
-    'assets/images/mood-linen.jpg',
-    'assets/images/mood-coast.jpg',
-    'assets/images/mood-desert.jpg'
+    'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1551803091-e20673f15770?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1509551388413-e18d0ac5d495?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=1200&q=80',
+    'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1200&q=80'
   ];
 
   const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif'];
@@ -493,7 +487,7 @@ window.MB_IMAGE_SOURCE = (() => {
       container.querySelector('#btn-add-gallery-item').addEventListener('click', () => {
         items.push({
           id: 'gal-' + items.length + '-' + Math.random().toString(36).substring(2, 6),
-          value: 'assets/images/prod-sienna.jpg'
+          value: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'
         });
         renderList();
         if (typeof options.onChange === 'function') {

@@ -15,11 +15,11 @@
 (function () {
   'use strict';
 
-  // 24 Official high-res posts fetched from @marshbarbary
+  // 24 Curated high-res fashion editorial posts for Marsh Barbary
   const OFFICIAL_INSTAGRAM_POSTS = [
     {
       id: 'ig-1',
-      img: 'assets/images/instagram/ig-post-1.jpg',
+      img: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80',
       caption: 'Quiet coastal grace in pure organic linen. Styled by Shwetha Menon for Marsh Barbary. #MarshBarbary #WildElegance',
       url: 'https://www.instagram.com/shwetha_menon/p/DW4Xlvukk3o/',
       likes: '350',
@@ -27,7 +27,7 @@
     },
     {
       id: 'ig-2',
-      img: 'assets/images/instagram/ig-post-2.jpg',
+      img: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80',
       caption: 'The art of natural draping. Crafted from 100% European flax linen. #MarshBarbary #WildElegance',
       url: 'https://www.instagram.com/marshbarbary/p/DV2jhdukVvU/',
       likes: '397',
@@ -35,7 +35,7 @@
     },
     {
       id: 'ig-3',
-      img: 'assets/images/instagram/ig-post-3.jpg',
+      img: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80',
       caption: 'Tactile textures that breathe with your movement. #SlowFashion #ConsciousClothing',
       url: 'https://www.instagram.com/marshbarbary/p/DV2jZLNkcB1/',
       likes: '444',
@@ -43,7 +43,7 @@
     },
     {
       id: 'ig-4',
-      img: 'assets/images/instagram/ig-post-4.jpg',
+      img: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=80',
       caption: 'Aanya Tiered Maxi Dress — sun-kissed terracotta inspired by coastal horizons. #MarshBarbary',
       url: 'https://www.instagram.com/marshbarbary/p/DVs55hSkQFR/',
       likes: '491',
@@ -51,7 +51,7 @@
     },
     {
       id: 'ig-5',
-      img: 'assets/images/instagram/ig-post-5.jpg',
+      img: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=80',
       caption: 'Chasing the wild tide. Designed to move with you, not against you. #NatureInspired',
       url: 'https://www.instagram.com/marshbarbary/p/DVsMksSEzGT/',
       likes: '538',
@@ -59,7 +59,7 @@
     },
     {
       id: 'ig-6',
-      img: 'assets/images/instagram/ig-post-6.jpg',
+      img: 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=800&q=80',
       caption: 'Clean architectural silhouettes with mindful heart. #TimelessDesign #MarshStyle',
       url: 'https://www.instagram.com/marshbarbary/p/DVqX66YEVYV/',
       likes: '585',
@@ -67,7 +67,7 @@
     },
     {
       id: 'ig-7',
-      img: 'assets/images/instagram/ig-post-7.jpg',
+      img: 'https://images.unsplash.com/photo-1509551388413-e18d0ac5d495?auto=format&fit=crop&w=800&q=80',
       caption: 'Botanical dye details and delicate finishing in the atelier. #MindfulCraft #Handmade',
       url: 'https://www.instagram.com/marshbarbary/p/DVoCH8VE5Mf/',
       likes: '632',
@@ -75,7 +75,7 @@
     },
     {
       id: 'ig-8',
-      img: 'assets/images/instagram/ig-post-8.jpg',
+      img: 'https://images.unsplash.com/photo-1551803091-e20673f15770?auto=format&fit=crop&w=800&q=80',
       caption: 'Understated elegance for quiet days and memorable evenings. #EffortlessLuxury',
       url: 'https://www.instagram.com/marshbarbary/p/DVk0c_Zkecd/',
       likes: '679',
@@ -83,7 +83,7 @@
     },
     {
       id: 'ig-9',
-      img: 'assets/images/instagram/ig-post-9.jpg',
+      img: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=800&q=80',
       caption: 'Swasika in the artisanal hand-loomed terracotta ensemble. Styled by Tharunya VK for Marsh Barbary. #Swasika #MarshBarbary',
       url: 'https://www.instagram.com/marshbarbary/p/DU8j01mkY9_/',
       likes: '1,240',
@@ -91,7 +91,7 @@
     },
     {
       id: 'ig-10',
-      img: 'assets/images/instagram/ig-post-10.jpg',
+      img: 'https://images.unsplash.com/photo-1508427953056-b00b8d78ebf5?auto=format&fit=crop&w=800&q=80',
       caption: 'The quiet beauty of slow mornings. Sustainable handloom tailored to perfection. #SlowLiving #Elegance',
       url: 'https://www.instagram.com/marshbarbary/p/DU0k718EY91/',
       likes: '890',
@@ -99,7 +99,7 @@
     },
     {
       id: 'ig-11',
-      img: 'assets/images/instagram/ig-post-11.jpg',
+      img: 'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?auto=format&fit=crop&w=800&q=80',
       caption: 'Monochrome sand tones. The Maya Relaxed Co-ord set made from certified organic cotton. #MarshStyle',
       url: 'https://www.instagram.com/marshbarbary/p/DT7m182E872/',
       likes: '760',
@@ -107,7 +107,7 @@
     },
     {
       id: 'ig-12',
-      img: 'assets/images/instagram/ig-post-12.jpg',
+      img: 'https://images.unsplash.com/photo-1502716119720-b23a93e5fe1b?auto=format&fit=crop&w=800&q=80',
       caption: 'Flowing tiers and hand-stitched detailing. The signature Aanya Dress. #SignatureCollection',
       url: 'https://www.instagram.com/marshbarbary/p/DT1o902k412/',
       likes: '620',
@@ -115,7 +115,7 @@
     },
     {
       id: 'ig-13',
-      img: 'assets/images/instagram/ig-post-13.jpg',
+      img: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=800&q=80',
       caption: 'Sculptural necklines meeting pure organic comfort. Modern minimalism for conscious wardrobes. #MinimalistFashion',
       url: 'https://www.instagram.com/marshbarbary/p/DS9v765k819/',
       likes: '540',
@@ -123,7 +123,7 @@
     },
     {
       id: 'ig-14',
-      img: 'assets/images/instagram/ig-post-14.jpg',
+      img: 'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=800&q=80',
       caption: 'Pleated wide-leg culottes designed for fluid grace and everyday ease. #WildElegance',
       url: 'https://www.instagram.com/marshbarbary/p/DS3w018E662/',
       likes: '690',
@@ -131,7 +131,7 @@
     },
     {
       id: 'ig-15',
-      img: 'assets/images/instagram/ig-post-15.jpg',
+      img: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80',
       caption: 'Warm clay pigments drawn from nature. The Sienna Gathered Midi Dress. #BotanicalDye',
       url: 'https://www.instagram.com/marshbarbary/p/DR8p219k771/',
       likes: '810',
@@ -139,7 +139,7 @@
     },
     {
       id: 'ig-16',
-      img: 'assets/images/instagram/ig-post-16.jpg',
+      img: 'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=800&q=80',
       caption: 'Relaxed tailoring in earth khaki linen. Built to last through seasons and trends. #ConsciousWardrobe',
       url: 'https://www.instagram.com/marshbarbary/p/DQ9x312E444/',
       likes: '480',
@@ -147,7 +147,7 @@
     },
     {
       id: 'ig-17',
-      img: 'assets/images/instagram/ig-post-17.jpg',
+      img: 'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?auto=format&fit=crop&w=800&q=80',
       caption: 'Hand-woven artisan accessories celebrating indigenous craft techniques. #ArtisanMade',
       url: 'https://www.instagram.com/marshbarbary/p/DP2q410k888/',
       likes: '530',
@@ -155,7 +155,7 @@
     },
     {
       id: 'ig-18',
-      img: 'assets/images/instagram/ig-post-18.jpg',
+      img: 'https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=800&q=80',
       caption: 'Where the marsh meets the wild barbarian spirit. Coastal horizons and wind-blown textures. #CoastlineMood',
       url: 'https://www.instagram.com/marshbarbary/p/DO5k911E333/',
       likes: '1,520',
@@ -163,7 +163,7 @@
     },
     {
       id: 'ig-19',
-      img: 'assets/images/instagram/ig-post-19.jpg',
+      img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
       caption: 'Sunlight and silence. Raw earth undertones that define our Autumn palette. #ColorStory',
       url: 'https://www.instagram.com/marshbarbary/p/DN8l123k777/',
       likes: '940',
@@ -171,7 +171,7 @@
     },
     {
       id: 'ig-20',
-      img: 'assets/images/instagram/ig-post-20.jpg',
+      img: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80',
       caption: 'Macro texture of 100% natural unbleached linen weave. Pure tactile luxury. #NaturalFabrics',
       url: 'https://www.instagram.com/marshbarbary/p/DM4j789E222/',
       likes: '1,120',
@@ -179,7 +179,7 @@
     },
     {
       id: 'ig-21',
-      img: 'assets/images/instagram/ig-post-21.jpg',
+      img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80',
       caption: 'The Horizon Collection: A symphony of earth pigments and effortless silhouettes. #NewArrivals',
       url: 'https://www.instagram.com/marshbarbary/p/DL7m654k111/',
       likes: '2,150',
@@ -187,7 +187,7 @@
     },
     {
       id: 'ig-22',
-      img: 'assets/images/instagram/ig-post-22.jpg',
+      img: 'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?auto=format&fit=crop&w=800&q=80',
       caption: 'Step into the atelier. Every seam tells a story of intention and respect for earth. #BehindTheScenes',
       url: 'https://www.instagram.com/marshbarbary/p/DK1n234E999/',
       likes: '1,830',
@@ -195,7 +195,7 @@
     },
     {
       id: 'ig-23',
-      img: 'assets/images/instagram/ig-post-23.jpg',
+      img: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=800&q=80',
       caption: 'Zero-waste botanical appliqués created from studio offcuts. #ZeroWasteFashion #UpcycledArt',
       url: 'https://www.instagram.com/marshbarbary/p/DJ9p876k555/',
       likes: '730',
@@ -203,13 +203,26 @@
     },
     {
       id: 'ig-24',
-      img: 'assets/images/instagram/ig-post-24.jpg',
+      img: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=80',
       caption: 'Evening mood. The understated allure of raw silk and hand-loomed fibers. #EveningWear',
       url: 'https://www.instagram.com/marshbarbary/p/DI3r567E444/',
       likes: '850',
       active: true
     }
   ];
+
+  function normalizeInstagramImg(imgUrl, id) {
+    if (!imgUrl || typeof imgUrl !== 'string') return OFFICIAL_INSTAGRAM_POSTS[0].img;
+    if (imgUrl.includes('assets/images/')) {
+      const match = imgUrl.match(/ig-post-(\d+)/);
+      if (match) {
+        const idx = (parseInt(match[1], 10) - 1) % OFFICIAL_INSTAGRAM_POSTS.length;
+        return OFFICIAL_INSTAGRAM_POSTS[idx].img;
+      }
+      return OFFICIAL_INSTAGRAM_POSTS[0].img;
+    }
+    return imgUrl;
+  }
 
   class InstagramSlider {
     constructor(elementOrSelector) {
@@ -325,13 +338,11 @@
     }
 
     renderCardHTML(post) {
-      const displayImg = post.img.startsWith('data:') || post.img.startsWith('http') 
-        ? post.img 
-        : post.img.replace(/^\.\.\//, '');
+      const displayImg = normalizeInstagramImg(post.img, post.id);
 
       return `
         <a href="${post.url || 'https://www.instagram.com/marshbarbary/'}" target="_blank" rel="noopener noreferrer" class="instagram-card" aria-label="View post on Instagram @marshbarbary">
-          <img src="${displayImg}" alt="${post.caption ? post.caption.substring(0, 50) : 'Marsh Barbary Instagram'}" class="instagram-card-img" loading="lazy" onerror="this.src='assets/images/logo-emblem.png'; this.style.objectFit='contain'; this.style.padding='40px';" />
+          <img src="${displayImg}" alt="${post.caption ? post.caption.substring(0, 50) : 'Marsh Barbary Instagram'}" class="instagram-card-img" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80';" />
           <div class="instagram-card-overlay">
             <svg class="instagram-card-icon" viewBox="0 0 24 24">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
