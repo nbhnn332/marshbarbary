@@ -16,13 +16,17 @@ window.MB_SUPABASE_CONFIG = (() => {
     return url.trim().replace(/\/rest\/v1\/?$/, '').replace(/\/$/, '');
   }
 
+  const envUrl = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_URL : null;
+  const envAnonKey = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_ANON_KEY : null;
+  const envPublishableKey = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY : null;
+
   const storedUrl = typeof localStorage !== 'undefined' ? localStorage.getItem('mb_supabase_url') : null;
   const storedAnonKey = typeof localStorage !== 'undefined' ? localStorage.getItem('mb_supabase_anon_key') : null;
 
   return {
-    url: cleanBaseUrl(storedUrl || defaultUrl),
-    anonKey: storedAnonKey || defaultAnonKey,
-    publishableKey: defaultPublishableKey,
+    url: cleanBaseUrl(storedUrl || envUrl || defaultUrl),
+    anonKey: storedAnonKey || envAnonKey || defaultAnonKey,
+    publishableKey: envPublishableKey || defaultPublishableKey,
 
     // Helper to check if live configured
     isLiveConfigured() {
