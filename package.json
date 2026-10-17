@@ -2,14 +2,17 @@
   "name": "marsh-barbary",
   "version": "1.0.0",
   "description": "Marsh Barbary - Wild Elegance Meets Style",
+  "bin": {
+    "vite": "./build.js"
+  },
   "scripts": {
-    "dev": "vite",
+    "dev": "node build.js",
     "build": "node build.js",
-    "preview": "vite preview"
+    "preview": "node build.js",
+    "vite": "node build.js"
   },
   "devDependencies": {
-    "puppeteer-core": "^25.12.0",
-    "vite": "^6.0.0"
+    "puppeteer-core": "^25.12.0"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2"
