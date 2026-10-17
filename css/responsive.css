@@ -97,6 +97,19 @@
     padding: 0;
   }
 
+  .hero-full-rectangle {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .hero-main-visual {
+    width: 100%;
+    min-height: unset;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
   /* Collection Categories Side-by-side to Stacked */
   .collection-layout-row {
     grid-template-columns: 1fr;

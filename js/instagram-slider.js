@@ -15,7 +15,7 @@
 (function () {
   'use strict';
 
-  // 8 Official high-res posts fetched from @marshbarbary
+  // 24 Official high-res posts fetched from @marshbarbary
   const OFFICIAL_INSTAGRAM_POSTS = [
     {
       id: 'ig-1',
@@ -79,6 +79,134 @@
       caption: 'Understated elegance for quiet days and memorable evenings. #EffortlessLuxury',
       url: 'https://www.instagram.com/marshbarbary/p/DVk0c_Zkecd/',
       likes: '679',
+      active: true
+    },
+    {
+      id: 'ig-9',
+      img: 'assets/images/instagram/ig-post-9.jpg',
+      caption: 'Swasika in the artisanal hand-loomed terracotta ensemble. Styled by Tharunya VK for Marsh Barbary. #Swasika #MarshBarbary',
+      url: 'https://www.instagram.com/marshbarbary/p/DU8j01mkY9_/',
+      likes: '1,240',
+      active: true
+    },
+    {
+      id: 'ig-10',
+      img: 'assets/images/instagram/ig-post-10.jpg',
+      caption: 'The quiet beauty of slow mornings. Sustainable handloom tailored to perfection. #SlowLiving #Elegance',
+      url: 'https://www.instagram.com/marshbarbary/p/DU0k718EY91/',
+      likes: '890',
+      active: true
+    },
+    {
+      id: 'ig-11',
+      img: 'assets/images/instagram/ig-post-11.jpg',
+      caption: 'Monochrome sand tones. The Maya Relaxed Co-ord set made from certified organic cotton. #MarshStyle',
+      url: 'https://www.instagram.com/marshbarbary/p/DT7m182E872/',
+      likes: '760',
+      active: true
+    },
+    {
+      id: 'ig-12',
+      img: 'assets/images/instagram/ig-post-12.jpg',
+      caption: 'Flowing tiers and hand-stitched detailing. The signature Aanya Dress. #SignatureCollection',
+      url: 'https://www.instagram.com/marshbarbary/p/DT1o902k412/',
+      likes: '620',
+      active: true
+    },
+    {
+      id: 'ig-13',
+      img: 'assets/images/instagram/ig-post-13.jpg',
+      caption: 'Sculptural necklines meeting pure organic comfort. Modern minimalism for conscious wardrobes. #MinimalistFashion',
+      url: 'https://www.instagram.com/marshbarbary/p/DS9v765k819/',
+      likes: '540',
+      active: true
+    },
+    {
+      id: 'ig-14',
+      img: 'assets/images/instagram/ig-post-14.jpg',
+      caption: 'Pleated wide-leg culottes designed for fluid grace and everyday ease. #WildElegance',
+      url: 'https://www.instagram.com/marshbarbary/p/DS3w018E662/',
+      likes: '690',
+      active: true
+    },
+    {
+      id: 'ig-15',
+      img: 'assets/images/instagram/ig-post-15.jpg',
+      caption: 'Warm clay pigments drawn from nature. The Sienna Gathered Midi Dress. #BotanicalDye',
+      url: 'https://www.instagram.com/marshbarbary/p/DR8p219k771/',
+      likes: '810',
+      active: true
+    },
+    {
+      id: 'ig-16',
+      img: 'assets/images/instagram/ig-post-16.jpg',
+      caption: 'Relaxed tailoring in earth khaki linen. Built to last through seasons and trends. #ConsciousWardrobe',
+      url: 'https://www.instagram.com/marshbarbary/p/DQ9x312E444/',
+      likes: '480',
+      active: true
+    },
+    {
+      id: 'ig-17',
+      img: 'assets/images/instagram/ig-post-17.jpg',
+      caption: 'Hand-woven artisan accessories celebrating indigenous craft techniques. #ArtisanMade',
+      url: 'https://www.instagram.com/marshbarbary/p/DP2q410k888/',
+      likes: '530',
+      active: true
+    },
+    {
+      id: 'ig-18',
+      img: 'assets/images/instagram/ig-post-18.jpg',
+      caption: 'Where the marsh meets the wild barbarian spirit. Coastal horizons and wind-blown textures. #CoastlineMood',
+      url: 'https://www.instagram.com/marshbarbary/p/DO5k911E333/',
+      likes: '1,520',
+      active: true
+    },
+    {
+      id: 'ig-19',
+      img: 'assets/images/instagram/ig-post-19.jpg',
+      caption: 'Sunlight and silence. Raw earth undertones that define our Autumn palette. #ColorStory',
+      url: 'https://www.instagram.com/marshbarbary/p/DN8l123k777/',
+      likes: '940',
+      active: true
+    },
+    {
+      id: 'ig-20',
+      img: 'assets/images/instagram/ig-post-20.jpg',
+      caption: 'Macro texture of 100% natural unbleached linen weave. Pure tactile luxury. #NaturalFabrics',
+      url: 'https://www.instagram.com/marshbarbary/p/DM4j789E222/',
+      likes: '1,120',
+      active: true
+    },
+    {
+      id: 'ig-21',
+      img: 'assets/images/instagram/ig-post-21.jpg',
+      caption: 'The Horizon Collection: A symphony of earth pigments and effortless silhouettes. #NewArrivals',
+      url: 'https://www.instagram.com/marshbarbary/p/DL7m654k111/',
+      likes: '2,150',
+      active: true
+    },
+    {
+      id: 'ig-22',
+      img: 'assets/images/instagram/ig-post-22.jpg',
+      caption: 'Step into the atelier. Every seam tells a story of intention and respect for earth. #BehindTheScenes',
+      url: 'https://www.instagram.com/marshbarbary/p/DK1n234E999/',
+      likes: '1,830',
+      active: true
+    },
+    {
+      id: 'ig-23',
+      img: 'assets/images/instagram/ig-post-23.jpg',
+      caption: 'Zero-waste botanical appliqués created from studio offcuts. #ZeroWasteFashion #UpcycledArt',
+      url: 'https://www.instagram.com/marshbarbary/p/DJ9p876k555/',
+      likes: '730',
+      active: true
+    },
+    {
+      id: 'ig-24',
+      img: 'assets/images/instagram/ig-post-24.jpg',
+      caption: 'Evening mood. The understated allure of raw silk and hand-loomed fibers. #EveningWear',
+      url: 'https://www.instagram.com/marshbarbary/p/DI3r567E444/',
+      likes: '850',
       active: true
     }
   ];

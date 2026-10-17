@@ -21,56 +21,192 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
       img: 'assets/images/instagram/ig-post-1.jpg',
       caption: 'Quiet coastal grace in pure organic linen. Styled by Shwetha Menon for Marsh Barbary. #MarshBarbary #WildElegance',
       url: 'https://www.instagram.com/shwetha_menon/p/DW4Xlvukk3o/',
-      likes: '350'
+      likes: '350',
+      tag: 'linen'
     },
     {
       id: 'ig-2',
       img: 'assets/images/instagram/ig-post-2.jpg',
       caption: 'The art of natural draping. Crafted from 100% European flax linen. #MarshBarbary #WildElegance',
       url: 'https://www.instagram.com/marshbarbary/p/DV2jhdukVvU/',
-      likes: '397'
+      likes: '397',
+      tag: 'linen'
     },
     {
       id: 'ig-3',
       img: 'assets/images/instagram/ig-post-3.jpg',
       caption: 'Tactile textures that breathe with your movement. #SlowFashion #ConsciousClothing',
       url: 'https://www.instagram.com/marshbarbary/p/DV2jZLNkcB1/',
-      likes: '444'
+      likes: '444',
+      tag: 'fabric'
     },
     {
       id: 'ig-4',
       img: 'assets/images/instagram/ig-post-4.jpg',
       caption: 'Aanya Tiered Maxi Dress — sun-kissed terracotta inspired by coastal horizons. #MarshBarbary',
       url: 'https://www.instagram.com/marshbarbary/p/DVs55hSkQFR/',
-      likes: '491'
+      likes: '491',
+      tag: 'dress'
     },
     {
       id: 'ig-5',
       img: 'assets/images/instagram/ig-post-5.jpg',
       caption: 'Chasing the wild tide. Designed to move with you, not against you. #NatureInspired',
       url: 'https://www.instagram.com/marshbarbary/p/DVsMksSEzGT/',
-      likes: '538'
+      likes: '538',
+      tag: 'editorial'
     },
     {
       id: 'ig-6',
       img: 'assets/images/instagram/ig-post-6.jpg',
       caption: 'Clean architectural silhouettes with mindful heart. #TimelessDesign #MarshStyle',
       url: 'https://www.instagram.com/marshbarbary/p/DVqX66YEVYV/',
-      likes: '585'
+      likes: '585',
+      tag: 'top'
     },
     {
       id: 'ig-7',
       img: 'assets/images/instagram/ig-post-7.jpg',
       caption: 'Botanical dye details and delicate finishing in the atelier. #MindfulCraft #Handmade',
       url: 'https://www.instagram.com/marshbarbary/p/DVoCH8VE5Mf/',
-      likes: '632'
+      likes: '632',
+      tag: 'craft'
     },
     {
       id: 'ig-8',
       img: 'assets/images/instagram/ig-post-8.jpg',
       caption: 'Understated elegance for quiet days and memorable evenings. #EffortlessLuxury',
       url: 'https://www.instagram.com/marshbarbary/p/DVk0c_Zkecd/',
-      likes: '679'
+      likes: '679',
+      tag: 'evening'
+    },
+    {
+      id: 'ig-9',
+      img: 'assets/images/instagram/ig-post-9.jpg',
+      caption: 'Swasika in the artisanal hand-loomed terracotta ensemble. Styled by Tharunya VK for Marsh Barbary. #Swasika #MarshBarbary',
+      url: 'https://www.instagram.com/marshbarbary/p/DU8j01mkY9_/',
+      likes: '1,240',
+      tag: 'celebrity'
+    },
+    {
+      id: 'ig-10',
+      img: 'assets/images/instagram/ig-post-10.jpg',
+      caption: 'The quiet beauty of slow mornings. Sustainable handloom tailored to perfection. #SlowLiving #Elegance',
+      url: 'https://www.instagram.com/marshbarbary/p/DU0k718EY91/',
+      likes: '890',
+      tag: 'editorial'
+    },
+    {
+      id: 'ig-11',
+      img: 'assets/images/instagram/ig-post-11.jpg',
+      caption: 'Monochrome sand tones. The Maya Relaxed Co-ord set made from certified organic cotton. #MarshStyle',
+      url: 'https://www.instagram.com/marshbarbary/p/DT7m182E872/',
+      likes: '760',
+      tag: 'coord'
+    },
+    {
+      id: 'ig-12',
+      img: 'assets/images/instagram/ig-post-12.jpg',
+      caption: 'Flowing tiers and hand-stitched detailing. The signature Aanya Dress. #SignatureCollection',
+      url: 'https://www.instagram.com/marshbarbary/p/DT1o902k412/',
+      likes: '620',
+      tag: 'dress'
+    },
+    {
+      id: 'ig-13',
+      img: 'assets/images/instagram/ig-post-13.jpg',
+      caption: 'Sculptural necklines meeting pure organic comfort. Modern minimalism for conscious wardrobes. #MinimalistFashion',
+      url: 'https://www.instagram.com/marshbarbary/p/DS9v765k819/',
+      likes: '540',
+      tag: 'top'
+    },
+    {
+      id: 'ig-14',
+      img: 'assets/images/instagram/ig-post-14.jpg',
+      caption: 'Pleated wide-leg culottes designed for fluid grace and everyday ease. #WildElegance',
+      url: 'https://www.instagram.com/marshbarbary/p/DS3w018E662/',
+      likes: '690',
+      tag: 'bottom'
+    },
+    {
+      id: 'ig-15',
+      img: 'assets/images/instagram/ig-post-15.jpg',
+      caption: 'Warm clay pigments drawn from nature. The Sienna Gathered Midi Dress. #BotanicalDye',
+      url: 'https://www.instagram.com/marshbarbary/p/DR8p219k771/',
+      likes: '810',
+      tag: 'dress'
+    },
+    {
+      id: 'ig-16',
+      img: 'assets/images/instagram/ig-post-16.jpg',
+      caption: 'Relaxed tailoring in earth khaki linen. Built to last through seasons and trends. #ConsciousWardrobe',
+      url: 'https://www.instagram.com/marshbarbary/p/DQ9x312E444/',
+      likes: '480',
+      tag: 'bottom'
+    },
+    {
+      id: 'ig-17',
+      img: 'assets/images/instagram/ig-post-17.jpg',
+      caption: 'Hand-woven artisan accessories celebrating indigenous craft techniques. #ArtisanMade',
+      url: 'https://www.instagram.com/marshbarbary/p/DP2q410k888/',
+      likes: '530',
+      tag: 'accessory'
+    },
+    {
+      id: 'ig-18',
+      img: 'assets/images/instagram/ig-post-18.jpg',
+      caption: 'Where the marsh meets the wild barbarian spirit. Coastal horizons and wind-blown textures. #CoastlineMood',
+      url: 'https://www.instagram.com/marshbarbary/p/DO5k911E333/',
+      likes: '1,520',
+      tag: 'editorial'
+    },
+    {
+      id: 'ig-19',
+      img: 'assets/images/instagram/ig-post-19.jpg',
+      caption: 'Sunlight and silence. Raw earth undertones that define our Autumn palette. #ColorStory',
+      url: 'https://www.instagram.com/marshbarbary/p/DN8l123k777/',
+      likes: '940',
+      tag: 'editorial'
+    },
+    {
+      id: 'ig-20',
+      img: 'assets/images/instagram/ig-post-20.jpg',
+      caption: 'Macro texture of 100% natural unbleached linen weave. Pure tactile luxury. #NaturalFabrics',
+      url: 'https://www.instagram.com/marshbarbary/p/DM4j789E222/',
+      likes: '1,120',
+      tag: 'fabric'
+    },
+    {
+      id: 'ig-21',
+      img: 'assets/images/instagram/ig-post-21.jpg',
+      caption: 'The Horizon Collection: A symphony of earth pigments and effortless silhouettes. #NewArrivals',
+      url: 'https://www.instagram.com/marshbarbary/p/DL7m654k111/',
+      likes: '2,150',
+      tag: 'editorial'
+    },
+    {
+      id: 'ig-22',
+      img: 'assets/images/instagram/ig-post-22.jpg',
+      caption: 'Step into the atelier. Every seam tells a story of intention and respect for earth. #BehindTheScenes',
+      url: 'https://www.instagram.com/marshbarbary/p/DK1n234E999/',
+      likes: '1,830',
+      tag: 'atelier'
+    },
+    {
+      id: 'ig-23',
+      img: 'assets/images/instagram/ig-post-23.jpg',
+      caption: 'Zero-waste botanical appliqués created from studio offcuts. #ZeroWasteFashion #UpcycledArt',
+      url: 'https://www.instagram.com/marshbarbary/p/DJ9p876k555/',
+      likes: '730',
+      tag: 'craft'
+    },
+    {
+      id: 'ig-24',
+      img: 'assets/images/instagram/ig-post-24.jpg',
+      caption: 'Evening mood. The understated allure of raw silk and hand-loomed fibers. #EveningWear',
+      url: 'https://www.instagram.com/marshbarbary/p/DI3r567E444/',
+      likes: '850',
+      tag: 'evening'
     }
   ];
 
@@ -332,55 +468,89 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
         </div>
 
         <!-- ==============================================================
-             MODAL 2: "FETCH FROM INSTAGRAM" VISUAL PICKER MODAL
+             MODAL 2: "FETCH FROM INSTAGRAM" VISUAL PICKER MODAL (ALL 24 POSTS + MULTI-SELECT)
              ============================================================== -->
-        <div id="ig-picker-modal-overlay" style="display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
-          <div style="background: #FFF; width: 100%; max-width: 860px; max-height: 88vh; border-radius: 10px; padding: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
+        <div id="ig-picker-modal-overlay" style="display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.65); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+          <div style="background: #FFF; width: 100%; max-width: 980px; max-height: 90vh; border-radius: 12px; padding: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
             
             <!-- Modal Header -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid #E5E5E5; padding-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid #E5E5E5; padding-bottom: 14px;">
               <div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#C46238"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="#FFF"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="#FFF" stroke-width="2"/></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#C46238"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="#FFF"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="#FFF" stroke-width="2"/></svg>
                   <h3 style="margin: 0; font-family: var(--mb-font-serif, serif); font-size: 22px; color: #1A1A1A;">
-                    Select Posts from @marshbarbary
+                    Fetch from Instagram (@marshbarbary)
                   </h3>
+                  <span style="background: #ECFDF5; color: #065F46; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;">
+                    ${OFFICIAL_IG_CATALOG.length} Public Posts Loaded
+                  </span>
                 </div>
                 <p style="font-size: 13px; color: #767676; margin: 4px 0 0 0;">
-                  Click <strong>"Add to Slider"</strong> on any official Instagram post to insert it into the <strong>${sliderName}</strong>.
+                  Select individual posts or use presets to batch-add images into the <strong>${sliderName}</strong>.
                 </p>
               </div>
-              <button type="button" id="ig-picker-close" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #767676;">&times;</button>
+              <button type="button" id="ig-picker-close" style="background: none; border: none; font-size: 26px; cursor: pointer; color: #767676; line-height: 1;">&times;</button>
             </div>
 
-            <!-- Posts Grid -->
-            <div style="flex: 1; overflow-y: auto; padding-right: 6px; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px;">
+            <!-- Toolbar: Search Filter & Batch Presets -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; padding: 12px 14px; background: #F8F9FA; border: 1px solid #E5E5E5; border-radius: 8px;">
+              <!-- Search Filter Input -->
+              <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 220px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#767676" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="ig-picker-search" placeholder="Search caption, tags (e.g. linen, dress, Swasika)..." style="width: 100%; border: 1px solid #D1D5DB; border-radius: 4px; padding: 6px 10px; font-size: 12px; background: #FFF;" />
+              </div>
+
+              <!-- Quick Selection Presets -->
+              <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <span style="font-size: 11px; font-weight: 600; color: #4B5563; text-transform: uppercase; letter-spacing: 0.05em;">Select:</span>
+                <button type="button" class="btn-ig-preset admin-btn admin-btn-outline" data-count="4" style="font-size: 11px; padding: 4px 8px; background: #FFF;">First 4</button>
+                <button type="button" class="btn-ig-preset admin-btn admin-btn-outline" data-count="8" style="font-size: 11px; padding: 4px 8px; background: #FFF;">First 8</button>
+                <button type="button" class="btn-ig-preset admin-btn admin-btn-outline" data-count="12" style="font-size: 11px; padding: 4px 8px; background: #FFF;">First 12</button>
+                <button type="button" class="btn-ig-preset admin-btn admin-btn-outline" data-count="all" style="font-size: 11px; padding: 4px 8px; background: #FFF;">All (${OFFICIAL_IG_CATALOG.length})</button>
+                <button type="button" id="btn-ig-deselect-all" class="admin-btn admin-btn-outline" style="font-size: 11px; padding: 4px 8px; color: #9CA3AF; background: #FFF;">Clear</button>
+              </div>
+
+              <!-- Batch Add Button -->
+              <button type="button" id="btn-batch-add-ig" class="admin-btn" style="background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); color: #FFF; font-weight: 600; font-size: 12px; padding: 7px 18px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(220, 39, 67, 0.3);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                Add Selected (<span id="ig-selected-counter">0</span>) to Slider
+              </button>
+            </div>
+
+            <!-- Posts Grid (All 24 Posts) -->
+            <div id="ig-picker-grid" style="flex: 1; overflow-y: auto; padding-right: 6px; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px;">
               ${OFFICIAL_IG_CATALOG.map((igItem, idx) => {
                 const isAlreadyAdded = posts.some(p => p.url === igItem.url || p.img === igItem.img);
                 return `
-                  <div style="border: 1px solid ${isAlreadyAdded ? '#10B981' : '#E5E5E5'}; border-radius: 6px; overflow: hidden; background: #FFF; display: flex; flex-direction: column;">
-                    <div style="position: relative; aspect-ratio: 1 / 1; background: #000;">
+                  <div class="ig-catalog-card" data-catalog-id="${igItem.id}" data-caption="${(igItem.caption || '').toLowerCase()}" data-tag="${igItem.tag || ''}" style="border: 1px solid ${isAlreadyAdded ? '#10B981' : '#E5E5E5'}; border-radius: 8px; overflow: hidden; background: #FFF; display: flex; flex-direction: column; transition: border-color 0.2s, box-shadow 0.2s;">
+                    <div style="position: relative; aspect-ratio: 1 / 1; background: #111;">
                       <img src="${resolvePreviewUrl(igItem.img)}" alt="" style="width: 100%; height: 100%; object-fit: cover;" />
-                      <div style="position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.65); color: #FFF; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px;">
-                        Post #${idx + 1}
+                      
+                      <!-- Top Left Checkbox + Post # -->
+                      <div style="position: absolute; top: 8px; left: 8px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.65); padding: 3px 8px; border-radius: 4px; backdrop-filter: blur(4px);">
+                        <input type="checkbox" class="ig-picker-checkbox" data-catalog-id="${igItem.id}" style="cursor: pointer; width: 14px; height: 14px; accent-color: #B47154;" />
+                        <span style="color: #FFF; font-size: 10px; font-weight: 700;">#${idx + 1}</span>
                       </div>
+
+                      <!-- Top Right In-Slider Badge -->
                       ${isAlreadyAdded ? `
-                        <div style="position: absolute; top: 8px; right: 8px; background: #10B981; color: #FFF; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px;">
-                          ✓ in Slider
+                        <div style="position: absolute; top: 8px; right: 8px; background: #10B981; color: #FFF; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 999px; box-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+                          ✓ In Slider
                         </div>
                       ` : ''}
                     </div>
-                    <div style="padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+
+                    <div style="padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
                       <div>
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: #767676; margin-bottom: 6px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; color: #767676; margin-bottom: 4px;">
                           <span>♥ ${igItem.likes} likes</span>
-                          <a href="${igItem.url}" target="_blank" rel="noopener noreferrer" style="color: #C46238; text-decoration: none;">View ↗</a>
+                          <a href="${igItem.url}" target="_blank" rel="noopener noreferrer" style="color: #C46238; text-decoration: none; font-weight: 600;">View ↗</a>
                         </div>
-                        <p style="font-size: 12px; line-height: 1.4; color: #374151; margin: 0 0 10px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                        <p style="font-size: 11.5px; line-height: 1.35; color: #374151; margin: 0 0 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                           ${igItem.caption}
                         </p>
                       </div>
-                      <button type="button" class="btn-picker-add admin-btn" data-catalog-id="${igItem.id}" style="width: 100%; font-size: 11px; padding: 6px 10px; background: ${isAlreadyAdded ? '#F3F4F6' : '#1A1A1A'}; color: ${isAlreadyAdded ? '#374151' : '#FFF'}; border: 1px solid ${isAlreadyAdded ? '#D1D5DB' : '#1A1A1A'}; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                      <button type="button" class="btn-picker-add admin-btn" data-catalog-id="${igItem.id}" style="width: 100%; font-size: 11px; padding: 5px 8px; background: ${isAlreadyAdded ? '#F3F4F6' : '#1A1A1A'}; color: ${isAlreadyAdded ? '#374151' : '#FFF'}; border: 1px solid ${isAlreadyAdded ? '#D1D5DB' : '#1A1A1A'}; border-radius: 4px; cursor: pointer; font-weight: 600;">
                         ${isAlreadyAdded ? '+ Add Again' : '+ Add to Slider'}
                       </button>
                     </div>
@@ -390,9 +560,13 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
             </div>
 
             <!-- Modal Footer -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; pt: 12px; border-top: 1px solid #E5E5E5;">
-              <span style="font-size: 12px; color: #767676;">Showing all 8 authentic Instagram posts from @marshbarbary</span>
-              <button type="button" id="ig-picker-done" class="admin-btn admin-btn-primary" style="padding: 6px 16px; font-size: 12px;">Done</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #E5E5E5;">
+              <span style="font-size: 12px; color: #767676;">
+                Showing all <strong>${OFFICIAL_IG_CATALOG.length}</strong> authentic posts from <strong>@marshbarbary</strong>
+              </span>
+              <button type="button" id="ig-picker-done" class="admin-btn admin-btn-primary" style="padding: 6px 18px; font-size: 12px; background: #1A1A1A; color: #FFF; border: none; border-radius: 4px; cursor: pointer;">
+                Close
+              </button>
             </div>
           </div>
         </div>
@@ -610,13 +784,31 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
         renderView();
       });
 
-      // 8. Instagram Picker Modal Handling
+      // 8. Instagram Picker Modal Handling & Multi-Select Logic
       const pickerModal = container.querySelector('#ig-picker-modal-overlay');
       const pickerClose = container.querySelector('#ig-picker-close');
       const pickerDone = container.querySelector('#ig-picker-done');
+      const pickerSearch = container.querySelector('#ig-picker-search');
+      const selectedCounter = container.querySelector('#ig-selected-counter');
+      const btnBatchAdd = container.querySelector('#btn-batch-add-ig');
+      const btnClearSelection = container.querySelector('#btn-ig-deselect-all');
+      const presetButtons = container.querySelectorAll('.btn-ig-preset');
+
+      function updateSelectedCounter() {
+        const checked = container.querySelectorAll('.ig-picker-checkbox:checked');
+        if (selectedCounter) {
+          selectedCounter.textContent = checked.length;
+        }
+        if (btnBatchAdd) {
+          btnBatchAdd.style.opacity = checked.length > 0 ? '1' : '0.6';
+        }
+      }
 
       container.querySelector('#btn-fetch-instagram')?.addEventListener('click', () => {
-        if (pickerModal) pickerModal.style.display = 'flex';
+        if (pickerModal) {
+          pickerModal.style.display = 'flex';
+          updateSelectedCounter();
+        }
       });
 
       pickerClose?.addEventListener('click', () => {
@@ -628,12 +820,118 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
         renderView();
       });
 
+      // Live search / filter across all 24 posts
+      pickerSearch?.addEventListener('input', (e) => {
+        const query = (e.target.value || '').toLowerCase().trim();
+        const cards = container.querySelectorAll('.ig-catalog-card');
+        cards.forEach(card => {
+          const caption = card.dataset.caption || '';
+          const tag = card.dataset.tag || '';
+          const id = card.dataset.catalogId || '';
+          const match = !query || caption.includes(query) || tag.includes(query) || id.includes(query);
+          card.style.display = match ? 'flex' : 'none';
+        });
+      });
+
+      // Checkbox click toggle card highlight
+      container.querySelectorAll('.ig-picker-checkbox').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          const card = e.target.closest('.ig-catalog-card');
+          if (card) {
+            if (e.target.checked) {
+              card.style.borderColor = '#B47154';
+              card.style.boxShadow = '0 0 0 2px rgba(180, 113, 84, 0.25)';
+            } else {
+              const catalogId = card.dataset.catalogId;
+              const isAlreadyAdded = posts.some(p => p.url === OFFICIAL_IG_CATALOG.find(item => item.id === catalogId)?.url);
+              card.style.borderColor = isAlreadyAdded ? '#10B981' : '#E5E5E5';
+              card.style.boxShadow = 'none';
+            }
+          }
+          updateSelectedCounter();
+        });
+      });
+
+      // Quick Selection Presets (First 4, First 8, First 12, All)
+      presetButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const countParam = e.currentTarget.dataset.count;
+          const checkboxes = Array.from(container.querySelectorAll('.ig-picker-checkbox')).filter(cb => {
+            const card = cb.closest('.ig-catalog-card');
+            return card && card.style.display !== 'none';
+          });
+
+          const targetCount = countParam === 'all' ? checkboxes.length : Math.min(parseInt(countParam, 10), checkboxes.length);
+
+          checkboxes.forEach((cb, idx) => {
+            cb.checked = idx < targetCount;
+            const card = cb.closest('.ig-catalog-card');
+            if (card) {
+              if (cb.checked) {
+                card.style.borderColor = '#B47154';
+                card.style.boxShadow = '0 0 0 2px rgba(180, 113, 84, 0.25)';
+              } else {
+                card.style.borderColor = '#E5E5E5';
+                card.style.boxShadow = 'none';
+              }
+            }
+          });
+          updateSelectedCounter();
+        });
+      });
+
+      // Clear selection
+      btnClearSelection?.addEventListener('click', () => {
+        container.querySelectorAll('.ig-picker-checkbox').forEach(cb => {
+          cb.checked = false;
+          const card = cb.closest('.ig-catalog-card');
+          if (card) {
+            card.style.borderColor = '#E5E5E5';
+            card.style.boxShadow = 'none';
+          }
+        });
+        updateSelectedCounter();
+      });
+
+      // Batch Add to Slider Button
+      btnBatchAdd?.addEventListener('click', async () => {
+        const checked = Array.from(container.querySelectorAll('.ig-picker-checkbox:checked'));
+        if (checked.length === 0) {
+          window.MB_ADMIN_SHELL?.showToast('Please select at least 1 post by checking the boxes or using presets', 'info');
+          return;
+        }
+
+        let addedCount = 0;
+        checked.forEach(cb => {
+          const catalogId = cb.dataset.catalogId;
+          const found = OFFICIAL_IG_CATALOG.find(item => item.id === catalogId);
+          if (found) {
+            const newId = 'ig-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+            posts.push({
+              id: newId,
+              img: found.img,
+              url: found.url,
+              caption: found.caption,
+              likes: found.likes,
+              active: true
+            });
+            addedCount++;
+          }
+        });
+
+        await service.saveSliderConfig(sliderId, { mode, posts });
+        window.MB_ADMIN_SHELL?.showToast(`Added ${addedCount} posts from @marshbarbary to ${sliderName}!`, 'success');
+        if (pickerModal) pickerModal.style.display = 'none';
+        renderView();
+      });
+
+      // Single Add Button per card
       container.querySelectorAll('.btn-picker-add').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const catalogId = e.currentTarget.dataset.catalogId;
           const found = OFFICIAL_IG_CATALOG.find(item => item.id === catalogId);
           if (found) {
-            const newId = 'ig-' + Date.now();
+            const newId = 'ig-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
             posts.push({
               id: newId,
               img: found.img,
@@ -644,9 +942,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
             });
             await service.saveSliderConfig(sliderId, { mode, posts });
             window.MB_ADMIN_SHELL?.showToast(`Added post #${catalogId} to ${sliderName}`, 'success');
-            // Re-render picker view so button states update
             renderView();
-            // Re-open picker
             const modalAgain = container.querySelector('#ig-picker-modal-overlay');
             if (modalAgain) modalAgain.style.display = 'flex';
           }

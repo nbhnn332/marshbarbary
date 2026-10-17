@@ -20,9 +20,11 @@
 
   /* Text & Inks */
   --color-text-primary: #26201D;     /* Deep warm espresso charcoal */
+  --color-text-dark: #26201D;        /* Deep espresso dark ink token */
   --color-text-secondary: #706660;   /* Muted warm taupe / earth stone */
   --color-text-muted: #9E938B;       /* Light stone for captions & borders */
   --color-text-on-dark: #FFFFFF;
+  --color-bg-dark: #26201D;          /* Deep rich espresso dark surface */
   
   /* Brand Accents */
   --color-accent-terracotta: #B47154;/* Warm earthy terracotta */
