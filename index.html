@@ -137,13 +137,15 @@
   <section class="hero-section" aria-label="Brand Hero">
     <div class="hero-full-rectangle">
       <img 
-        src="" 
+        src="assets/images/hero-banner.jpg" 
         alt="Where Wild Elegance Meets Style" 
         class="hero-main-visual"
-        style="display: none;"
+        loading="eager"
       />
+      <!-- Soft organic bottom fade melting into Collections section -->
+      <div class="hero-melt-gradient"></div>
       <script>
-        // Apply admin/Supabase hero image immediately on parse to prevent any image splash on reload
+        // Apply admin/Supabase hero image immediately on parse
         (function() {
           try {
             var el = document.querySelector('.hero-main-visual');
@@ -157,7 +159,6 @@
             }
             if (saved && el) {
               el.src = saved;
-              el.style.display = 'block';
             }
           } catch(e) {}
         })();

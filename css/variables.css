@@ -5,12 +5,19 @@
 
 :root {
   /* Color Palette */
-  --color-bg-primary: #F9F5F0;       /* Warm oat / sand page backdrop */
-  --color-bg-secondary: #F3ECE3;     /* Muted almond warm surface */
-  --color-bg-card: #FAF7F3;          /* Soft ivory card background */
+  --color-bg-primary: #FAF7F2;       /* Warm luminous oat / sand page backdrop */
+  --color-bg-secondary: #F4ECE4;     /* Muted almond warm surface */
+  --color-bg-light: #F7EFE7;         /* Soft warm ivory light surface */
+  --color-bg-card: #FFFFFF;          /* Soft ivory card background */
   --color-bg-card-hover: #FFFFFF;    /* Pure crisp white card surface */
-  --color-bg-terracotta-tint: #F6EEE7;
+  --color-bg-terracotta-tint: #F7EFE9;
   
+  /* Melting Ambient Gradients */
+  --gradient-ambient-sand: radial-gradient(1200px circle at 50% -50px, rgba(235, 217, 206, 0.45) 0%, transparent 70%);
+  --gradient-melting-surface: linear-gradient(180deg, rgba(250, 247, 242, 0.5) 0%, rgba(244, 236, 228, 0.75) 100%);
+  --gradient-card-glass: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(247, 239, 233, 0.7) 100%);
+  --gradient-glow-terracotta: radial-gradient(circle at 50% 50%, rgba(180, 113, 84, 0.1) 0%, transparent 65%);
+
   /* Text & Inks */
   --color-text-primary: #26201D;     /* Deep warm espresso charcoal */
   --color-text-secondary: #706660;   /* Muted warm taupe / earth stone */
@@ -24,9 +31,14 @@
   --color-accent-gold: #9C816A;      /* Warm taupe gold */
   
   /* UI Borders & Lines */
-  --color-border-subtle: #E8DFD5;    /* Delicate warm outline */
+  --color-border-subtle: rgba(180, 113, 84, 0.12); /* Delicate warm outline */
   --color-border-medium: #D5C8BC;
   --color-border-dark: #26201D;
+
+  /* Luxurious Soft Shadows */
+  --shadow-soft: 0 8px 24px -6px rgba(38, 32, 29, 0.05);
+  --shadow-melt: 0 20px 48px -12px rgba(180, 113, 84, 0.1);
+  --shadow-float: 0 16px 36px -8px rgba(38, 32, 29, 0.08);
   
   /* Typography */
   --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;

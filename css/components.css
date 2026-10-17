@@ -357,6 +357,7 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
+  background-color: #EAE3D9;
 }
 
 .hero-main-visual {
@@ -364,6 +365,19 @@
   height: auto;
   display: block;
   object-fit: cover;
+  min-height: 380px;
+}
+
+/* Hero Bottom Melting Gradient: dissolves visual into Collection section */
+.hero-melt-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(80px, 12vw, 150px);
+  background: linear-gradient(to bottom, rgba(250, 247, 242, 0) 0%, rgba(250, 247, 242, 0.45) 50%, var(--color-bg-primary) 100%);
+  pointer-events: none;
+  z-index: 2;
 }
 
 /* Hero Decorative Accents & Floating Metadata */
@@ -420,12 +434,25 @@
 }
 
 /* --------------------------------------------------------------------------
-   4. COLLECTION SECTION & CATEGORY CARDS (SINGLE RIGHT-SIDE WING / LEAF FORM)
+   4. COLLECTION SECTION & CATEGORY CARDS (MELTING AMBIENT BACKDROP)
    -------------------------------------------------------------------------- */
 .collection-section {
-  padding-top: clamp(48px, 6vw, 80px);
+  padding-top: clamp(40px, 5vw, 68px);
   padding-bottom: clamp(48px, 6vw, 80px);
-  background-color: var(--color-bg-primary, #FAF8F5);
+  background: radial-gradient(circle at 10% 20%, rgba(180, 113, 84, 0.06) 0%, transparent 45%),
+              radial-gradient(circle at 90% 75%, rgba(197, 139, 112, 0.07) 0%, transparent 50%),
+              var(--color-bg-primary);
+  position: relative;
+}
+
+.collection-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8%;
+  width: 84%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(180, 113, 84, 0.2), transparent);
 }
 
 .collection-layout-row {
@@ -584,8 +611,20 @@
    5. NEW ARRIVALS & REUSABLE PRODUCT CARDS
    -------------------------------------------------------------------------- */
 .new-arrivals-section {
-  padding-top: 48px;
-  padding-bottom: 64px;
+  padding-top: clamp(48px, 6vw, 76px);
+  padding-bottom: clamp(56px, 7vw, 88px);
+  background: linear-gradient(180deg, var(--color-bg-primary) 0%, rgba(246, 238, 231, 0.55) 50%, var(--color-bg-primary) 100%);
+  position: relative;
+}
+
+.new-arrivals-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8%;
+  width: 84%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(180, 113, 84, 0.2), transparent);
 }
 
 .products-header-row {
@@ -606,17 +645,25 @@
   grid-template-columns: minmax(280px, 340px);
 }
 
-/* Product Card Component - Clean Minimalist Editorial (Zara/COS style) */
+/* Product Card Component - Melting Soft Glassmorphic Luxury */
 .product-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  background-color: transparent;
-  border: none;
-  border-radius: 0;
-  overflow: visible;
-  box-shadow: none;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 242, 236, 0.65) 100%);
+  border: 1px solid rgba(180, 113, 84, 0.1);
+  border-radius: 8px;
+  padding: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px -4px rgba(38, 32, 29, 0.04);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
   width: 100%;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 36px -8px rgba(180, 113, 84, 0.15);
+  border-color: rgba(180, 113, 84, 0.25);
 }
 
 .product-thumb-wrap {
@@ -625,7 +672,7 @@
   aspect-ratio: 3 / 4;
   background-color: #EDE8E1;
   overflow: hidden;
-  border-radius: 3px;
+  border-radius: 6px;
 }
 
 .product-thumb-link {
@@ -1090,10 +1137,14 @@
    7. BRAND VALUES PILLARS (CONSCIOUS, CONFIDENT, TIMELESS, REFINED)
    -------------------------------------------------------------------------- */
 .values-section {
-  background-color: #FFFFFF;
-  border-top: 1px solid var(--color-border-subtle);
-  border-bottom: 1px solid var(--color-border-subtle);
-  padding: 36px 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(247, 240, 233, 0.82) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(180, 113, 84, 0.14);
+  border-bottom: 1px solid rgba(180, 113, 84, 0.14);
+  box-shadow: 0 10px 32px -10px rgba(180, 113, 84, 0.08);
+  padding: 38px 0;
+  position: relative;
 }
 
 .values-header-mobile {
@@ -1284,13 +1335,17 @@
    9. STAY IN THE LOOP (NEWSLETTER)
    -------------------------------------------------------------------------- */
 .newsletter-section {
-  padding: 48px 0;
+  padding: clamp(56px, 7vw, 92px) 0;
+  background: radial-gradient(circle at 50% 50%, rgba(180, 113, 84, 0.08) 0%, transparent 68%);
+  position: relative;
 }
 
 .newsletter-card {
-  background-color: var(--color-bg-secondary);
-  border-radius: var(--radius-xs);
-  padding: 48px;
+  background: linear-gradient(135deg, #F4ECE3 0%, #EBD9CE 100%);
+  border: 1px solid rgba(180, 113, 84, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 20px 48px -16px rgba(180, 113, 84, 0.16);
+  padding: clamp(36px, 5vw, 56px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1903,9 +1958,10 @@
 
 /* Shop Intro Section */
 .shop-intro-section {
-  padding: 56px 0 28px 0;
+  padding: clamp(56px, 7vw, 84px) 0 36px 0;
   text-align: center;
-  background-color: transparent;
+  background: radial-gradient(circle at 50% 20%, rgba(180, 113, 84, 0.08) 0%, transparent 65%), var(--color-bg-primary);
+  position: relative;
 }
 
 .shop-intro-inner {
@@ -1944,12 +2000,15 @@
 
 /* Horizontal Category Navigation Bar */
 .shop-category-nav-wrap {
-  border-top: 1px solid var(--color-border-subtle);
-  border-bottom: 1px solid var(--color-border-subtle);
-  background-color: var(--color-bg-primary);
+  border-top: 1px solid rgba(180, 113, 84, 0.12);
+  border-bottom: 1px solid rgba(180, 113, 84, 0.12);
+  background-color: rgba(250, 247, 242, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   position: sticky;
   top: 70px;
   z-index: 10;
+  box-shadow: 0 4px 20px -6px rgba(38, 32, 29, 0.04);
 }
 
 .shop-category-nav {

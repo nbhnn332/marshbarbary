@@ -30,6 +30,12 @@ body {
   line-height: 1.6;
   color: var(--color-text-primary);
   background-color: var(--color-bg-primary);
+  background-image: 
+    radial-gradient(circle at 10% 5%, rgba(180, 113, 84, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 90% 20%, rgba(197, 139, 112, 0.05) 0%, transparent 45%),
+    radial-gradient(circle at 35% 55%, rgba(235, 217, 206, 0.3) 0%, transparent 55%),
+    radial-gradient(circle at 85% 85%, rgba(180, 113, 84, 0.05) 0%, transparent 50%);
+  background-attachment: fixed;
   overflow-x: hidden;
   min-height: 100vh;
   scrollbar-width: none; /* Firefox */
