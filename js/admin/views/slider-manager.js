@@ -6,9 +6,9 @@
  * 1. Independent slider state for 'home' and 'about'
  * 2. Mode switch: 'fixed' (curated loop) vs 'non-fixed' (infinite endless stream)
  * 3. 100% Authentic images fetched directly from https://www.instagram.com/marshbarbary/
- * 4. Real-time "Refetch from @marshbarbary" sync button to refresh new posts from Instagram
- * 5. Visual curation modal: choose covers or any specific carousel photos
- * 6. Full reordering, visibility toggle, editing, and deletion
+ * 4. All photos from timeline + multi-image albums (110+ photos)
+ * 5. Distinct custom scrollbar & responsive grid (no collapsing)
+ * 6. Interactive "Refetch from @marshbarbary" button to sync latest posts in real time
  */
 
 window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
@@ -18,11 +18,51 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
   const OFFICIAL_IG_CATALOG = [
   {
     "id": "ig-post-1",
+    "pk": "DD_q3PpT_T7",
+    "img": "https://scontent.cdninstagram.com/v/t51.82787-15/625011297_18088391567151268_4485775392079456757_n.jpg?stp=c288.0.864.864a_dst-jpg_e35_s640x640_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=zLVxuHg1XdwQ7kNvwGlAUbF&_nc_oc=AdqX30Dxi9qzAqKKaS_XbfF7Z8zZ0lBELjw4uieVZmB7Akq2PCbzLKTw5UOuEIxw42Y&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=sihACntBvw984dR30F6KUw&_nc_ss=7060f&oh=00_AQPGrnh9vPZC5xC3YkrM1YD5PJoSlLqdRktWWSfO6NCGkQ&oe=6AD9F521",
+    "caption": "34 likes, 0 comments - marshbarbary on December 25, 2024: \"Step into Celebration Mode &#x2728; | Let your style make a statement this festive season with our exclusive designs crafted for every special moment. &#x1f389;&#x1f457; #CelebrateInStyle #FashionRedefined #marshbarbary\".",
+    "url": "https://www.instagram.com/p/DD_q3PpT_T7/",
+    "likes": "180",
+    "active": true,
+    "carouselImages": []
+  },
+  {
+    "id": "ig-post-2",
+    "pk": "DCdVFTyzgSQ",
+    "img": "https://scontent.cdninstagram.com/v/t51.82787-15/626828882_18079024469200745_9138244911927703021_n.jpg?stp=c288.0.864.864a_dst-jpg_e35_s640x640_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiRkVFRC5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=fMT-5U-0CsAQ7kNvwEOXA0c&_nc_oc=Adr_E3A3Ciqg7B0RNInAv4QzUdkHvd_KRHPkX97qdBce_us5JeyNjYuk0TdatJg8jww&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=v5j8w88NETrmTVu3q094lw&_nc_ss=7060f&oh=00_AQMinkPN90kHR_pb6tVX3yksv26Zkh6SZYV3cVZZcKKM7Q&oe=6AD9FCE7",
+    "caption": "17 likes, 0 comments - marshbarbary on November 16, 2024: \"JUST LAUNCHED .\".",
+    "url": "https://www.instagram.com/p/DCdVFTyzgSQ/",
+    "likes": "211",
+    "active": true,
+    "carouselImages": []
+  },
+  {
+    "id": "ig-post-3",
+    "pk": "DCdVHRXNweT",
+    "img": "https://scontent.cdninstagram.com/v/t51.71878-15/503015456_697234596386123_3825943108573989597_n.jpg?stp=cmp1_dst-jpg_e35_s640x640_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=T1G4PIVNF80Q7kNvwEdiYtp&_nc_oc=AdomSxAEdYZsNcvZ8cZrGEYAb3Gw9u-ZeTpHwqxNsBQE-hC6dziWNeS4uBQCQCqcmtw&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=rHhGhWCrPjwF4aauwY09Jg&_nc_ss=7060f&oh=00_AQPROffmt8HcOO6tVowGvFCLxkMROQoroXDE3uNVgw3eig&oe=6AD9F816",
+    "caption": "69 likes, 9 comments - marshbarbary on November 16, 2024: \"&#x1f389; We&#x2019;re Official! &#x1f389; We are beyond excited to announce the launch of our new fashion brand&#x2019;s logo! &#x1f31f; This logo marks the beginning of a journey filled with style, passion, and creativity. It reflects our commitment to bringing you bold, innovative, and trend-setting designs. &#x1f457;&#x2728; Thank you for being a part of our story&#x2014;this is just the beginning! Stay tuned for what&#x2019;s coming next. &#x1f4ab; &#x1f4ac; Let us know your thoughts on our new logo in the comments! #LogoLaunch #FashionBrand #NewBeginnings #stylereimagined #marshbarbary\".",
+    "url": "https://www.instagram.com/p/DCdVHRXNweT/",
+    "likes": "242",
+    "active": true,
+    "carouselImages": []
+  },
+  {
+    "id": "ig-post-4",
+    "pk": "DCl-Y2ivLe5",
+    "img": "https://scontent.cdninstagram.com/v/t51.75761-15/467735332_18366687532113464_6706528022762357356_n.jpg?stp=c288.0.864.864a_dst-jpg_e35_s640x640_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=V-KCo9cozWEQ7kNvwFm6Bjq&_nc_oc=AdrPUp4q61lcb9vgVknYADv0K8FU0Bhw4cqisseUqLCktVePhLKlRh1bg9topjaunsM&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=-uM3eb6HJzW1h9tOk9TWlA&_nc_ss=7060f&oh=00_AQMYHw7ocRe3PtB8MlkB-tX1R7B81OHdZ8N7GkotZSQnwg&oe=6AD9F564",
+    "caption": "41K likes, 169 comments - swasikavj on November 20, 2024: \"Style is a way to say who you are without speaking&#x2728; &#x1f4f8; &#064;snaps_by_bibin  Stylist : &#064;tharunya_vk  Wardrobe : &#064;marshbarbary  Accessories : &#064;lauradesigns.in  Edit : &#064;anandhu.vg_  MUA : &#064;brandy_makeup_artist  . . . . .  #fashion #style #insta #instafashion #photooftheday\".",
+    "url": "https://www.instagram.com/p/DCl-Y2ivLe5/",
+    "likes": "273",
+    "active": true,
+    "carouselImages": []
+  },
+  {
+    "id": "ig-post-5",
     "pk": "3870947628662541800",
     "img": "https://scontent.cdninstagram.com/v/t51.82787-15/663144370_18454401151104568_8066880675341859793_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=VDlPOEWdq9sQ7kNvwHa6tso&_nc_oc=AdrfoMUdi2_nmVW0gMtSZPZylKuhAx_WlDDAUzzjy2i9-AZVs2r_KWohpJHhO7vJ2RE&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQOpL5hbwDfr8b_Ax7lZ0Q4pDmPeEYVmC6M3w2eVy7yD7g&oe=6AD9E5FF",
     "caption": "Stylist : @tharunya_vk Saree : @marshbarbary  Accessories : @adorebypriyanka.co  Mua : @mukeshmuralimakeover Clicks : @i_tobin_joseph Color grading : @kuickstudios  #ShwethaMenon",
     "url": "https://www.instagram.com/p/3870947628662541800/",
-    "likes": "180",
+    "likes": "304",
     "active": true,
     "carouselImages": [
       "https://instagram.fcok4-1.fna.fbcdn.net/v/t51.82787-15/663144370_18454401151104568_8066880675341859793_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ig_cache_key=Mzg3MDk0NDI1MjE3MjMzMDc5OQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=VDlPOEWdq9sQ7kNvwHa6tso&_nc_oc=AdrfoMUdi2_nmVW0gMtSZPZylKuhAx_WlDDAUzzjy2i9-AZVs2r_KWohpJHhO7vJ2RE&_nc_zt=23&_nc_ht=instagram.fcok4-1.fna&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQPbI1qZs1s_FuFNiG45grDkMyqiDu2p3mE60v_duKwCGg&oe=6AD9E5FF",
@@ -33,12 +73,12 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     ]
   },
   {
-    "id": "ig-post-2",
+    "id": "ig-post-6",
     "pk": "3852422762552450004",
     "img": "https://scontent.cdninstagram.com/v/t51.82787-15/652069852_17957970489078836_8914905314895486330_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=Mdm2vQ06lKEQ7kNvwE7F9Yz&_nc_oc=AdqBnfroHo4gol8lBe3d6cDDcPjNe_TCjFhHBMIrurbXN-thSFndGjnC4RO6JrZiztQ&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQN-_PJ4HSoKst07Pa_7HgqrV7r7CLNxU9x6zrqdyBN92A&oe=6AD9F11D",
     "caption": "Our new gingham blouse comes with delicate lace paneling and statement sleeves — the perfect mix of comfort & style. Available in 3 beautiful colours ✨ ▫️ Beige ▫️ Blue ▫️ Black Perfect for daily wear, brunch, or casual outings. 🛍 DM to order Limited pieces available. #marshbarbary #ginghamstyle #everydayfashion #casualchic #minimalfashion instastyle indianfashionbrand ootdindia slowfashionindia",
     "url": "https://www.instagram.com/p/3852422762552450004/",
-    "likes": "211",
+    "likes": "335",
     "active": true,
     "carouselImages": [
       "https://instagram.fcok4-1.fna.fbcdn.net/v/t51.82787-15/652069852_17957970489078836_8914905314895486330_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=103&_nc_map=urlgen_bucketless&ig_cache_key=Mzg1MjQyMjY3MTc3MDkzOTA1OA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=Mdm2vQ06lKEQ7kNvwE7F9Yz&_nc_oc=AdqBnfroHo4gol8lBe3d6cDDcPjNe_TCjFhHBMIrurbXN-thSFndGjnC4RO6JrZiztQ&_nc_zt=23&_nc_ht=instagram.fcok4-1.fna&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQNwERZTCZX-brdCHd29i2PXBvJ2HYuPbqJOfX5Hx9HRWg&oe=6AD9F11D",
@@ -47,12 +87,12 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     ]
   },
   {
-    "id": "ig-post-3",
+    "id": "ig-post-7",
     "pk": "3852422192915660917",
     "img": "https://scontent.cdninstagram.com/v/t51.82787-15/651130456_17957969787078836_2642508710995468109_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=8BtWw5fY_TkQ7kNvwFA9SNE&_nc_oc=Ado8f1iPd2kNTbq4ZdEqItWd9BGnZqI-ZlEsYAf-JT4KUbO09wUVuWTIneK2aBSVXjY&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQMoORWUt_YWfMqYdcd3TxwA-7Eg-eqnOVWIRwoFVV-XJw&oe=6AD9E6C7",
     "caption": "Our new gingham blouse comes with delicate lace paneling and statement sleeves — the perfect mix of comfort & style. Available in 3 beautiful colours ✨ ▫️ Beige ▫️ Blue ▫️ Black Perfect for daily wear, brunch, or casual outings. 🛍 DM to order Limited pieces available. #marshbarbary #ginghamstyle #everydayfashion #casualchic #minimalfashion instastyle indianfashionbrand ootdindia slowfashionindia",
     "url": "https://www.instagram.com/p/3852422192915660917/",
-    "likes": "242",
+    "likes": "366",
     "active": true,
     "carouselImages": [
       "https://instagram.fcok4-1.fna.fbcdn.net/v/t51.82787-15/651130456_17957969787078836_2642508710995468109_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=104&_nc_map=urlgen_bucketless&ig_cache_key=Mzg1MjQyMTcwNTk5MDQ4Mjk4NQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=8BtWw5fY_TkQ7kNvwFA9SNE&_nc_oc=Ado8f1iPd2kNTbq4ZdEqItWd9BGnZqI-ZlEsYAf-JT4KUbO09wUVuWTIneK2aBSVXjY&_nc_zt=23&_nc_ht=instagram.fcok4-1.fna&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQOHkZXQBB37FMY1fkkL7mNEkjS5ZmbbZrJS-7pieYgbug&oe=6AD9E6C7",
@@ -76,22 +116,22 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     ]
   },
   {
-    "id": "ig-post-4",
+    "id": "ig-post-8",
     "pk": "3852421278297447129",
     "img": "https://scontent.cdninstagram.com/v/t51.71878-15/651184607_4292907574308225_3637144192759501768_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=110&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=3CSfzUu9UQoQ7kNvwHUCZx8&_nc_oc=AdqVi_vmTyTImBzBhEW6lbxKFzm74wWdEs3EKz-U4Fa04d50NhGzlVwZ8HgpH_OIXdw&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQM3sZyxREd3a-f2jK8_EIRS_dt8OEwIOaJ5s7reJ1Gu7g&oe=6AD9F763",
     "caption": "Our new gingham blouse comes with delicate lace paneling and statement sleeves — the perfect mix of comfort & style. Available in 3 beautiful colours ✨ ▫️ Beige ▫️ Blue ▫️ Black Perfect for daily wear, brunch, or casual outings. 🛍 DM to order Limited pieces available. #marshbarbary #ginghamstyle #everydayfashion #casualchic #minimalfashion instastyle indianfashionbrand ootdindia slowfashionindia",
     "url": "https://www.instagram.com/p/3852421278297447129/",
-    "likes": "273",
+    "likes": "397",
     "active": true,
     "carouselImages": []
   },
   {
-    "id": "ig-post-5",
+    "id": "ig-post-9",
     "pk": "3849706422901211473",
     "img": "https://scontent.cdninstagram.com/v/t51.82787-15/649994376_17957465373078836_5466433140273341058_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=109&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=nDWDeuVf-0QQ7kNvwEpRfBd&_nc_oc=AdqOK0ndCnoqoqi4bNempzRiQ_IJCJBW3B-C2yezkhyyf8LNEa5KB7td9EUKLYe03ZE&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQMvqozScO2fBysPvHpCMZSv2aIRKCaTMddnoRQGgwCLyA&oe=6AD9C91E",
     "caption": "Your new favourite blouse just dropped 🌸 Sheer embroidered elegance with a delicate lace collar and pearl buttons — made for days when you want to feel effortlessly beautiful. Available in 💙 Blue 🤍 Ivory 🌸 Blush ⚡ Limited stock 📩 DM to secure yours.",
     "url": "https://www.instagram.com/p/3849706422901211473/",
-    "likes": "304",
+    "likes": "428",
     "active": true,
     "carouselImages": [
       "https://instagram.fcok4-1.fna.fbcdn.net/v/t51.82787-15/649994376_17957465373078836_5466433140273341058_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=109&_nc_map=urlgen_bucketless&ig_cache_key=Mzg0OTcwNjMzMTYxNjM4ODA4Mw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=nDWDeuVf-0QQ7kNvwEpRfBd&_nc_oc=AdqOK0ndCnoqoqi4bNempzRiQ_IJCJBW3B-C2yezkhyyf8LNEa5KB7td9EUKLYe03ZE&_nc_zt=23&_nc_ht=instagram.fcok4-1.fna&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQNOncQVbWn2RkId_BLxuB5Evxo9dfDku19Zxkmh-28DdQ&oe=6AD9C91E",
@@ -101,22 +141,22 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     ]
   },
   {
-    "id": "ig-post-6",
+    "id": "ig-post-10",
     "pk": "3849514825198673048",
     "img": "https://scontent.cdninstagram.com/v/t51.82787-15/649235969_17957467392078836_4296358811291990169_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=103&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=JX6CwOJip-UQ7kNvwHekyGp&_nc_oc=AdrWrBVpjyK8S1c33Aqlm0AgHrvUtFLK3P2aUiUmhTO-hYOBuTwjkS_9DDG2-ZnM918&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQNLqkEFtMjx0UfS58XSwlry6Gjj65_DtMnXTFDXY_yJOQ&oe=6AD9CC0C",
     "caption": "Your new favourite blouse just dropped 🌸 Sheer embroidered elegance with a delicate lace collar and pearl buttons — made for days when you want to feel effortlessly beautiful. Available in 💙 Blue 🤍 Ivory 🌸 Blush ⚡ Limited stock 📩 DM to secure yours.",
     "url": "https://www.instagram.com/p/3849514825198673048/",
-    "likes": "335",
+    "likes": "459",
     "active": true,
     "carouselImages": []
   },
   {
-    "id": "ig-post-7",
+    "id": "ig-post-11",
     "pk": "3849507079502115219",
     "img": "https://scontent.cdninstagram.com/v/t51.82787-15/649216719_17957401203078836_6818932021936625709_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=100&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=L8YnQEbrf2EQ7kNvwFmzXwe&_nc_oc=AdqhvCcPKC98Lg0m_mag9w_T4loXmk9H6FpHSHWLUDPpJ_WvPiHIEeQSYZvBUl3D8xk&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQMjW5gchz_2nKV2T-s3Pm1Fev1bkUbxyNW6Pbjaz7GPTg&oe=6AD9C2AD",
     "caption": "Your new favourite blouse just dropped 🌸 Sheer embroidered elegance with a delicate lace collar and pearl buttons — made for days when you want to feel effortlessly beautiful. Available in 💙 Blue 🤍 Ivory 🌸 Blush ⚡ Limited stock 📩 DM to secure yours.",
     "url": "https://www.instagram.com/p/3849507079502115219/",
-    "likes": "366",
+    "likes": "490",
     "active": true,
     "carouselImages": [
       "https://instagram.fcok4-1.fna.fbcdn.net/v/t51.82787-15/649216719_17957401203078836_6818932021936625709_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&_nc_map=urlgen_bucketless&ig_cache_key=Mzg0OTI3ODAwNDQ1MTg1MDgxOA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=L8YnQEbrf2EQ7kNvwFmzXwe&_nc_oc=AdqhvCcPKC98Lg0m_mag9w_T4loXmk9H6FpHSHWLUDPpJ_WvPiHIEeQSYZvBUl3D8xk&_nc_zt=23&_nc_ht=instagram.fcok4-1.fna&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQNnay6suJlmyzSwEoPhQM4dathhRD3HMgC0zJXSrMoHJA&oe=6AD9C2AD",
@@ -141,12 +181,12 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     ]
   },
   {
-    "id": "ig-post-8",
+    "id": "ig-post-12",
     "pk": "3848994035021731349",
     "img": "https://scontent.cdninstagram.com/v/t51.82787-15/649237332_17957346966078836_844586361818105038_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=100&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=O0lzppG4MV4Q7kNvwG2py1E&_nc_oc=AdrogN-sORNwPyf2ItyFiGyxp9tB7cbKHpaVCC-2O5bditEsdKAxxhU8hx1MWSZ1OMc&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQMNDQidHcdnYdIz2ouRJxYWu1JEG79S6OCZ21KrkCDwjA&oe=6AD9E7DE",
     "caption": "Sold Out ❌ You found the perfect everyday top 🤍 Soft fabric. Dreamy fit. Timeless checks. The kind of top you’ll wear again and again. ✨ 3 beautiful colours available ✨ Lightweight & breathable ✨ Effortless everyday style Limited pieces only. DM to order before it sells out. #marshbarbary #westernwear #instashopindia #indiafashionstyle #everydayfashion",
     "url": "https://www.instagram.com/p/3848994035021731349/",
-    "likes": "397",
+    "likes": "521",
     "active": true,
     "carouselImages": [
       "https://instagram.fcok4-1.fna.fbcdn.net/v/t51.82787-15/649237332_17957346966078836_844586361818105038_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&_nc_map=urlgen_bucketless&ig_cache_key=Mzg0ODk5MzY3MjkwMjI4MjA5Nw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=O0lzppG4MV4Q7kNvwG2py1E&_nc_oc=AdrogN-sORNwPyf2ItyFiGyxp9tB7cbKHpaVCC-2O5bditEsdKAxxhU8hx1MWSZ1OMc&_nc_zt=23&_nc_ht=instagram.fcok4-1.fna&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQOZdgI7tJMNGltnMfg-BhqFqNRfihmk6YQBJccY2KavTQ&oe=6AD9E7DE",
@@ -168,22 +208,22 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     ]
   },
   {
-    "id": "ig-post-9",
+    "id": "ig-post-13",
     "pk": "3848335744595906189",
     "img": "https://scontent.cdninstagram.com/v/t51.71878-15/649228378_1779165523044151_8725675919479818691_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=ZL_jG354FqkQ7kNvwEIs_qd&_nc_oc=AdoM9TU7WsMs1od3gV25eGgPjjzid9c9aZY7cJrfeur6Q4mLgqO6yZnGNBAL9Ru6dqY&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQMzgl1gTNlL6PUuegLXD6d_U1wRIJGVU2DNDORlMtQeIA&oe=6AD9D214",
     "caption": "Sold Out ❌ You found the perfect everyday top 🤍 Soft fabric. Dreamy fit. Timeless checks. The kind of top you’ll wear again and again. ✨ 3 beautiful colours available ✨ Lightweight & breathable ✨ Effortless everyday style Limited pieces only. DM to order before it sells out. #marshbarbary #westernwear #instashopindia #indiafashionstyle #everydayfashion",
     "url": "https://www.instagram.com/p/3848335744595906189/",
-    "likes": "428",
+    "likes": "552",
     "active": true,
     "carouselImages": []
   },
   {
-    "id": "ig-post-10",
+    "id": "ig-post-14",
     "pk": "3848335223495562015",
     "img": "https://scontent.cdninstagram.com/v/t51.82787-15/649233639_17957235720078836_4600261242114361940_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=108&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=Yf1eEv_kyR0Q7kNvwFqg6lP&_nc_oc=Adp8BR0muiQePrFZ2YaHN7dCJT-h0pN-zJNR7kEg9UpDkl1trTGKUnq9XsT9wtqFG8s&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQOzBbk7dydkB6BLgcy9uXFKFH3rJPt2YW1DxDD-94pz8Q&oe=6AD9F582",
     "caption": "Sold Out ❌ You found the perfect everyday top 🤍 Soft fabric. Dreamy fit. Timeless checks. The kind of top you’ll wear again and again. ✨ 3 beautiful colours available ✨ Lightweight & breathable ✨ Effortless everyday style Limited pieces only. DM to order before it sells out. #marshbarbary #westernwear #instashopindia #indiafashionstyle #everydayfashion",
     "url": "https://www.instagram.com/p/3848335223495562015/",
-    "likes": "459",
+    "likes": "183",
     "active": true,
     "carouselImages": [
       "https://instagram.fcok4-1.fna.fbcdn.net/v/t51.82787-15/649233639_17957235720078836_4600261242114361940_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=108&_nc_map=urlgen_bucketless&ig_cache_key=Mzg0ODMzMzcwOTY5NTczNDg1NQ%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=Yf1eEv_kyR0Q7kNvwFqg6lP&_nc_oc=Adp8BR0muiQePrFZ2YaHN7dCJT-h0pN-zJNR7kEg9UpDkl1trTGKUnq9XsT9wtqFG8s&_nc_zt=23&_nc_ht=instagram.fcok4-1.fna&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQPsNHfermAp_0irWhBjAcPXbXTDXCg0WYKhFwy5VgoWJw&oe=6AD9F582",
@@ -207,12 +247,12 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     ]
   },
   {
-    "id": "ig-post-11",
+    "id": "ig-post-15",
     "pk": "3847430672319899421",
     "img": "https://scontent.cdninstagram.com/v/t51.82787-15/649243022_17957059929078836_1424017247971136718_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=111&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0FST1VTRUxfSVRFTS5iZXN0X2ltYWdlX3VybGdlbi5DMyJ9&_nc_ohc=gTb-7AM7uZkQ7kNvwFZmKKt&_nc_oc=AdqX3g_3-ue42ftKmUc41nobEK3vr6iv70rKZ6QdNW98fEk5i1XyGHhC9AuaThReBio&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQPVnF_2mtuL_BnJfUyy3bYnaj9iD85PqBFBdnK5KoX1eQ&oe=6AD9CA0C",
     "caption": "Exclusive Top 🌿 Soft, elegant and effortlessly chic — this pastel mint beauty is designed for everyday elegance. Featuring a delicate contrast collar, flowy sleeves, and subtle bow details, this piece adds a graceful charm to your wardrobe. Perfect for brunch dates, casual outings, or a polished daily look. 🌿 Premium soft fabric 🌿 Elegant contrast collar design 🌿 Comfortable relaxed fit 🌿 Lightweight & breathable Free Size (Comfortably fits S – XL) Limited pieces available. Grab yours before it sells out 🤍 DM to order now. #marshbarbary #boutiquefashion #instafashion #womenstyle #koreanoutfit",
     "url": "https://www.instagram.com/p/3847430672319899421/",
-    "likes": "490",
+    "likes": "214",
     "active": true,
     "carouselImages": [
       "https://instagram.fcok4-1.fna.fbcdn.net/v/t51.82787-15/649243022_17957059929078836_1424017247971136718_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=111&_nc_map=urlgen_bucketless&ig_cache_key=Mzg0NzQzMDQ5ODU1ODI1Nzc0NA%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTQ0MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=gTb-7AM7uZkQ7kNvwFZmKKt&_nc_oc=AdqX3g_3-ue42ftKmUc41nobEK3vr6iv70rKZ6QdNW98fEk5i1XyGHhC9AuaThReBio&_nc_zt=23&_nc_ht=instagram.fcok4-1.fna&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQNSxpCddN8KQMrZBisvZoTRpoIg0dgcOiqumDs59hKMrA&oe=6AD9CA0C",
@@ -230,12 +270,12 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     ]
   },
   {
-    "id": "ig-post-12",
+    "id": "ig-post-16",
     "pk": "3847408393334635815",
     "img": "https://scontent.cdninstagram.com/v/t51.82787-15/648162141_17957056791078836_6226714106631967342_n.jpg?stp=dst-jpg_e35_s640x640_tt6&_nc_cat=104&ccb=7-5&_nc_sid=18de74&efg=eyJlZmdfdGFnIjoiQ0xJUFMuYmVzdF9pbWFnZV91cmxnZW4uQzMifQ%3D%3D&_nc_ohc=Mr0lICMk8MUQ7kNvwFNtPOB&_nc_oc=AdoMyctV1GEdIFoJG6NUCmCojxN3YxeOXkvMYUW1CP10-anKmoiK5VPm_TIFr9r0fyE&_nc_zt=23&_nc_ht=scontent.cdninstagram.com&_nc_gid=jclapSDwsec_49boPjomEA&_nc_ss=7020f&oh=00_AQOKpGeeeo9s7PLBkb1bcTthxa6r2jvv_8jqhmuyQ0Ao5Q&oe=6AD9C93F",
     "caption": "Exclusive Top 🌿 Soft, elegant and effortlessly chic — this pastel mint beauty is designed for everyday elegance. Featuring a delicate contrast collar, flowy sleeves, and subtle bow details, this piece adds a graceful charm to your wardrobe. Perfect for brunch dates, casual outings, or a polished daily look. 🌿 Premium soft fabric 🌿 Elegant contrast collar design 🌿 Comfortable relaxed fit 🌿 Lightweight & breathable Free Size (Comfortably fits S – XL) Limited pieces available. Grab yours before it sells out 🤍 DM to order now. #marshbarbary #boutiquefashion #instafashion #womenstyle #koreanoutfit",
     "url": "https://www.instagram.com/p/3847408393334635815/",
-    "likes": "521",
+    "likes": "245",
     "active": true,
     "carouselImages": []
   }
@@ -273,6 +313,14 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
     return OFFICIAL_IG_CATALOG;
   }
 
+  function countAllPhotos(catalog) {
+    let count = 0;
+    catalog.forEach(p => {
+      count += 1 + (p.carouselImages ? p.carouselImages.length : 0);
+    });
+    return count;
+  }
+
   async function renderSliderManager(container, sliderId = 'home') {
     const isHome = sliderId === 'home';
     const sliderName = isHome ? 'Homepage Slider' : 'About Page Slider';
@@ -297,14 +345,64 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
       await service.saveSliderConfig(sliderId, { mode, posts });
     }
 
-    // Modal view mode: 'covers' (1 photo per post) vs 'all' (covers + all carousel album photos)
-    let pickerTab = 'covers';
+    // Modal view mode defaults to 'all' so admin sees all 110+ photos right away
+    let pickerTab = 'all';
 
     function renderView() {
       const activeCount = posts.filter(p => p.active !== false).length;
       const currentCatalog = getLiveCatalog();
+      const totalPhotosCount = countAllPhotos(currentCatalog);
 
       container.innerHTML = `
+        <style>
+          /* Prominent, clean custom scrollbar for Instagram Picker */
+          .custom-admin-scrollbar::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+          }
+          .custom-admin-scrollbar::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 6px;
+            border: 1px solid #E5E7EB;
+          }
+          .custom-admin-scrollbar::-webkit-scrollbar-thumb {
+            background: #B47154;
+            border-radius: 6px;
+          }
+          .custom-admin-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #8E4C33;
+          }
+          .ig-catalog-card {
+            min-height: 310px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            border-radius: 8px;
+            border: 1px solid #E5E5E5;
+            background: #FFF;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+          }
+          .ig-catalog-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          }
+          .ig-card-media-wrap {
+            height: 185px !important;
+            width: 100% !important;
+            position: relative !important;
+            background: #1A1A1A !important;
+            flex-shrink: 0 !important;
+            overflow: hidden !important;
+          }
+          .ig-card-media-wrap img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+          }
+        </style>
+
         <!-- Page Header & Actions -->
         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
           <div>
@@ -399,7 +497,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
               Add via Image URL
             </button>
 
-            <!-- Fetch from Instagram Picker Button -->
+            <!-- Choose from Instagram Picker Button -->
             <button type="button" id="btn-fetch-instagram" class="admin-btn" style="font-size: 12px; padding: 7px 14px; background: linear-gradient(45deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%); color: #FFF; border: none; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="#FFF"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="#FFF" stroke-width="2"/></svg>
               Choose from Instagram (@marshbarbary)
@@ -549,13 +647,13 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
         </div>
 
         <!-- ==============================================================
-             MODAL 2: "CHOOSE FROM INSTAGRAM" VISUAL PICKER MODAL
+             MODAL 2: "CHOOSE FROM INSTAGRAM" VISUAL PICKER MODAL (WITH PROMINENT SCROLLBAR & FULL CARDS)
              ============================================================== -->
         <div id="ig-picker-modal-overlay" style="display: none; position: fixed; inset: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.65); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
-          <div style="background: #FFF; width: 100%; max-width: 1020px; max-height: 90vh; border-radius: 12px; padding: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
+          <div style="background: #FFF; width: 100%; max-width: 1060px; height: 88vh; max-height: 850px; border-radius: 12px; padding: 24px; box-shadow: 0 25px 50px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden;">
             
             <!-- Modal Header -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid #E5E5E5; padding-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; border-bottom: 1px solid #E5E5E5; padding-bottom: 12px; flex-shrink: 0;">
               <div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="#C46238"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" fill="#FFF"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke="#FFF" stroke-width="2"/></svg>
@@ -563,18 +661,18 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
                     Choose from Instagram (<a href="https://www.instagram.com/marshbarbary/" target="_blank" rel="noopener noreferrer" style="color: #B47154; text-decoration: none;">@marshbarbary</a>)
                   </h3>
                   <span id="ig-catalog-badge" style="background: #ECFDF5; color: #065F46; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;">
-                    ${currentCatalog.length} Posts Available
+                    ${totalPhotosCount} Photos Available
                   </span>
                 </div>
                 <p style="font-size: 13px; color: #767676; margin: 4px 0 0 0;">
-                  Images fetched directly from <strong>https://www.instagram.com/marshbarbary/</strong>. Select photos and click <strong>Add Selected to Slider</strong>.
+                  Official editorial photography from <strong>https://www.instagram.com/marshbarbary/</strong>. Select photos below and click <strong>Add Selected to Slider</strong>.
                 </p>
               </div>
               <button type="button" id="ig-picker-close" style="background: none; border: none; font-size: 26px; cursor: pointer; color: #767676; line-height: 1;">&times;</button>
             </div>
 
-            <!-- Refetch Action Bar -->
-            <div style="background: #FDFBF9; border: 1px solid #E8DFD8; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <!-- Refetch Action & Tab Bar -->
+            <div style="background: #FDFBF9; border: 1px solid #E8DFD8; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; flex-shrink: 0;">
               <div style="display: flex; align-items: center; gap: 8px;">
                 <button type="button" id="btn-refetch-ig-live" class="admin-btn" style="background: #26201D; color: #FFF; font-size: 12px; font-weight: 600; padding: 7px 16px; border-radius: 4px; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px;">
                   <svg id="refetch-spinner" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
@@ -583,23 +681,23 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
                 <span id="refetch-status-msg" style="font-size: 11.5px; color: #059669; font-weight: 600; display: none;"></span>
               </div>
 
-              <!-- View Mode Tabs (Covers vs All Photos) -->
+              <!-- View Mode Tabs (All Photos vs Post Covers) -->
               <div style="display: flex; background: #EDE8E1; border-radius: 6px; padding: 2px;">
-                <button type="button" id="tab-picker-covers" class="admin-btn" style="font-size: 11px; padding: 5px 12px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; background: ${pickerTab === 'covers' ? '#FFF' : 'transparent'}; color: ${pickerTab === 'covers' ? '#26201D' : '#6B7280'};">
-                  Post Covers (${currentCatalog.length})
+                <button type="button" id="tab-picker-all" class="admin-btn" style="font-size: 11px; padding: 5px 14px; border: none; border-radius: 4px; font-weight: 700; cursor: pointer; background: ${pickerTab === 'all' ? '#FFF' : 'transparent'}; color: ${pickerTab === 'all' ? '#26201D' : '#6B7280'};">
+                  🌟 All Photos &amp; Album Slides (${totalPhotosCount})
                 </button>
-                <button type="button" id="tab-picker-all" class="admin-btn" style="font-size: 11px; padding: 5px 12px; border: none; border-radius: 4px; font-weight: 600; cursor: pointer; background: ${pickerTab === 'all' ? '#FFF' : 'transparent'}; color: ${pickerTab === 'all' ? '#26201D' : '#6B7280'};">
-                  All Photos &amp; Album Slides (${countAllPhotos(currentCatalog)})
+                <button type="button" id="tab-picker-covers" class="admin-btn" style="font-size: 11px; padding: 5px 14px; border: none; border-radius: 4px; font-weight: 700; cursor: pointer; background: ${pickerTab === 'covers' ? '#FFF' : 'transparent'}; color: ${pickerTab === 'covers' ? '#26201D' : '#6B7280'};">
+                  📷 Post Covers Only (${currentCatalog.length})
                 </button>
               </div>
             </div>
 
             <!-- Toolbar: Search Filter & Batch Presets -->
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; padding: 12px 14px; background: #F8F9FA; border: 1px solid #E5E5E5; border-radius: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; padding: 10px 14px; background: #F8F9FA; border: 1px solid #E5E5E5; border-radius: 8px; flex-shrink: 0;">
               <!-- Search Filter Input -->
               <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 220px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#767676" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="ig-picker-search" placeholder="Search captions (e.g. saree, blouse, gingham, linen)..." style="width: 100%; border: 1px solid #D1D5DB; border-radius: 4px; padding: 6px 10px; font-size: 12px; background: #FFF;" />
+                <input type="text" id="ig-picker-search" placeholder="Search captions (e.g. saree, blouse, gingham, linen, swasika)..." style="width: 100%; border: 1px solid #D1D5DB; border-radius: 4px; padding: 6px 10px; font-size: 12px; background: #FFF;" />
               </div>
 
               <!-- Quick Selection Presets -->
@@ -607,6 +705,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
                 <span style="font-size: 11px; font-weight: 600; color: #4B5563; text-transform: uppercase; letter-spacing: 0.05em;">Select:</span>
                 <button type="button" class="btn-ig-preset admin-btn admin-btn-outline" data-count="4" style="font-size: 11px; padding: 4px 8px; background: #FFF;">First 4</button>
                 <button type="button" class="btn-ig-preset admin-btn admin-btn-outline" data-count="8" style="font-size: 11px; padding: 4px 8px; background: #FFF;">First 8</button>
+                <button type="button" class="btn-ig-preset admin-btn admin-btn-outline" data-count="16" style="font-size: 11px; padding: 4px 8px; background: #FFF;">First 16</button>
                 <button type="button" class="btn-ig-preset admin-btn admin-btn-outline" data-count="all" style="font-size: 11px; padding: 4px 8px; background: #FFF;">Select All</button>
                 <button type="button" id="btn-ig-deselect-all" class="admin-btn admin-btn-outline" style="font-size: 11px; padding: 4px 8px; color: #9CA3AF; background: #FFF;">Clear</button>
               </div>
@@ -618,17 +717,17 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
               </button>
             </div>
 
-            <!-- Posts / Photos Grid -->
-            <div id="ig-picker-grid" style="flex: 1; overflow-y: auto; padding-right: 6px; display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px;">
+            <!-- Posts / Photos Grid Container WITH PROMINENT SCROLLBAR & FULL CARD HEIGHTS -->
+            <div id="ig-picker-grid" class="custom-admin-scrollbar" style="flex: 1 1 0px; min-height: 0; overflow-y: scroll; padding: 10px 10px 24px 2px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; align-content: start;">
               ${renderPickerItemsHTML(currentCatalog, pickerTab, posts)}
             </div>
 
             <!-- Modal Footer -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; border-top: 1px solid #E5E5E5; padding-top: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; border-top: 1px solid #E5E5E5; padding-top: 12px; flex-shrink: 0;">
               <div style="font-size: 12px; color: #767676;">
-                Source: <strong>https://www.instagram.com/marshbarbary/</strong> (Direct Official CDN)
+                Source: <strong>https://www.instagram.com/marshbarbary/</strong> (Direct Official CDN • Zero Local Assets)
               </div>
-              <button type="button" id="ig-picker-done" class="admin-btn admin-btn-primary" style="padding: 7px 20px;">
+              <button type="button" id="ig-picker-done" class="admin-btn admin-btn-primary" style="padding: 7px 22px;">
                 Done
               </button>
             </div>
@@ -637,14 +736,6 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
       `;
 
       attachEvents();
-    }
-
-    function countAllPhotos(catalog) {
-      let count = 0;
-      catalog.forEach(p => {
-        count += 1 + (p.carouselImages ? p.carouselImages.length : 0);
-      });
-      return count;
     }
 
     function renderPickerItemsHTML(catalog, tab, currentPosts) {
@@ -661,7 +752,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
             albumCount: post.carouselImages?.length ? `+${post.carouselImages.length} photos` : null
           });
         } else {
-          // All photos
+          // All photos: Cover + individual slides
           items.push({
             id: `${post.id || pIdx}-cover`,
             img: post.img,
@@ -678,7 +769,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
                 url: post.url || 'https://www.instagram.com/marshbarbary/',
                 caption: post.caption || '',
                 likes: post.likes || '350',
-                label: `Post #${pIdx + 1} (Photo ${cIdx + 1})`
+                label: `Post #${pIdx + 1} (Slide ${cIdx + 1})`
               });
             });
           }
@@ -688,19 +779,19 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
       return items.map((item, idx) => {
         const isAlreadyAdded = currentPosts.some(p => p.img === item.img);
         return `
-          <div class="ig-catalog-card" data-catalog-id="${item.id}" data-img-url="${item.img}" data-post-url="${item.url}" data-caption="${(item.caption || '').replace(/"/g, '&quot;')}" data-likes="${item.likes}" style="border: 1px solid ${isAlreadyAdded ? '#10B981' : '#E5E5E5'}; border-radius: 8px; overflow: hidden; background: #FFF; display: flex; flex-direction: column; transition: border-color 0.2s, box-shadow 0.2s;">
-            <div style="position: relative; aspect-ratio: 1 / 1; background: #111;">
-              <img src="${item.img}" referrerpolicy="no-referrer" alt="" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.opacity='0.6';" />
+          <div class="ig-catalog-card" data-catalog-id="${item.id}" data-img-url="${item.img}" data-post-url="${item.url}" data-caption="${(item.caption || '').replace(/"/g, '&quot;')}" data-likes="${item.likes}" style="border: 1px solid ${isAlreadyAdded ? '#10B981' : '#E5E5E5'};">
+            <div class="ig-card-media-wrap">
+              <img src="${item.img}" referrerpolicy="no-referrer" alt="" loading="lazy" onerror="this.style.opacity='0.6';" />
               
               <!-- Checkbox + Item Number -->
-              <div style="position: absolute; top: 8px; left: 8px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.7); padding: 3px 8px; border-radius: 4px; backdrop-filter: blur(4px);">
+              <div style="position: absolute; top: 8px; left: 8px; display: flex; align-items: center; gap: 6px; background: rgba(0,0,0,0.75); padding: 3px 8px; border-radius: 4px; backdrop-filter: blur(4px);">
                 <input type="checkbox" class="ig-picker-checkbox" data-catalog-id="${item.id}" style="cursor: pointer; width: 14px; height: 14px; accent-color: #B47154;" />
                 <span style="color: #FFF; font-size: 10px; font-weight: 700;">#${idx + 1}</span>
               </div>
 
               <!-- Album badge if carousel cover -->
               ${item.albumCount ? `
-                <div style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.75); color: #FFF; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px;">
+                <div style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.8); color: #FFF; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px;">
                   ${item.albumCount}
                 </div>
               ` : ''}
@@ -713,17 +804,17 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
               ` : ''}
             </div>
 
-            <div style="padding: 10px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+            <div style="padding: 12px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; background: #FFF;">
               <div>
-                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #767676; margin-bottom: 4px;">
-                  <span style="font-weight: 600; color: #26201D;">${item.label}</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #767676; margin-bottom: 6px;">
+                  <span style="font-weight: 700; color: #26201D; font-size: 11.5px;">${item.label}</span>
                   <a href="${item.url}" target="_blank" rel="noopener noreferrer" style="color: #C46238; text-decoration: none; font-weight: 600;">View ↗</a>
                 </div>
-                <p style="font-size: 11.5px; line-height: 1.35; color: #374151; margin: 0 0 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${item.caption}">
-                  ${item.caption || '@marshbarbary editorial'}
+                <p style="font-size: 11.5px; line-height: 1.4; color: #374151; margin: 0 0 10px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${item.caption}">
+                  ${item.caption || '@marshbarbary Collection'}
                 </p>
               </div>
-              <button type="button" class="btn-picker-add-single admin-btn" data-catalog-id="${item.id}" style="width: 100%; font-size: 11px; padding: 5px 8px; background: ${isAlreadyAdded ? '#F3F4F6' : '#1A1A1A'}; color: ${isAlreadyAdded ? '#374151' : '#FFF'}; border: 1px solid ${isAlreadyAdded ? '#D1D5DB' : '#1A1A1A'}; border-radius: 4px; cursor: pointer; font-weight: 600;">
+              <button type="button" class="btn-picker-add-single admin-btn" data-catalog-id="${item.id}" style="width: 100%; font-size: 11px; padding: 6px 10px; background: ${isAlreadyAdded ? '#F3F4F6' : '#1A1A1A'}; color: ${isAlreadyAdded ? '#374151' : '#FFF'}; border: 1px solid ${isAlreadyAdded ? '#D1D5DB' : '#1A1A1A'}; border-radius: 4px; cursor: pointer; font-weight: 600;">
                 ${isAlreadyAdded ? '+ Add Again' : '+ Add to Slider'}
               </button>
             </div>
@@ -982,6 +1073,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
           pickerModal.style.display = 'flex';
           updateSelectedCounter();
           wirePickerCheckboxes();
+          wireSingleAddButtons();
         }
       }
 
@@ -1002,7 +1094,6 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
           if (window.MB_INSTAGRAM_SOURCE && typeof window.MB_INSTAGRAM_SOURCE.refetchInstagram === 'function') {
             await window.MB_INSTAGRAM_SOURCE.refetchInstagram();
           } else {
-            // Fetch serverless endpoint directly
             const resp = await fetch('/api/instagram');
             if (resp.ok) {
               const data = await resp.json();
@@ -1027,7 +1118,7 @@ window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
             wireSingleAddButtons();
           }
           const badge = container.querySelector('#ig-catalog-badge');
-          if (badge) badge.textContent = `${currentCatalog.length} Posts Available`;
+          if (badge) badge.textContent = `${countAllPhotos(currentCatalog)} Photos Available`;
         } catch (err) {
           console.warn('[SliderManager] Refetch warning:', err);
           if (refetchStatusMsg) {
