@@ -33,7 +33,9 @@ const dirsToCopy = [
   'js',
   'assets',
   'design',
-  'supabase'
+  'supabase',
+  'api',
+  'data'
 ];
 
 for (const dir of dirsToCopy) {
