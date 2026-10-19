@@ -11,6 +11,7 @@
   // State Management
   let currentProduct = null;
   let activeImageIndex = 0;
+  let currentActiveGallery = [];
   let selectedColor = '';
   let selectedSize = '';
   let quantity = 1;
@@ -138,11 +139,11 @@
     // Swatches
     renderSwatches(product.swatches || []);
 
-    // Sizes
-    renderSizes(product.sizes || [], product.unavailableSizes || []);
-
-    // Stock Status
-    renderStockStatus(product);
+    // Fallback sizes & stock if product has no color swatches
+    if (!product.swatches || product.swatches.length === 0) {
+      renderSizes(product.sizes || [], product.unavailableSizes || []);
+      renderStockStatus(product);
+    }
 
     // Accordions Content
     renderAccordions(product);
@@ -217,7 +218,9 @@
    */
   function openLightbox(index) {
     if (!elements.lightbox || !currentProduct) return;
-    const gallery = currentProduct.gallery || [currentProduct.image];
+    const gallery = (currentActiveGallery && currentActiveGallery.length > 0)
+      ? currentActiveGallery
+      : (currentProduct.gallery && currentProduct.gallery.length > 0 ? currentProduct.gallery : [currentProduct.image]);
     activeImageIndex = index >= 0 && index < gallery.length ? index : activeImageIndex;
     
     elements.lightboxImg.src = gallery[activeImageIndex];
@@ -236,7 +239,9 @@
 
   function stepLightbox(direction) {
     if (!currentProduct) return;
-    const gallery = currentProduct.gallery || [currentProduct.image];
+    const gallery = (currentActiveGallery && currentActiveGallery.length > 0)
+      ? currentActiveGallery
+      : (currentProduct.gallery && currentProduct.gallery.length > 0 ? currentProduct.gallery : [currentProduct.image]);
     let newIndex = activeImageIndex + direction;
     if (newIndex < 0) newIndex = gallery.length - 1;
     if (newIndex >= gallery.length) newIndex = 0;
@@ -250,22 +255,55 @@
   }
 
   /**
-   * Render Swatches
+   * Resolve Color Images (Case-insensitive lookup)
    */
+  function getColorImages(colorName) {
+    if (!currentProduct) return [];
+    const normalized = (colorName || '').trim().toLowerCase();
+
+    // 1. Check colorGalleries
+    if (currentProduct.colorGalleries) {
+      if (Array.isArray(currentProduct.colorGalleries[colorName]) && currentProduct.colorGalleries[colorName].length > 0) {
+        return currentProduct.colorGalleries[colorName];
+      }
+      if (Array.isArray(currentProduct.colorGalleries[normalized]) && currentProduct.colorGalleries[normalized].length > 0) {
+        return currentProduct.colorGalleries[normalized];
+      }
+      for (const [k, imgs] of Object.entries(currentProduct.colorGalleries)) {
+        if (k.trim().toLowerCase() === normalized && Array.isArray(imgs) && imgs.length > 0) {
+          return imgs;
+        }
+      }
+    }
+
+    // 2. Check swatches
+    const swatch = (currentProduct.swatches || []).find(s => (s.name || '').trim().toLowerCase() === normalized);
+    if (swatch) {
+      if (Array.isArray(swatch.images) && swatch.images.length > 0) return swatch.images;
+      if (swatch.image) return [swatch.image];
+    }
+
+    // 3. Check variants
+    const matchingVariant = (currentProduct.variants || []).find(v => (v.color || '').trim().toLowerCase() === normalized && v.image_url);
+    if (matchingVariant?.image_url) {
+      return [matchingVariant.image_url];
+    }
+
+    return [];
+  }
+
   /**
    * Update Gallery for Active Colour
    * If colour has independent photos, display them. Otherwise, fall back to main product gallery.
    */
   function updateGalleryForColor(colorName) {
     if (!currentProduct) return;
-    const swatch = (currentProduct.swatches || []).find(s => (s.name || '').toLowerCase() === (colorName || '').toLowerCase());
-    const colorImages = (currentProduct.colorGalleries && currentProduct.colorGalleries[colorName])
-      || (swatch && Array.isArray(swatch.images) && swatch.images.length > 0 ? swatch.images : (swatch?.image ? [swatch.image] : []));
-
-    const activeGallery = (Array.isArray(colorImages) && colorImages.length > 0)
+    const colorImages = getColorImages(colorName);
+    const activeGallery = (colorImages && colorImages.length > 0)
       ? colorImages
       : (currentProduct.gallery && currentProduct.gallery.length > 0 ? currentProduct.gallery : [currentProduct.image]);
 
+    currentActiveGallery = activeGallery;
     activeImageIndex = 0;
     renderGallery(activeGallery);
   }
@@ -284,15 +322,30 @@
     selectedColor = swatches[0].name;
     if (elements.colorLabel) elements.colorLabel.textContent = selectedColor;
 
-    elements.swatchesContainer.innerHTML = swatches.map((s, idx) => `
-      <button type="button" 
-              class="pdp-swatch-btn ${idx === 0 ? 'active' : ''}" 
-              style="background-color: ${s.color};" 
-              title="${s.name}" 
-              data-name="${s.name}"
-              data-image="${s.image || ''}">
-      </button>
-    `).join('');
+    elements.swatchesContainer.innerHTML = swatches.map((s, idx) => {
+      const thumbUrl = s.image || (s.images && s.images[0]) || '';
+      const hasImage = Boolean(thumbUrl);
+
+      return `
+        <button type="button" 
+                class="pdp-swatch-btn ${idx === 0 ? 'active' : ''}" 
+                title="${s.name}" 
+                aria-label="Color: ${s.name}"
+                data-name="${s.name}"
+                data-image="${thumbUrl}">
+          ${hasImage ? `
+            <img src="${thumbUrl}" 
+                 alt="${s.name}" 
+                 class="pdp-swatch-thumb-img" 
+                 loading="lazy" 
+                 onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='block';" />
+            <span class="pdp-swatch-fallback-color" style="display:none; background-color: ${s.color || '#DDD'};"></span>
+          ` : `
+            <span class="pdp-swatch-fallback-color" style="display:block; background-color: ${s.color || '#DDD'};"></span>
+          `}
+        </button>
+      `;
+    }).join('');
 
     elements.swatchesContainer.querySelectorAll('.pdp-swatch-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -314,6 +367,57 @@
     updateSizesForColor(selectedColor);
   }
 
+  /**
+   * Update Stock Status for Specific (Color, Size) Variant
+   */
+  function updateStockForVariant(color, size) {
+    if (!currentProduct || !elements.stockText || !elements.stockDot) return;
+    const variants = currentProduct.variants || [];
+    const normalizedColor = (color || '').trim().toLowerCase();
+    const normalizedSize = (size || '').trim();
+
+    let matched = variants.find(v => 
+      (v.color || '').trim().toLowerCase() === normalizedColor &&
+      (v.size || '').trim() === normalizedSize
+    );
+
+    if (!matched && variants.length > 0) {
+      // Fallback match by size if color was generic
+      matched = variants.find(v => (v.size || '').trim() === normalizedSize);
+    }
+
+    if (matched) {
+      const stock = typeof matched.stock_qty === 'number' ? matched.stock_qty : (typeof matched.stock === 'number' ? matched.stock : 0);
+      const lowThreshold = currentProduct.lowStockThreshold || 5;
+
+      if (stock <= 0) {
+        elements.stockDot.className = 'stock-dot out';
+        elements.stockText.textContent = `Out of stock in ${color ? color + ' / ' : ''}${size}`;
+        if (elements.addToBagBtn) {
+          elements.addToBagBtn.disabled = true;
+          elements.addToBagBtn.textContent = 'Out of Stock';
+        }
+      } else if (stock <= lowThreshold) {
+        elements.stockDot.className = 'stock-dot low';
+        elements.stockText.textContent = `Only ${stock} left in ${color ? color + ' / ' : ''}${size} • Order soon`;
+        if (elements.addToBagBtn) {
+          elements.addToBagBtn.disabled = false;
+          elements.addToBagBtn.textContent = 'Add to Bag';
+        }
+      } else {
+        elements.stockDot.className = 'stock-dot';
+        elements.stockText.textContent = `In Stock (${color ? color + ' / ' : ''}${size}) • Ready to ship`;
+        if (elements.addToBagBtn) {
+          elements.addToBagBtn.disabled = false;
+          elements.addToBagBtn.textContent = 'Add to Bag';
+        }
+      }
+    } else {
+      // General product stock fallback
+      renderStockStatus(currentProduct);
+    }
+  }
+
   function updateSizesForColor(color) {
     if (!currentProduct) return;
     const allVariants = currentProduct.variants || [];
@@ -325,38 +429,13 @@
     if (colorVars.length > 0) {
       sizesToDisplay = [...new Set(colorVars.map(v => v.size).filter(Boolean))];
       unavailable = colorVars.filter(v => (v.stock ?? v.stock_qty ?? 0) <= 0).map(v => v.size);
-      
-      const colorStock = colorVars.reduce((sum, v) => sum + (v.stock ?? v.stock_qty ?? 0), 0);
-      if (elements.stockText && elements.stockDot) {
-        if (colorStock <= 0) {
-          elements.stockDot.className = 'stock-dot out';
-          elements.stockText.textContent = `Out of stock in ${color}`;
-          if (elements.addToBagBtn) {
-            elements.addToBagBtn.disabled = true;
-            elements.addToBagBtn.textContent = 'Out of Stock';
-          }
-        } else if (colorStock <= (currentProduct.lowStockThreshold || 5)) {
-          elements.stockDot.className = 'stock-dot low';
-          elements.stockText.textContent = `Only ${colorStock} left in ${color} • Order soon`;
-          if (elements.addToBagBtn) {
-            elements.addToBagBtn.disabled = false;
-            elements.addToBagBtn.textContent = 'Add to Bag';
-          }
-        } else {
-          elements.stockDot.className = 'stock-dot';
-          elements.stockText.textContent = `In Stock in ${color} • Ready to ship`;
-          if (elements.addToBagBtn) {
-            elements.addToBagBtn.disabled = false;
-            elements.addToBagBtn.textContent = 'Add to Bag';
-          }
-        }
-      }
     } else {
       sizesToDisplay = currentProduct.sizes || ['XS', 'S', 'M', 'L', 'XL'];
       unavailable = currentProduct.unavailableSizes || [];
     }
 
     renderSizes(sizesToDisplay, unavailable);
+    updateStockForVariant(color, selectedSize);
   }
 
   /**
@@ -365,10 +444,14 @@
   function renderSizes(sizes, unavailable) {
     if (!elements.sizesContainer) return;
 
-    // Default to first available size
+    // Preserve previously selected size if it's available in this color, otherwise pick first available
     const availableSizes = sizes.filter(s => !unavailable.includes(s));
-    selectedSize = availableSizes.length > 0 ? availableSizes[0] : sizes[0];
-    if (elements.sizeLabel) elements.sizeLabel.textContent = selectedSize;
+    if (selectedSize && availableSizes.includes(selectedSize)) {
+      // keep selectedSize
+    } else {
+      selectedSize = availableSizes.length > 0 ? availableSizes[0] : sizes[0];
+    }
+    if (elements.sizeLabel) elements.sizeLabel.textContent = selectedSize || '—';
 
     elements.sizesContainer.innerHTML = sizes.map(s => {
       const isUnavailable = unavailable.includes(s);
@@ -389,6 +472,7 @@
         btn.classList.add('active');
         selectedSize = btn.getAttribute('data-size');
         if (elements.sizeLabel) elements.sizeLabel.textContent = selectedSize;
+        updateStockForVariant(selectedColor, selectedSize);
       });
     });
   }

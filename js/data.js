@@ -139,9 +139,14 @@ window.MB_DATA.loadLiveCatalog = async function() {
           sortedImgs.forEach((img, idx) => {
             const meta = parseImgMeta(img.alt_text, idx);
             if (meta.role === 'color' && meta.colorName) {
-              const cName = meta.colorName;
-              colorGalleries[cName] = colorGalleries[cName] || [];
-              colorGalleries[cName].push(img.storage_path);
+              const rawName = meta.colorName.trim();
+              const lowerName = rawName.toLowerCase();
+              colorGalleries[rawName] = colorGalleries[rawName] || [];
+              colorGalleries[rawName].push(img.storage_path);
+              if (lowerName !== rawName) {
+                colorGalleries[lowerName] = colorGalleries[lowerName] || [];
+                colorGalleries[lowerName].push(img.storage_path);
+              }
             } else {
               mainImgs.push(img);
             }
@@ -154,7 +159,7 @@ window.MB_DATA.loadLiveCatalog = async function() {
           const rawVariants = p.variants || [];
           const variants = rawVariants.map(v => {
             const vColor = (v.color || 'Standard').trim();
-            const vImgs = colorGalleries[vColor] || [];
+            const vImgs = colorGalleries[vColor] || colorGalleries[vColor.toLowerCase()] || [];
             return {
               ...v,
               stock: v.stock_qty,
@@ -197,13 +202,20 @@ window.MB_DATA.loadLiveCatalog = async function() {
             stockStatus: totalStock > 0 ? (totalStock <= (p.low_stock_threshold || 5) ? 'low-stock' : 'available') : 'out-of-stock',
             stockNote: totalStock > 0 ? (totalStock <= 5 ? `Only ${totalStock} pieces remaining` : 'In Stock • Ready to ship') : 'Backorder Available',
             swatches: uniqueColors.map(c => {
-              const cImgs = colorGalleries[c] || [];
-              const matchingVariant = variants.find(v => v.color === c);
+              const cRaw = (c || 'Standard').trim();
+              const cLower = cRaw.toLowerCase();
+              const cImgs = colorGalleries[cRaw] || colorGalleries[cLower] || [];
+              const matchingVariant = variants.find(v => (v.color || '').trim().toLowerCase() === cLower);
+              const validThumb = (cImgs && cImgs.length > 0 && cImgs[0])
+                ? cImgs[0]
+                : (matchingVariant?.image_url && !matchingVariant.image_url.startsWith('data:image/svg') ? matchingVariant.image_url : mainImg);
+
               return {
-                name: c,
-                color: resolveColorHex(c),
-                image: cImgs[0] || matchingVariant?.image_url || mainImg,
-                images: cImgs
+                name: cRaw,
+                color: resolveColorHex(cRaw),
+                image: validThumb,
+                images: cImgs,
+                hasColorImage: Boolean(cImgs && cImgs.length > 0)
               };
             }),
             sizes: uniqueSizes.length ? uniqueSizes : ['XS', 'S', 'M', 'L', 'XL'],
