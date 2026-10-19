@@ -24,17 +24,10 @@ window.MB_COMPONENTS = {
 
     // Resolve robust, non-broken image URL
     function resolveCategoryImg(raw) {
-      const defaultImg = 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=85';
+      const defaultImg = window.MB_FALLBACK_SVG || '';
       if (!raw || typeof raw !== 'string') return defaultImg;
       let clean = raw.trim();
-      if (!clean) return defaultImg;
-      if (clean.includes('assets/images/')) {
-        if (clean.includes('cat-tops')) return 'https://images.unsplash.com/photo-1551803091-e20673f15770?auto=format&fit=crop&w=800&q=85';
-        if (clean.includes('cat-bottoms')) return 'https://images.unsplash.com/photo-1509551388413-e18d0ac5d495?auto=format&fit=crop&w=800&q=85';
-        if (clean.includes('cat-coords')) return 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=85';
-        if (clean.includes('cat-accessories')) return 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=85';
-        return defaultImg;
-      }
+      if (!clean || clean.includes('unsplash.com')) return defaultImg;
       while (clean.startsWith('../')) clean = clean.substring(3);
       if (clean.startsWith('./')) clean = clean.substring(2);
       if (clean.startsWith('http://') || clean.startsWith('https://') || clean.startsWith('data:') || clean.startsWith('blob:')) {

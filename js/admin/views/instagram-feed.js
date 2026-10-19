@@ -65,10 +65,10 @@ window.MB_ADMIN_VIEWS['instagram-feed'] = {
             <div class="admin-card" data-id="${post.id}" style="background: #FFF; border: 1px solid var(--mb-admin-border, #E5E5E5); border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.2s ease;">
               <!-- Thumbnail & Status Header -->
               <div style="position: relative; aspect-ratio: 1 / 1; background: #F5F5F5; overflow: hidden;">
-                <img src="${post.img && !post.img.includes('assets/images/') ? post.img : 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=85'}" 
+                <img src="${post.img && !post.img.includes('assets/images/') && !post.img.includes('unsplash.com') ? post.img : (window.MB_FALLBACK_SVG || '')}" 
                      alt="Post preview" 
                      style="width: 100%; height: 100%; object-fit: cover; opacity: ${post.active === false ? 0.4 : 1};"
-                     onerror="this.src='https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=85';" />
+                     onerror="this.src=window.MB_FALLBACK_SVG || '';" />
                 
                 <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.65); color: #FFF; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 4px; backdrop-filter: blur(2px);">
                   #${idx + 1}
@@ -132,7 +132,7 @@ window.MB_ADMIN_VIEWS['instagram-feed'] = {
               
               <div style="margin-bottom: 16px;">
                 <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: #1A1A1A;">Image URL *</label>
-                <input type="text" id="ig-form-img" required placeholder="https://images.unsplash.com/... or https://..." style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid #E5E5E5; border-radius: 4px; box-sizing: border-box;" />
+                <input type="text" id="ig-form-img" required placeholder="https://... or data:image/..." style="width: 100%; padding: 8px 12px; font-size: 13px; border: 1px solid #E5E5E5; border-radius: 4px; box-sizing: border-box;" />
                 <span style="font-size: 11px; color: #767676; display: block; margin-top: 4px;">Paste an external image CDN URL or direct link</span>
               </div>
 

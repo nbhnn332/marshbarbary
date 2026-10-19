@@ -20,7 +20,7 @@ window.MB_ADMIN_VIEWS.homepage = {
     const products = await service.getProducts();
 
     const hero = config.hero || {
-      image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop',
+      image: window.MB_FALLBACK_SVG || '',
       altText: 'Where Wild Elegance Meets Style',
       enabled: true
     };
@@ -112,7 +112,7 @@ window.MB_ADMIN_VIEWS.homepage = {
                   Live Hero Preview
                 </div>
                 <div style="border: 1px solid var(--mb-admin-border); border-radius: var(--mb-radius-sm); overflow: hidden; background: #000; position: relative;">
-                  <img id="hero-prev-img" src="${window.MB_IMAGE_SOURCE ? window.MB_IMAGE_SOURCE.resolveDisplayUrl(hero.image || 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85') : (hero.image || 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85')}" alt="${hero.altText || ''}" style="width: 100%; height: 180px; object-fit: cover; display: block;" onerror="this.src='https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85';">
+                  <img id="hero-prev-img" src="${window.MB_IMAGE_SOURCE ? window.MB_IMAGE_SOURCE.resolveDisplayUrl(hero.image || (window.MB_FALLBACK_SVG || '')) : (hero.image || (window.MB_FALLBACK_SVG || ''))}" alt="${hero.altText || ''}" style="width: 100%; height: 180px; object-fit: cover; display: block;" onerror="this.src=window.MB_FALLBACK_SVG || '';">
                   <div style="position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.65); color: #fff; padding: 2px 8px; font-size: 10px; border-radius: 2px;">
                     Full Rectangle (No CTA Button)
                   </div>
@@ -314,7 +314,7 @@ window.MB_ADMIN_VIEWS.homepage = {
     const saveHandler = async (e) => {
       if (e) e.preventDefault();
 
-      let heroImage = hero.image || 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop';
+      let heroImage = hero.image || (window.MB_FALLBACK_SVG || '');
 
       if (window.MB_IMAGE_SOURCE) {
         const heroVal = window.MB_IMAGE_SOURCE.getValue('#hero-img-source-mount');

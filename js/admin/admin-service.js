@@ -117,9 +117,30 @@ window.MB_ADMIN_SERVICE = (() => {
 
           const mapped = liveProds.map(p => {
             const sortedImgs = (p.images || []).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-            const mainImg = sortedImgs[0]?.storage_path || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';
-            const gallery = sortedImgs.map(i => i.storage_path);
-            const variants = p.variants || [];
+            const mainImgs = sortedImgs.filter(i => !i.alt_text || !i.alt_text.startsWith('color:'));
+            const colorImgs = sortedImgs.filter(i => i.alt_text && i.alt_text.startsWith('color:'));
+
+            const colorGalleries = {};
+            colorImgs.forEach(i => {
+              const colName = i.alt_text.replace(/^color:/, '').trim() || 'Standard';
+              colorGalleries[colName] = colorGalleries[colName] || [];
+              colorGalleries[colName].push(i.storage_path);
+            });
+
+            const mainImg = mainImgs[0]?.storage_path || (window.MB_FALLBACK_SVG || '');
+            const gallery = mainImgs.map(i => i.storage_path);
+            const rawVariants = p.variants || [];
+            const variants = rawVariants.map(v => {
+              const vColor = (v.color || 'Standard').trim();
+              const vImgs = colorGalleries[vColor] || [];
+              return {
+                ...v,
+                stock: v.stock_qty,
+                image_url: vImgs[0] || mainImg,
+                images: vImgs
+              };
+            });
+
             const totalStock = variants.reduce((sum, v) => sum + (v.stock_qty || 0), 0);
             const resolvedCat = catMap.get(p.category_id) || 'dresses';
 
@@ -142,6 +163,7 @@ window.MB_ADMIN_SERVICE = (() => {
               care: p.care_instructions || '',
               image: mainImg,
               gallery: gallery.length ? gallery : [mainImg],
+              colorGalleries: colorGalleries,
               variants: variants
             };
           });
@@ -284,28 +306,55 @@ window.MB_ADMIN_SERVICE = (() => {
         // Sync Product Images to product_images table in Supabase
         if (targetId) {
           const imagesToSave = [];
-          const mainImg = productData.image || productData.gallery?.[0];
-          if (mainImg) {
-            imagesToSave.push({ product_id: targetId, storage_path: mainImg, display_order: 1 });
-          }
-          if (Array.isArray(productData.gallery)) {
-            productData.gallery.forEach((g, idx) => {
-              if (g && g !== mainImg) {
-                imagesToSave.push({ product_id: targetId, storage_path: g, display_order: idx + 2 });
-              }
-            });
-          }
-          if (imagesToSave.length > 0) {
-            try {
-              await fetch(`${url}/rest/v1/product_images?product_id=eq.${targetId}`, { method: 'DELETE', headers });
-              await fetch(`${url}/rest/v1/product_images`, {
+
+          // 1. Save general main gallery images (alt_text = 'main')
+          const mainGallery = Array.isArray(productData.gallery) && productData.gallery.length > 0
+            ? productData.gallery
+            : (productData.image ? [productData.image] : []);
+
+          mainGallery.forEach((src, idx) => {
+            if (src && !src.startsWith('data:image/svg+xml')) {
+              imagesToSave.push({
+                product_id: targetId,
+                storage_path: src,
+                display_order: idx + 1,
+                alt_text: 'main'
+              });
+            }
+          });
+
+          // 2. Save colour variant images (alt_text = 'color:' + colName)
+          const colorGalleries = productData.colorGalleries || {};
+          Object.keys(colorGalleries).forEach(colName => {
+            const imgs = colorGalleries[colName];
+            if (Array.isArray(imgs)) {
+              imgs.forEach((src, idx) => {
+                if (src && !src.startsWith('data:image/svg+xml')) {
+                  imagesToSave.push({
+                    product_id: targetId,
+                    storage_path: src,
+                    display_order: idx + 1,
+                    alt_text: `color:${colName}`
+                  });
+                }
+              });
+            }
+          });
+
+          try {
+            await fetch(`${url}/rest/v1/product_images?product_id=eq.${targetId}`, { method: 'DELETE', headers });
+            if (imagesToSave.length > 0) {
+              const imgRes = await fetch(`${url}/rest/v1/product_images`, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify(imagesToSave)
               });
-            } catch (ie) {
-              console.warn('[AdminService] Supabase product_images sync warning:', ie);
+              if (!imgRes.ok) {
+                console.warn('[AdminService] product_images POST error:', imgRes.status, await imgRes.text());
+              }
             }
+          } catch (ie) {
+            console.warn('[AdminService] Supabase product_images sync warning:', ie);
           }
         }
 
@@ -313,19 +362,32 @@ window.MB_ADMIN_SERVICE = (() => {
         if (targetId && Array.isArray(productData.variants) && productData.variants.length > 0) {
           try {
             await fetch(`${url}/rest/v1/product_variants?product_id=eq.${targetId}`, { method: 'DELETE', headers });
-            const varsPayload = productData.variants.map((v, idx) => ({
-              product_id: targetId,
-              sku: v.sku || `${productData.sku || 'MB'}-${v.size || idx}`,
-              size: v.size || 'M',
-              color: v.color || 'Default',
-              stock_qty: Number(v.stock ?? v.stock_qty ?? 10),
-              image_url: v.image_url || null
-            }));
-            await fetch(`${url}/rest/v1/product_variants`, {
+            const varsPayload = productData.variants.map((v, idx) => {
+              const item = {
+                product_id: targetId,
+                sku: v.sku || `${productData.sku || 'MB'}-${v.size || idx}`,
+                size: v.size || 'M',
+                color: v.color || 'Standard',
+                stock_qty: Number(v.stock ?? v.stock_qty ?? 0),
+                is_active: true
+              };
+              if (v.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v.id)) {
+                item.id = v.id;
+              }
+              return item;
+            });
+
+            const varRes = await fetch(`${url}/rest/v1/product_variants`, {
               method: 'POST',
               headers,
               body: JSON.stringify(varsPayload)
             });
+            if (!varRes.ok) {
+              const errText = await varRes.text();
+              console.error('[AdminService] product_variants POST error:', varRes.status, errText);
+            } else {
+              console.log('[AdminService] Successfully synced', varsPayload.length, 'variants to Supabase');
+            }
           } catch (ve) {
             console.warn('[AdminService] Supabase product_variants sync warning:', ve);
           }
@@ -477,7 +539,7 @@ window.MB_ADMIN_SERVICE = (() => {
               name: c.name,
               slug: c.slug,
               description: c.description || '',
-              image: c.image_url || 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=1000&auto=format&fit=crop',
+              image: c.image_url || (window.MB_FALLBACK_SVG || ''),
               displayOrder: c.display_order || 1,
               status: c.is_active ? 'active' : 'hidden',
               productCount: prods.filter(p => p.category_id === c.id).length
@@ -685,7 +747,7 @@ window.MB_ADMIN_SERVICE = (() => {
       title: i.title || i.name || 'Garment',
       price: i.price || 0,
       quantity: i.quantity || i.qty || 1,
-      image: (i.image && !i.image.includes('assets/images/')) ? i.image : 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'
+      image: (i.image && !i.image.includes('assets/images/') && !i.image.includes('unsplash.com')) ? i.image : (window.MB_FALLBACK_SVG || '')
     }));
 
     return {
@@ -770,7 +832,7 @@ window.MB_ADMIN_SERVICE = (() => {
                 size: i.size || '',
                 color: i.color || '',
                 total: Number(i.unit_price || 0) * (i.quantity || 1),
-                image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'
+                image: (i.image_url && !i.image_url.includes('unsplash.com')) ? i.image_url : (window.MB_FALLBACK_SVG || '')
               }));
 
               return {
@@ -854,7 +916,7 @@ window.MB_ADMIN_SERVICE = (() => {
                 title: i.product_name,
                 price: Number(i.unit_price || 0),
                 quantity: i.quantity || 1,
-                image: (i.image_url && !i.image_url.includes('assets/images/')) ? i.image_url : 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'
+                image: (i.image_url && !i.image_url.includes('assets/images/') && !i.image_url.includes('unsplash.com')) ? i.image_url : (window.MB_FALLBACK_SVG || '')
               })),
               pricing: {
                 subtotal: Number(devO.subtotal || 0),

@@ -5,7 +5,7 @@
 
 window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
 
-const DEFAULT_CAT_IMAGE = 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=85';
+const DEFAULT_CAT_IMAGE = window.MB_FALLBACK_SVG || '';
 
 window.MB_ADMIN_VIEWS.categories = {
   title: 'Categories & Silhouettes',
