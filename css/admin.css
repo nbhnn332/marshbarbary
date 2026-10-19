@@ -806,6 +806,19 @@ body.admin-body {
   background-color: var(--admin-bg-base);
 }
 
+.admin-table td img {
+  width: 44px;
+  height: 56px;
+  max-width: 44px;
+  max-height: 56px;
+  object-fit: cover;
+  border-radius: 3px;
+  border: 1px solid var(--admin-border, #DDD3C8);
+  display: block;
+  background: #F5EFEB;
+  flex-shrink: 0;
+}
+
 .admin-table-actions {
   display: flex;
   align-items: center;
@@ -1577,6 +1590,9 @@ body.admin-body {
     padding-bottom: 4px;
   }
   .admin-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* ==========================================================================
@@ -2233,12 +2249,14 @@ body.admin-body {
 }
 
 .mb-gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
 .mb-gallery-card {
+  width: 120px;
+  max-width: 120px;
   border: 1px solid #DDD3C8;
   border-radius: 6px;
   overflow: hidden;
@@ -2247,6 +2265,7 @@ body.admin-body {
   flex-direction: column;
   position: relative;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .mb-gallery-card:hover {
@@ -2260,8 +2279,8 @@ body.admin-body {
 }
 
 .mb-gallery-card-img-wrap {
-  width: 100%;
-  height: 110px;
+  width: 120px;
+  height: 140px;
   background: #F5EFEB;
   display: flex;
   align-items: center;
