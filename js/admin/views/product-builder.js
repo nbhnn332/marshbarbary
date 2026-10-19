@@ -39,6 +39,15 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
     let unsubscribe = null;
 
     function renderModal(state) {
+      // Preserve active input focus and cursor position in case of re-render
+      const activeEl = document.activeElement;
+      const activeId = activeEl?.id;
+      const activeClass = activeEl ? Array.from(activeEl.classList || []).find(c => c.startsWith('inp-')) : null;
+      const activeTempId = activeEl?.dataset?.tempId;
+      const activeSize = activeEl?.dataset?.size;
+      const selStart = (activeEl instanceof HTMLInputElement || activeEl instanceof HTMLTextAreaElement) ? activeEl.selectionStart : null;
+      const selEnd = (activeEl instanceof HTMLInputElement || activeEl instanceof HTMLTextAreaElement) ? activeEl.selectionEnd : null;
+
       const isBasic = state.activeTab === 'basic';
       const b = state.basicInfo;
       const mainImgs = state.mainGallery || [];
@@ -275,7 +284,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
             <div class="mb-modal-header">
               <div class="mb-modal-title">
                 <span>${isEditMode ? 'Edit Garment' : 'Create New Garment'}</span>
-                ${b.name ? `<span style="font-size: 14px; color: #8C827A; font-family: sans-serif;">— ${b.name}</span>` : ''}
+                <span id="mb-modal-title-name" style="font-size: 14px; color: #8C827A; font-family: sans-serif;">${b.name ? '— ' + b.name : ''}</span>
               </div>
               <button type="button" id="btn-close-modal" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #8C827A;">&times;</button>
             </div>
@@ -333,6 +342,25 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
       `;
 
       attachModalEvents(container);
+
+      // Restore focus & cursor selection if applicable
+      if (activeId && container.querySelector('#' + activeId)) {
+        const el = container.querySelector('#' + activeId);
+        el.focus();
+        if (selStart !== null && selEnd !== null && typeof el.setSelectionRange === 'function') {
+          try { el.setSelectionRange(selStart, selEnd); } catch (e) {}
+        }
+      } else if (activeClass && activeTempId) {
+        let sel = `.${activeClass}[data-temp-id="${activeTempId}"]`;
+        if (activeSize) sel += `[data-size="${activeSize}"]`;
+        const el = container.querySelector(sel);
+        if (el) {
+          el.focus();
+          if (selStart !== null && selEnd !== null && typeof el.setSelectionRange === 'function') {
+            try { el.setSelectionRange(selStart, selEnd); } catch (e) {}
+          }
+        }
+      }
     }
 
     // --- TAB 1: BASIC INFO & MAIN PRODUCT GALLERY ---
@@ -479,8 +507,8 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
           <!-- CARD HEADER -->
           <div class="mb-color-card-header">
             <div style="display: flex; align-items: center; gap: 12px;">
-              <span style="display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: ${cv.colorHex || '#C4B5A5'}; border: 1px solid #B0A79C;"></span>
-              <strong style="font-size: 14px; color: #1A1816;">${cv.colorName || 'Standard'}</strong>
+              <span class="color-card-dot" data-temp-id="${cv.tempId}" style="display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: ${cv.colorHex || '#C4B5A5'}; border: 1px solid #B0A79C;"></span>
+              <strong class="color-card-title" data-temp-id="${cv.tempId}" style="font-size: 14px; color: #1A1816;">${cv.colorName || 'Standard'}</strong>
               <span style="font-size: 11px; color: #8C827A; background: #FFF; padding: 2px 8px; border-radius: 12px; border: 1px solid #ECE7E1;">
                 ${activeSizes.length} Active Sizes &bull; ${totalColorStock} Total Units
               </span>
@@ -645,59 +673,67 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
 
       // Basic tab inputs
       const inpName = root.querySelector('#inp-name');
+      const inpSlug = root.querySelector('#inp-slug');
+
       inpName?.addEventListener('input', e => {
-        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ name: e.target.value });
+        const val = e.target.value;
+        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ name: val }, true);
+        const titleName = root.querySelector('#mb-modal-title-name');
+        if (titleName) titleName.textContent = val ? `— ${val}` : '';
+        const st = window.MB_PRODUCT_FORM_STATE.getState().basicInfo;
+        if (inpSlug && st.slugAuto !== false) {
+          inpSlug.value = st.slug;
+        }
       });
 
-      const inpSlug = root.querySelector('#inp-slug');
       inpSlug?.addEventListener('input', e => {
-        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ slug: e.target.value, slugAuto: false });
+        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ slug: e.target.value, slugAuto: false }, true);
       });
 
       const inpCategory = root.querySelector('#inp-category');
       inpCategory?.addEventListener('change', e => {
         const cat = categories.find(c => c.id === e.target.value);
-        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ categoryId: e.target.value, categorySlug: cat?.slug || '' });
+        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ categoryId: e.target.value, categorySlug: cat?.slug || '' }, true);
       });
 
       const inpPrice = root.querySelector('#inp-price');
       inpPrice?.addEventListener('input', e => {
-        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ basePrice: e.target.value });
+        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ basePrice: e.target.value }, true);
       });
 
       const inpSalePrice = root.querySelector('#inp-sale-price');
       inpSalePrice?.addEventListener('input', e => {
-        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ salePrice: e.target.value });
+        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ salePrice: e.target.value }, true);
       });
 
       const inpDesc = root.querySelector('#inp-desc');
       inpDesc?.addEventListener('input', e => {
-        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ description: e.target.value });
+        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ description: e.target.value }, true);
       });
 
       const inpFabric = root.querySelector('#inp-fabric');
       inpFabric?.addEventListener('input', e => {
-        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ fabric: e.target.value });
+        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ fabric: e.target.value }, true);
       });
 
       const inpCare = root.querySelector('#inp-care');
       inpCare?.addEventListener('input', e => {
-        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ care: e.target.value });
+        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ care: e.target.value }, true);
       });
 
       const chkActive = root.querySelector('#chk-active');
       chkActive?.addEventListener('change', e => {
-        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ isActive: e.target.checked });
+        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ isActive: e.target.checked }, true);
       });
 
       const chkFeatured = root.querySelector('#chk-featured');
       chkFeatured?.addEventListener('change', e => {
-        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ isFeatured: e.target.checked });
+        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ isFeatured: e.target.checked }, true);
       });
 
       const chkNew = root.querySelector('#chk-new');
       chkNew?.addEventListener('change', e => {
-        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ isNewArrival: e.target.checked });
+        window.MB_PRODUCT_FORM_STATE.updateBasicInfo({ isNewArrival: e.target.checked }, true);
       });
 
       // Main image actions
@@ -743,20 +779,31 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
       });
 
       root.querySelectorAll('.inp-color-name').forEach(inp => {
-        inp.addEventListener('change', e => {
-          window.MB_PRODUCT_FORM_STATE.updateColorVariant(inp.dataset.tempId, { colorName: e.target.value.trim() || 'Standard' });
+        inp.addEventListener('input', e => {
+          const val = e.target.value.trim() || 'Standard';
+          window.MB_PRODUCT_FORM_STATE.updateColorVariant(inp.dataset.tempId, { colorName: val }, true);
+          const headerName = root.querySelector(`.color-card-title[data-temp-id="${inp.dataset.tempId}"]`);
+          if (headerName) headerName.textContent = val;
         });
       });
 
       root.querySelectorAll('.inp-color-hex').forEach(inp => {
         inp.addEventListener('input', e => {
-          window.MB_PRODUCT_FORM_STATE.updateColorVariant(inp.dataset.tempId, { colorHex: e.target.value });
+          window.MB_PRODUCT_FORM_STATE.updateColorVariant(inp.dataset.tempId, { colorHex: e.target.value }, true);
+          const textInp = root.querySelector(`.inp-color-hex-text[data-temp-id="${inp.dataset.tempId}"]`);
+          if (textInp) textInp.value = e.target.value;
+          const dot = root.querySelector(`.color-card-dot[data-temp-id="${inp.dataset.tempId}"]`);
+          if (dot) dot.style.backgroundColor = e.target.value;
         });
       });
 
       root.querySelectorAll('.inp-color-hex-text').forEach(inp => {
-        inp.addEventListener('change', e => {
-          window.MB_PRODUCT_FORM_STATE.updateColorVariant(inp.dataset.tempId, { colorHex: e.target.value });
+        inp.addEventListener('input', e => {
+          window.MB_PRODUCT_FORM_STATE.updateColorVariant(inp.dataset.tempId, { colorHex: e.target.value }, true);
+          const colorInp = root.querySelector(`.inp-color-hex[data-temp-id="${inp.dataset.tempId}"]`);
+          if (colorInp && /^#[0-9A-Fa-f]{6}$/.test(e.target.value)) colorInp.value = e.target.value;
+          const dot = root.querySelector(`.color-card-dot[data-temp-id="${inp.dataset.tempId}"]`);
+          if (dot) dot.style.backgroundColor = e.target.value;
         });
       });
 
@@ -810,14 +857,14 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
 
       // Size row inputs
       root.querySelectorAll('.inp-size-sku').forEach(inp => {
-        inp.addEventListener('change', e => {
-          window.MB_PRODUCT_FORM_STATE.updateSizeRow(inp.dataset.tempId, inp.dataset.size, 'sku', e.target.value);
+        inp.addEventListener('input', e => {
+          window.MB_PRODUCT_FORM_STATE.updateSizeRow(inp.dataset.tempId, inp.dataset.size, 'sku', e.target.value, true);
         });
       });
 
       root.querySelectorAll('.inp-size-stock').forEach(inp => {
-        inp.addEventListener('change', e => {
-          window.MB_PRODUCT_FORM_STATE.updateSizeRow(inp.dataset.tempId, inp.dataset.size, 'stock', e.target.value);
+        inp.addEventListener('input', e => {
+          window.MB_PRODUCT_FORM_STATE.updateSizeRow(inp.dataset.tempId, inp.dataset.size, 'stock', e.target.value, true);
         });
       });
 
