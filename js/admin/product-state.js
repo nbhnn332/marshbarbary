@@ -197,12 +197,14 @@ window.MB_PRODUCT_FORM_STATE = (() => {
 
   // --- ACTIONS ---
 
-  function updateBasicInfo(fields) {
+  function updateBasicInfo(fields, silent = false) {
     currentState.basicInfo = { ...currentState.basicInfo, ...fields };
     if (fields.name && !currentState.id && (!currentState.basicInfo.slug || currentState.basicInfo.slugAuto !== false)) {
       currentState.basicInfo.slug = generateSlug(fields.name);
     }
-    notify();
+    if (!silent) {
+      notify();
+    }
   }
 
   function addMainImage(url) {
@@ -257,11 +259,13 @@ window.MB_PRODUCT_FORM_STATE = (() => {
     return { success: true };
   }
 
-  function updateColorVariant(tempId, updates) {
+  function updateColorVariant(tempId, updates, silent = false) {
     const cv = currentState.colorVariants.find(c => c.tempId === tempId);
     if (!cv) return;
     Object.assign(cv, updates);
-    notify();
+    if (!silent) {
+      notify();
+    }
   }
 
   function addColorImage(tempId, url) {
@@ -324,7 +328,7 @@ window.MB_PRODUCT_FORM_STATE = (() => {
     notify();
   }
 
-  function updateSizeRow(tempId, sizeName, field, value) {
+  function updateSizeRow(tempId, sizeName, field, value, silent = false) {
     const cv = currentState.colorVariants.find(c => c.tempId === tempId);
     if (!cv) return;
     const target = cv.sizes.find(s => s.size.toUpperCase() === sizeName.toUpperCase());
@@ -335,7 +339,9 @@ window.MB_PRODUCT_FORM_STATE = (() => {
     } else if (field === 'sku') {
       target.sku = (value || '').trim();
     }
-    notify();
+    if (!silent) {
+      notify();
+    }
   }
 
   function setActiveTab(tab) {
