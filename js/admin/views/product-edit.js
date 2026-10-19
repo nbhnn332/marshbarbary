@@ -42,7 +42,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
       newArrival: true,
       shortDescription: '',
       description: '',
-      image: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85',
+      image: FALLBACK_GARMENT_SVG,
       gallery: [],
       variants: []
     };
@@ -59,14 +59,14 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
       .filter(sz => sz && !BASE_SIZES.includes(sz));
     const ALL_SUPPORTED_SIZES = [...new Set([...BASE_SIZES, ...customExistingSizes])];
 
-    // Main product gallery (up to 5 images independently)
+    // Main product gallery (up to 5 images independently - strictly separate from colour variants)
     let mainImages = [];
     if (Array.isArray(product.gallery) && product.gallery.length > 0) {
       mainImages = product.gallery.filter(Boolean).slice(0, 5);
-    } else if (product.image) {
+    } else if (product.image && product.image !== FALLBACK_GARMENT_SVG) {
       mainImages = [product.image];
     } else {
-      mainImages = ['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'];
+      mainImages = [FALLBACK_GARMENT_SVG];
     }
 
     // Active Modal Tab state: 'basic' or 'variants'
@@ -140,13 +140,15 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
 
       if (Array.isArray(vars) && vars.length > 0) {
         vars.forEach(v => {
-          const col = (v.color || 'Natural').trim();
+          const col = (v.color || 'Standard').trim();
           if (!groups.has(col)) {
+            const existingColorImages = (product.colorGalleries && product.colorGalleries[col])
+              || (Array.isArray(v.images) && v.images.length ? v.images : (v.image_url ? [v.image_url] : []));
             groups.set(col, {
               id: 'cg_' + Math.random().toString(36).substring(2, 9),
               color: col,
               color_code: v.color_code || '',
-              images: v.image_url ? [v.image_url] : [],
+              images: Array.isArray(existingColorImages) ? [...existingColorImages] : [],
               isExpanded: true,
               sizeConfigs: new Map()
             });
@@ -155,8 +157,16 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
           if (v.image_url && !g.images.includes(v.image_url) && g.images.length < 5) {
             g.images.push(v.image_url);
           }
+          if (Array.isArray(v.images)) {
+            v.images.forEach(img => {
+              if (img && !g.images.includes(img) && g.images.length < 5) {
+                g.images.push(img);
+              }
+            });
+          }
           const sz = v.size || 'M';
           g.sizeConfigs.set(sz, {
+            variantId: v.id,
             checked: true,
             stock: v.stock ?? v.stock_qty ?? 5,
             draftStock: v.stock ?? v.stock_qty ?? 5,
@@ -166,9 +176,9 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
         });
       }
 
-      // If new product or no variants, provide initial colour
+      // If new product or no variants, provide initial variant group
       if (groups.size === 0) {
-        const initialCol = 'Natural';
+        const initialCol = 'Standard';
         const defaultConfigs = new Map();
         ALL_SUPPORTED_SIZES.forEach(sz => {
           const isStandardChecked = ['S', 'M', 'L'].includes(sz);
@@ -184,8 +194,8 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
         groups.set(initialCol, {
           id: 'cg_' + Math.random().toString(36).substring(2, 9),
           color: initialCol,
-          color_code: '#E5DFD7',
-          images: mainImages.length ? [mainImages[0]] : [],
+          color_code: '#B47154',
+          images: [], // Main images belong strictly to main gallery unless explicitly added
           isExpanded: true,
           sizeConfigs: defaultConfigs
         });
@@ -224,9 +234,9 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
       const skuOccurrences = new Map();
 
       colorVariants.forEach(cg => {
+        // No color name required - default to "Standard" if left blank
         if (!cg.color || !cg.color.trim()) {
-          errors.emptyColors.add(cg.id);
-          errors.hasErrors = true;
+          cg.color = 'Standard';
         }
 
         let checkedCount = 0;
@@ -464,7 +474,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
 
             <!-- Image Add Bar -->
             <div class="mb-image-input-bar">
-              <input type="url" id="inp-main-img-url" class="admin-input" placeholder="https://images.unsplash.com/... or direct image link" style="flex: 1; min-width: 260px;" ${isMaxMainImages ? 'disabled' : ''}>
+              <input type="url" id="inp-main-img-url" class="admin-input" placeholder="Paste direct image URL (https://...)" style="flex: 1; min-width: 260px;" ${isMaxMainImages ? 'disabled' : ''}>
               <button type="button" id="btn-add-main-url" class="admin-btn admin-btn-outline admin-btn-sm" ${isMaxMainImages ? 'disabled' : ''}>
                 + Add URL
               </button>
@@ -754,7 +764,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
                       </div>
 
                       <div class="variant-header-info">
-                        <span class="variant-color-title">${cg.color || '<em style="color:#DC2626;">Unnamed Colour</em>'}</span>
+                        <span class="variant-color-title">${cg.color || 'Standard'}</span>
                         ${cg.color_code ? `<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${cg.color_code}; border:1px solid #CCC;" title="${cg.color_code}"></span>` : ''}
                         <span class="variant-count-badge">${(cg.images || []).length}/5 images • ${checkedSizes.length} active sizes • ${totalUnitsInGroup} units</span>
                         ${hasNoCheckedSizes ? `<span class="variant-field-error" style="margin:0;">⚠ No sizes selected</span>` : ''}
@@ -783,9 +793,8 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
                       <!-- Left: Colour Name & Hex -->
                       <div>
                         <div style="margin-bottom: 12px;">
-                          <label class="admin-label" style="font-size: 11px;">Colour Name *</label>
-                          <input type="text" class="variant-input-sm var-color-name-input ${hasColorNameError ? 'has-error' : ''}" data-cidx="${cIdx}" value="${cg.color || ''}" placeholder="e.g. Natural, Noir Black" required>
-                          ${hasColorNameError ? `<div class="variant-field-error">Colour name is required</div>` : ''}
+                          <label class="admin-label" style="font-size: 11px;">Colour / Variant Name (Optional)</label>
+                          <input type="text" class="variant-input-sm var-color-name-input" data-cidx="${cIdx}" value="${cg.color || ''}" placeholder="e.g. Natural, Noir Black (Optional)">
                         </div>
                         <div>
                           <label class="admin-label" style="font-size: 11px;">Swatch Tone / Hex (Optional)</label>
@@ -1355,11 +1364,15 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
         const flatVariants = [];
         let totalStockUnits = 0;
         const cleanSkuBase = getProductSkuPrefix();
-        const mainCover = mainImages[0] || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';
+        const mainCover = mainImages[0] || FALLBACK_GARMENT_SVG;
+
+        const colorGalleries = {};
 
         colorVariants.forEach(cg => {
-          const colName = cg.color.trim();
-          const colImg = (cg.images && cg.images.length > 0) ? cg.images[0] : mainCover;
+          const colName = (cg.color && cg.color.trim()) || 'Standard';
+          const cgImages = Array.isArray(cg.images) ? [...cg.images].filter(Boolean).slice(0, 5) : [];
+          colorGalleries[colName] = cgImages;
+          const colImg = cgImages.length > 0 ? cgImages[0] : null;
 
           cg.sizeConfigs.forEach((cfg, sz) => {
             if (cfg.checked) {
@@ -1368,27 +1381,22 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
               const sku = (cfg.sku || generateDefaultSku(cleanSkuBase, colName, sz)).trim().toUpperCase();
 
               flatVariants.push({
+                id: cfg.variantId || undefined,
                 size: sz,
                 color: colName,
                 color_code: cg.color_code || null,
                 stock: stockNum,
                 stock_qty: stockNum,
                 sku: sku,
-                image_url: colImg
+                image_url: colImg || mainCover,
+                images: cgImages
               });
             }
           });
         });
 
-        // 6. Assemble Complete Gallery (Main product images + distinct colour variant images)
-        const combinedGallery = [...mainImages];
-        colorVariants.forEach(cg => {
-          (cg.images || []).forEach(img => {
-            if (img && !combinedGallery.includes(img)) {
-              combinedGallery.push(img);
-            }
-          });
-        });
+        // 6. Main Product Gallery contains ONLY general main product images (Never polluted by variant images)
+        const pureMainGallery = [...mainImages].filter(Boolean).slice(0, 5);
 
         // 7. Build complete updated Product object
         const updatedProduct = {
@@ -1412,8 +1420,8 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
           care: product.care || 'Hand wash cold or gentle machine cycle. Dry flat.',
           fit: product.fit || 'Relaxed elegant fit.',
           image: mainCover,
-          gallery: combinedGallery,
-          variants: flatVariants
+          gallery: pureMainGallery,
+          colorGalleries: colorGalleries,
         };
 
         // 8. Persist using existing backend service

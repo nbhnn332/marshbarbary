@@ -158,7 +158,7 @@ window.MB_ADMIN_VIEWS['order-detail'] = {
                     ${(order.items || []).map(item => `
                       <tr>
                         <td>
-                          <img src="${window.MB_IMAGE_SOURCE ? window.MB_IMAGE_SOURCE.resolveDisplayUrl(item.image || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85') : (item.image || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85')}" alt="" style="width: 42px; height: 54px; object-fit: cover; border-radius: 2px; border: 1px solid var(--admin-border-subtle); background: #fdfdfd;" onerror="this.src='https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';">
+                          <img src="${window.MB_IMAGE_SOURCE ? window.MB_IMAGE_SOURCE.resolveDisplayUrl(item.image || (window.MB_FALLBACK_SVG || '')) : (item.image || (window.MB_FALLBACK_SVG || ''))}" alt="" style="width: 42px; height: 54px; object-fit: cover; border-radius: 2px; border: 1px solid var(--admin-border-subtle); background: #fdfdfd;" onerror="this.src=window.MB_FALLBACK_SVG || '';">
                         </td>
                         <td>
                           <div style="font-weight: 500; color: var(--admin-text-primary);">${item.title}</div>

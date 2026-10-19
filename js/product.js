@@ -253,7 +253,25 @@
    * Render Swatches
    */
   /**
-   * Render Swatches & Switch Variant Image
+   * Update Gallery for Active Colour
+   * If colour has independent photos, display them. Otherwise, fall back to main product gallery.
+   */
+  function updateGalleryForColor(colorName) {
+    if (!currentProduct) return;
+    const swatch = (currentProduct.swatches || []).find(s => (s.name || '').toLowerCase() === (colorName || '').toLowerCase());
+    const colorImages = (currentProduct.colorGalleries && currentProduct.colorGalleries[colorName])
+      || (swatch && Array.isArray(swatch.images) && swatch.images.length > 0 ? swatch.images : (swatch?.image ? [swatch.image] : []));
+
+    const activeGallery = (Array.isArray(colorImages) && colorImages.length > 0)
+      ? colorImages
+      : (currentProduct.gallery && currentProduct.gallery.length > 0 ? currentProduct.gallery : [currentProduct.image]);
+
+    activeImageIndex = 0;
+    renderGallery(activeGallery);
+  }
+
+  /**
+   * Render Swatches & Switch Variant Image/Gallery
    */
   function renderSwatches(swatches) {
     if (!elements.swatchesContainer) return;
@@ -265,11 +283,6 @@
     elements.swatchesContainer.closest('.pdp-option-group')?.style.setProperty('display', 'block');
     selectedColor = swatches[0].name;
     if (elements.colorLabel) elements.colorLabel.textContent = selectedColor;
-
-    // If initial swatch has an image, display it
-    if (swatches[0].image && elements.mainImg) {
-      elements.mainImg.src = swatches[0].image;
-    }
 
     elements.swatchesContainer.innerHTML = swatches.map((s, idx) => `
       <button type="button" 
@@ -288,29 +301,23 @@
         selectedColor = btn.getAttribute('data-name');
         if (elements.colorLabel) elements.colorLabel.textContent = selectedColor;
 
-        // IN THE PRODUCT VIEW SHOW THE PRODUCT IMAGE OF VARIANT
-        const variantImg = btn.getAttribute('data-image');
-        if (variantImg && elements.mainImg) {
-          elements.mainImg.style.opacity = '0.4';
-          setTimeout(() => {
-            elements.mainImg.src = variantImg;
-            elements.mainImg.style.opacity = '1';
-          }, 100);
-        }
+        // Switch to this colour's gallery
+        updateGalleryForColor(selectedColor);
 
         // Update sizes and stock for this color variant
         updateSizesForColor(selectedColor);
       });
     });
 
-    // Update sizes for initial color
+    // Initial gallery and sizes for default color
+    updateGalleryForColor(selectedColor);
     updateSizesForColor(selectedColor);
   }
 
   function updateSizesForColor(color) {
     if (!currentProduct) return;
     const allVariants = currentProduct.variants || [];
-    const colorVars = allVariants.filter(v => (v.color || '').toLowerCase() === color.toLowerCase());
+    const colorVars = allVariants.filter(v => (v.color || '').trim().toLowerCase() === (color || '').trim().toLowerCase());
 
     let sizesToDisplay = [];
     let unavailable = [];

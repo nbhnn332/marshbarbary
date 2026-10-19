@@ -103,7 +103,7 @@ window.MB_DATA.loadLiveCatalog = async function() {
           name: c.name,
           slug: c.slug,
           originalSlug: c.slug,
-          image: c.image_url || 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=85',
+          image: c.image_url || (window.MB_FALLBACK_SVG || ''),
           link: `shop.html?category=${c.slug}`,
           description: c.description || '',
           displayOrder: c.display_order || 1,
@@ -117,14 +117,34 @@ window.MB_DATA.loadLiveCatalog = async function() {
       const liveProds = await prodRes.json();
       if (Array.isArray(liveProds)) {
         window.MB_DATA.products = liveProds.map(p => {
-          // Resolve product images
+          // Resolve product images (Strict separation: main vs color variants)
           const sortedImgs = (p.images || []).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-          const mainImg = sortedImgs[0]?.storage_path || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';
-          const gallery = sortedImgs.map(i => i.storage_path);
-          if (!gallery.includes(mainImg)) gallery.unshift(mainImg);
+          const mainImgs = sortedImgs.filter(i => !i.alt_text || !i.alt_text.startsWith('color:'));
+          const colorImgs = sortedImgs.filter(i => i.alt_text && i.alt_text.startsWith('color:'));
+
+          const colorGalleries = {};
+          colorImgs.forEach(i => {
+            const colName = i.alt_text.replace(/^color:/, '').trim() || 'Standard';
+            colorGalleries[colName] = colorGalleries[colName] || [];
+            colorGalleries[colName].push(i.storage_path);
+          });
+
+          const mainImg = mainImgs[0]?.storage_path || (window.MB_FALLBACK_SVG || '');
+          const gallery = mainImgs.map(i => i.storage_path);
 
           // Resolve variants, sizes, colors, and stock
-          const variants = p.variants || [];
+          const rawVariants = p.variants || [];
+          const variants = rawVariants.map(v => {
+            const vColor = (v.color || 'Standard').trim();
+            const vImgs = colorGalleries[vColor] || [];
+            return {
+              ...v,
+              stock: v.stock_qty,
+              image_url: vImgs[0] || mainImg,
+              images: vImgs
+            };
+          });
+
           const uniqueSizes = [...new Set(variants.map(v => v.size).filter(Boolean))];
           const uniqueColors = [...new Set(variants.map(v => v.color).filter(Boolean))];
           const totalStock = variants.reduce((sum, v) => sum + (v.stock_qty || 0), 0);
@@ -144,6 +164,7 @@ window.MB_DATA.loadLiveCatalog = async function() {
             formattedPrice: '₹' + price.toLocaleString('en-IN'),
             image: mainImg,
             gallery: gallery.length ? gallery : [mainImg],
+            colorGalleries: colorGalleries,
             category: resolvedCat,
             categoryId: p.category_id,
             description: p.description || '',
@@ -158,16 +179,17 @@ window.MB_DATA.loadLiveCatalog = async function() {
             stockStatus: totalStock > 0 ? (totalStock <= (p.low_stock_threshold || 5) ? 'low-stock' : 'available') : 'out-of-stock',
             stockNote: totalStock > 0 ? (totalStock <= 5 ? `Only ${totalStock} pieces remaining` : 'In Stock • Ready to ship') : 'Backorder Available',
             swatches: uniqueColors.map(c => {
-              // Find first variant with this color that has an image
+              const cImgs = colorGalleries[c] || [];
               const matchingVariant = variants.find(v => v.color === c);
               return {
                 name: c,
                 color: resolveColorHex(c),
-                image: matchingVariant?.image_url || null
+                image: cImgs[0] || matchingVariant?.image_url || mainImg,
+                images: cImgs
               };
             }),
             sizes: uniqueSizes.length ? uniqueSizes : ['XS', 'S', 'M', 'L', 'XL'],
-            unavailableSizes: variants.filter(v => v.stock_qty <= 0).map(v => v.size),
+            unavailableSizes: variants.filter(v => (v.stock_qty || 0) <= 0).map(v => v.size),
             inStock: totalStock > 0,
             isNew: Boolean(p.is_featured),
             variants: variants

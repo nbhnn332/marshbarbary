@@ -230,11 +230,11 @@ window.MB_CHECKOUT = (() => {
     if (itemsContainer) {
       itemsContainer.innerHTML = items.map(item => `
         <div class="checkout-mini-item">
-          <img src="${item.image && !item.image.includes('assets/images/') ? item.image : 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'}" alt="${escapeHtml(item.name)}" />
+          <img src="${item.image && !item.image.includes('assets/images/') && !item.image.includes('unsplash.com') ? item.image : (window.MB_FALLBACK_SVG || '')}" alt="${escapeHtml(item.name)}" />
           <div class="checkout-mini-details">
             <div class="checkout-mini-name">${escapeHtml(item.name)}</div>
-            <div class="checkout-mini-meta">Qty: ${item.quantity || 1} ${item.size ? `&bull; Size: ${escapeHtml(item.size)}` : ''}</div>
-            <div class="checkout-mini-price">₹${((item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN')}</div>
+            <div class="checkout-mini-meta">Qty: ${item.qty || item.quantity || 1} ${item.size ? `&bull; Size: ${escapeHtml(item.size)}` : ''}</div>
+            <div class="checkout-mini-price">₹${((item.price || 0) * (item.qty || item.quantity || 1)).toLocaleString('en-IN')}</div>
           </div>
         </div>
       `).join('');
@@ -448,17 +448,21 @@ window.MB_CHECKOUT = (() => {
       updated_at: new Date().toISOString()
     };
 
-    const orderItems = cartState.items.map(item => ({
-      product_id: item.id || item.variantId || 'mb_item',
-      product_name: item.name,
-      sku: item.sku || `MB-${(item.name || '').substring(0, 3).toUpperCase()}`,
-      size: item.size || 'Regular',
-      color: item.color || 'Signature',
-      quantity: item.quantity || 1,
-      unit_price: item.price,
-      total_price: (item.price || 0) * (item.quantity || 1),
-      image_url: item.image || ''
-    }));
+    const orderItems = cartState.items.map(item => {
+      const q = item.qty || item.quantity || 1;
+      const unit = Number(item.price) || 0;
+      return {
+        product_id: item.id || item.variantId || 'mb_item',
+        product_name: item.name,
+        sku: item.sku || `MB-${(item.name || '').substring(0, 3).toUpperCase()}`,
+        size: item.size || 'Regular',
+        color: item.color || 'Signature',
+        quantity: q,
+        unit_price: unit,
+        total_price: unit * q,
+        image_url: item.image || ''
+      };
+    });
 
     const supabase = getClient();
     if (window.MB_SUPABASE && window.MB_SUPABASE.isLive()) {
@@ -495,15 +499,22 @@ window.MB_CHECKOUT = (() => {
 
         if (orderErr) throw orderErr;
 
-        const liveItemsWithOrderId = cartState.items.map(item => ({
-          order_id: createdOrder.id,
-          product_id: (item.id && item.id.length > 20) ? item.id : null,
-          product_name: item.name || 'Marsh Barbary Item',
-          size: item.size || 'Regular',
-          color: item.color || 'Signature',
-          quantity: item.quantity || 1,
-          unit_price: item.price
-        }));
+        const liveItemsWithOrderId = cartState.items.map(item => {
+          const q = item.qty || item.quantity || 1;
+          const unit = Number(item.price) || 0;
+          return {
+            order_id: createdOrder.id,
+            product_id: String(item.id || item.variantId || 'mb_item'),
+            product_name: item.name || 'Marsh Barbary Item',
+            sku: item.sku || null,
+            size: item.size || 'Regular',
+            color: item.color || 'Signature',
+            quantity: q,
+            unit_price: unit,
+            total_price: unit * q,
+            image_url: item.image || null
+          };
+        });
 
         const { error: itemsErr } = await supabase
           .from('order_items')

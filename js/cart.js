@@ -218,29 +218,73 @@ window.MB_CART = (() => {
     }
 
     const requestedQty = parseInt(qty, 10) || 1;
-    const variantId = buildVariantId(product.id, size, color);
+    const variants = Array.isArray(product.variants) ? product.variants : [];
+    const normalizedColor = (color || 'Standard').trim().toLowerCase();
+    const normalizedSize = (size || '').trim();
+
+    // Match exact color + size variant
+    let matchedVariant = variants.find(v => 
+      (v.color || 'Standard').trim().toLowerCase() === normalizedColor &&
+      (v.size || '').trim() === normalizedSize
+    );
+
+    // Fallback: match by size if color was generic or not explicitly paired
+    if (!matchedVariant && variants.length > 0) {
+      matchedVariant = variants.find(v => (v.size || '').trim() === normalizedSize);
+    }
+
+    const variantId = matchedVariant?.id || buildVariantId(product.id, size, color);
+    const sku = matchedVariant?.sku || product.sku || `MB-${String(product.id).slice(0, 8).toUpperCase()}-${size}`;
+
+    // Resolve variant image: color gallery or swatch or fallback
+    const colorImgs = product.colorGalleries?.[color] || 
+                      product.swatches?.find(s => (s.name || '').trim().toLowerCase() === normalizedColor)?.images || [];
+    const itemImage = matchedVariant?.image_url || colorImgs[0] || product.image || (window.MB_FALLBACK_SVG || '');
+
+    // Resolve max stock
+    let maxStock = 10;
+    if (matchedVariant) {
+      if (typeof matchedVariant.stock_qty === 'number') maxStock = matchedVariant.stock_qty;
+      else if (typeof matchedVariant.stock === 'number') maxStock = matchedVariant.stock;
+    } else if (typeof product.stockCount === 'number') {
+      maxStock = product.stockCount;
+    } else if (typeof product.stock === 'number') {
+      maxStock = product.stock;
+    }
+
+    if (maxStock <= 0) {
+      showToast(`${product.name} (${color && color !== 'Default' ? color + ' / ' : ''}${size}) is out of stock`);
+      return false;
+    }
+
     const existingIndex = state.items.findIndex(item => item.variantId === variantId);
 
-    // Resolve max stock if available
-    const maxStock = product.stockCount || 10;
-
     if (existingIndex > -1) {
-      const currentQty = state.items[existingIndex].qty;
+      const currentQty = state.items[existingIndex].qty || state.items[existingIndex].quantity || 0;
       if (currentQty + requestedQty > maxStock) {
-        showToast(`Stock limit reached for ${product.name} (${size})`);
+        showToast(`Stock limit reached (${maxStock} max) for ${product.name} (${size})`);
         return false;
       }
-      state.items[existingIndex].qty += requestedQty;
+      state.items[existingIndex].qty = currentQty + requestedQty;
+      state.items[existingIndex].quantity = currentQty + requestedQty;
+      state.items[existingIndex].maxStock = maxStock;
+      if (sku) state.items[existingIndex].sku = sku;
     } else {
+      if (requestedQty > maxStock) {
+        showToast(`Only ${maxStock} available for ${product.name} (${size})`);
+        return false;
+      }
       state.items.push({
         id: product.id,
         variantId: variantId,
+        sku: sku,
         name: product.name,
         price: product.price,
-        image: product.image,
+        image: itemImage,
         color: color,
         size: size,
         qty: requestedQty,
+        quantity: requestedQty,
         maxStock: maxStock
       });
     }
@@ -264,7 +308,8 @@ window.MB_CART = (() => {
 
     if (index > -1 && state.items[index]) {
       const targetItem = state.items[index];
-      const newQty = targetItem.qty + delta;
+      const current = targetItem.qty || targetItem.quantity || 1;
+      const newQty = current + delta;
 
       if (newQty <= 0) {
         removeItem(index);
@@ -272,11 +317,12 @@ window.MB_CART = (() => {
       }
 
       if (newQty > (targetItem.maxStock || 10)) {
-        showToast(`Maximum available stock reached for ${targetItem.name}`);
+        showToast(`Maximum available stock (${targetItem.maxStock || 10}) reached for ${targetItem.name}`);
         return;
       }
 
       targetItem.qty = newQty;
+      targetItem.quantity = newQty;
       notify();
     }
   }
@@ -300,7 +346,9 @@ window.MB_CART = (() => {
       }
       const targetItem = state.items[index];
       const max = targetItem.maxStock || 10;
-      targetItem.qty = Math.min(qty, max);
+      const finalQty = Math.min(qty, max);
+      targetItem.qty = finalQty;
+      targetItem.quantity = finalQty;
       notify();
     }
   }
