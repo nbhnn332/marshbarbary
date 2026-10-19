@@ -285,6 +285,7 @@
   overflow: hidden;
   border-radius: 8px;
   cursor: grab;
+  max-height: 340px;
 }
 
 .instagram-slider-viewport:active {
@@ -301,6 +302,7 @@
 /* Non-Fixed Infinite Marquee Stream Mode */
 .instagram-slider-container.is-non-fixed .instagram-slider-viewport {
   overflow: hidden;
+  max-height: 320px;
 }
 
 .instagram-slider-container.is-non-fixed .instagram-slider-track.is-marquee {
@@ -317,6 +319,15 @@
   display: none !important;
 }
 
+/* Strictly lock card sizing in non-fixed mode to prevent huge image expansion */
+.instagram-slider-container.is-non-fixed .instagram-card {
+  flex: 0 0 250px !important;
+  width: 250px !important;
+  height: 250px !important;
+  max-width: 250px !important;
+  max-height: 250px !important;
+}
+
 @keyframes mbInstagramMarquee {
   0% {
     transform: translateX(0);
@@ -329,8 +340,10 @@
 /* Individual Post Card */
 .instagram-card {
   flex: 0 0 calc((100% - 60px) / 4);
+  max-width: calc((100% - 60px) / 4);
   position: relative;
   aspect-ratio: 1 / 1;
+  max-height: 320px;
   border-radius: 8px;
   overflow: hidden;
   background-color: #EFECE6;

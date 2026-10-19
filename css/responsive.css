@@ -86,7 +86,7 @@
   }
 
   body {
-    padding-bottom: 84px; /* Clearance for floating bottom nav */
+    padding-bottom: 0 !important;
     overflow-x: hidden;
   }
 
@@ -122,8 +122,9 @@
   }
 
   .brand-logo-img {
-    height: 24px;
+    height: 26px;
     width: auto;
+    object-fit: contain;
   }
 
   .header-actions {
@@ -141,93 +142,12 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* 2. Floating Mobile App Bottom Navigation Bar */
+  /* Completely remove bottom app nav */
   .mobile-bottom-nav {
-    display: flex !important;
-    position: fixed;
-    bottom: 14px;
-    left: 16px;
-    right: 16px;
-    height: 60px;
-    background: rgba(38, 32, 29, 0.94);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 36px;
-    box-shadow: 0 12px 36px rgba(38, 32, 29, 0.28), 0 2px 6px rgba(0, 0, 0, 0.1);
-    z-index: 990;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 10px;
-    transform: translateZ(0);
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    display: none !important;
   }
 
-  .mobile-bottom-nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    text-decoration: none;
-    color: rgba(255, 255, 255, 0.65);
-    font-family: var(--font-sans);
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    padding: 6px 12px;
-    border-radius: 20px;
-    transition: all 0.2s ease;
-    position: relative;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .mobile-bottom-nav-item svg {
-    width: 20px;
-    height: 20px;
-    stroke: currentColor;
-    transition: transform 0.2s ease;
-  }
-
-  .mobile-bottom-nav-item.active {
-    color: #FFFFFF;
-    font-weight: 700;
-  }
-
-  .mobile-bottom-nav-item.active svg {
-    transform: translateY(-1px) scale(1.08);
-    stroke: #EBDBCB;
-  }
-
-  .mobile-bottom-nav-item:active {
-    transform: scale(0.92);
-  }
-
-  .mobile-bottom-nav-icon-wrap {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .mobile-bottom-badge {
-    position: absolute;
-    top: -5px;
-    right: -9px;
-    background: var(--color-earth-terracotta, #B85D3E);
-    color: #FFFFFF;
-    font-size: 9px;
-    font-weight: 700;
-    min-width: 16px;
-    height: 16px;
-    line-height: 16px;
-    border-radius: 8px;
-    padding: 0 4px;
-    text-align: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-  }
+  /* 2. Hero Section Mobile (Striking Editorial Card) */
 
   /* 3. Hero Section Mobile (Striking Editorial Card) */
   .hero-section {
@@ -373,8 +293,8 @@
     flex-direction: row !important;
     overflow-x: auto !important;
     scroll-snap-type: x mandatory;
-    gap: 12px;
-    padding: 4px 16px 18px 16px !important;
+    gap: 16px;
+    padding: 8px 16px 20px 16px !important;
     margin: 0;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -384,17 +304,72 @@
     display: none;
   }
 
+  .category-circle-card,
+  .category-wing-card,
   .category-card {
-    flex: 0 0 138px !important;
-    width: 138px !important;
+    flex: 0 0 96px !important;
+    width: 96px !important;
     scroll-snap-align: start;
-    border-radius: 16px !important;
-    overflow: hidden;
+    border-radius: 0 !important;
+    overflow: visible !important;
     position: relative;
-    aspect-ratio: 4 / 5;
-    box-shadow: 0 6px 18px rgba(38, 32, 29, 0.08);
-    background: #ECE6E1;
+    aspect-ratio: unset !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
     transition: transform 0.2s ease;
+  }
+
+  .category-circle-media-wrap,
+  .category-wing-shape-wrap {
+    width: 84px !important;
+    height: 84px !important;
+    max-width: 84px !important;
+    aspect-ratio: 1 / 1 !important;
+    margin: 0 auto;
+  }
+
+  .category-circle-ring {
+    width: 84px !important;
+    height: 84px !important;
+    border-radius: 50% !important;
+    border: 2px solid rgba(180, 113, 84, 0.3) !important;
+    overflow: hidden !important;
+    box-shadow: 0 4px 14px rgba(38, 32, 29, 0.08) !important;
+  }
+
+  .category-circle-img,
+  .category-wing-img {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+  }
+
+  .category-circle-meta,
+  .category-wing-meta {
+    margin-top: 8px !important;
+    gap: 2px !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .category-circle-title,
+  .category-wing-title {
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: var(--color-text-primary, #26201D) !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .category-circle-explore,
+  .category-wing-explore {
+    display: none !important;
   }
 
   /* 5. New Arrivals Product Grid (High-Fashion 2-Column Lookbook) */
@@ -575,11 +550,19 @@
     display: none !important;
   }
 
+  .instagram-slider-viewport {
+    max-height: 200px !important;
+    overflow: hidden !important;
+  }
+
   .instagram-card {
     flex: 0 0 170px !important;
     width: 170px !important;
-    height: 230px !important;
-    border-radius: 16px !important;
+    height: 170px !important;
+    max-width: 170px !important;
+    max-height: 170px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 12px !important;
     overflow: hidden;
     margin-right: 12px !important;
     box-shadow: 0 6px 18px rgba(38, 32, 29, 0.08);

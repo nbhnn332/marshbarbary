@@ -113,6 +113,21 @@ window.MB_MODAL = (() => {
     if (label) label.textContent = colorName;
     document.querySelectorAll('.modal-swatches-box .color-swatch-dot').forEach(d => d.classList.remove('active'));
     el.classList.add('active');
+
+    // Switch image in modal to variant image
+    if (activeProduct) {
+      const swatch = (activeProduct.swatches || []).find(s => s.name === colorName);
+      const variant = (activeProduct.variants || []).find(v => (v.color || '').toLowerCase() === colorName.toLowerCase());
+      const variantImg = swatch?.image || variant?.image_url;
+      const imgEl = document.querySelector('.modal-product-image');
+      if (variantImg && imgEl) {
+        imgEl.style.opacity = '0.5';
+        setTimeout(() => {
+          imgEl.src = variantImg;
+          imgEl.style.opacity = '1';
+        }, 80);
+      }
+    }
   }
 
   function addActiveToCart() {
