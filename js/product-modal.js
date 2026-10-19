@@ -83,7 +83,7 @@ window.MB_MODAL = (() => {
         <div class="product-swatches">
           ${prod.swatches.map((s, idx) => `
             <span class="color-swatch-dot ${idx === 0 ? 'active' : ''}" 
-                  style="background-color: ${s.color}; width: 14px; height: 14px;" 
+                  style="${s.image ? `background-image: url('${s.image}'); background-size: cover; background-position: center; border: 1px solid rgba(0,0,0,0.12);` : `background-color: ${s.color};`}" 
                   title="${s.name}" 
                   onclick="MB_MODAL.selectColor('${s.name}', this)"></span>
           `).join('')}
