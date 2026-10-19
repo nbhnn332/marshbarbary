@@ -252,6 +252,9 @@
   /**
    * Render Swatches
    */
+  /**
+   * Render Swatches & Switch Variant Image
+   */
   function renderSwatches(swatches) {
     if (!elements.swatchesContainer) return;
     if (!swatches || swatches.length === 0) {
@@ -259,15 +262,22 @@
       return;
     }
 
+    elements.swatchesContainer.closest('.pdp-option-group')?.style.setProperty('display', 'block');
     selectedColor = swatches[0].name;
     if (elements.colorLabel) elements.colorLabel.textContent = selectedColor;
+
+    // If initial swatch has an image, display it
+    if (swatches[0].image && elements.mainImg) {
+      elements.mainImg.src = swatches[0].image;
+    }
 
     elements.swatchesContainer.innerHTML = swatches.map((s, idx) => `
       <button type="button" 
               class="pdp-swatch-btn ${idx === 0 ? 'active' : ''}" 
               style="background-color: ${s.color};" 
               title="${s.name}" 
-              data-name="${s.name}">
+              data-name="${s.name}"
+              data-image="${s.image || ''}">
       </button>
     `).join('');
 
@@ -277,8 +287,69 @@
         btn.classList.add('active');
         selectedColor = btn.getAttribute('data-name');
         if (elements.colorLabel) elements.colorLabel.textContent = selectedColor;
+
+        // IN THE PRODUCT VIEW SHOW THE PRODUCT IMAGE OF VARIANT
+        const variantImg = btn.getAttribute('data-image');
+        if (variantImg && elements.mainImg) {
+          elements.mainImg.style.opacity = '0.4';
+          setTimeout(() => {
+            elements.mainImg.src = variantImg;
+            elements.mainImg.style.opacity = '1';
+          }, 100);
+        }
+
+        // Update sizes and stock for this color variant
+        updateSizesForColor(selectedColor);
       });
     });
+
+    // Update sizes for initial color
+    updateSizesForColor(selectedColor);
+  }
+
+  function updateSizesForColor(color) {
+    if (!currentProduct) return;
+    const allVariants = currentProduct.variants || [];
+    const colorVars = allVariants.filter(v => (v.color || '').toLowerCase() === color.toLowerCase());
+
+    let sizesToDisplay = [];
+    let unavailable = [];
+
+    if (colorVars.length > 0) {
+      sizesToDisplay = [...new Set(colorVars.map(v => v.size).filter(Boolean))];
+      unavailable = colorVars.filter(v => (v.stock ?? v.stock_qty ?? 0) <= 0).map(v => v.size);
+      
+      const colorStock = colorVars.reduce((sum, v) => sum + (v.stock ?? v.stock_qty ?? 0), 0);
+      if (elements.stockText && elements.stockDot) {
+        if (colorStock <= 0) {
+          elements.stockDot.className = 'stock-dot out';
+          elements.stockText.textContent = `Out of stock in ${color}`;
+          if (elements.addToBagBtn) {
+            elements.addToBagBtn.disabled = true;
+            elements.addToBagBtn.textContent = 'Out of Stock';
+          }
+        } else if (colorStock <= (currentProduct.lowStockThreshold || 5)) {
+          elements.stockDot.className = 'stock-dot low';
+          elements.stockText.textContent = `Only ${colorStock} left in ${color} • Order soon`;
+          if (elements.addToBagBtn) {
+            elements.addToBagBtn.disabled = false;
+            elements.addToBagBtn.textContent = 'Add to Bag';
+          }
+        } else {
+          elements.stockDot.className = 'stock-dot';
+          elements.stockText.textContent = `In Stock in ${color} • Ready to ship`;
+          if (elements.addToBagBtn) {
+            elements.addToBagBtn.disabled = false;
+            elements.addToBagBtn.textContent = 'Add to Bag';
+          }
+        }
+      }
+    } else {
+      sizesToDisplay = currentProduct.sizes || ['XS', 'S', 'M', 'L', 'XL'];
+      unavailable = currentProduct.unavailableSizes || [];
+    }
+
+    renderSizes(sizesToDisplay, unavailable);
   }
 
   /**

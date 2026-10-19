@@ -372,8 +372,8 @@
       const displayImg = normalizeInstagramImg(post.img, post.id);
 
       return `
-        <a href="${post.url || 'https://www.instagram.com/marshbarbary/'}" target="_blank" rel="noopener noreferrer" class="instagram-card" aria-label="View post on Instagram @marshbarbary">
-          <img src="${displayImg}" referrerpolicy="no-referrer" alt="${post.caption ? post.caption.substring(0, 50) : 'Marsh Barbary Instagram'}" class="instagram-card-img" loading="lazy" onerror="this.style.opacity='0.7';" />
+        <a href="${post.url || 'https://www.instagram.com/marshbarbary/'}" target="_blank" rel="noopener noreferrer" class="instagram-card" style="aspect-ratio: 1 / 1;" aria-label="View post on Instagram @marshbarbary">
+          <img src="${displayImg}" referrerpolicy="no-referrer" alt="${post.caption ? post.caption.substring(0, 50) : 'Marsh Barbary Instagram'}" class="instagram-card-img" style="width: 100%; height: 100%; object-fit: cover; display: block;" loading="lazy" onerror="this.style.opacity='0.7';" />
           <div class="instagram-card-overlay">
             <svg class="instagram-card-icon" viewBox="0 0 24 24">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>

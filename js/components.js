@@ -47,31 +47,19 @@ window.MB_COMPONENTS = {
     const imgSrc = resolveCategoryImg(cat.image);
 
     // Guaranteed valid, clean, unique ID for SVG clipPath (strictly alphanumeric and dashes)
-    const rawKey = cat.rawId || cat.slug || cat.id || ('cat-' + Math.random().toString(36).substring(2, 8));
-    const safeClipId = 'clip-wing-' + String(rawKey).toLowerCase().replace(/[^a-z0-9_-]/g, '-');
-
-    const wingPath = 'M 8,120 C 6,85 5,42 22,24 C 36,12 65,10 96,2 C 92,38 88,76 80,98 C 65,116 38,124 8,120 Z';
     const title = (cat.title || cat.name || 'COLLECTION').toUpperCase();
     const link = cat.link || `shop.html?category=${cat.slug || cat.id}`;
 
     return `
-      <a href="${link}" class="category-wing-card category-card" data-category="${cat.slug || cat.id}" aria-label="Explore ${title} Collection">
-        <div class="category-wing-shape-wrap">
-          <svg viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="category-wing-svg" role="img" aria-label="${title}">
-            <defs>
-              <clipPath id="${safeClipId}" clipPathUnits="userSpaceOnUse">
-                <path d="${wingPath}" />
-              </clipPath>
-            </defs>
-            <g clip-path="url(#${safeClipId})">
-              <image href="${imgSrc}" xlink:href="${imgSrc}" x="${offset.x}" y="${offset.y}" width="${offset.width}" height="${offset.height}" preserveAspectRatio="xMidYMid slice" class="category-wing-img" />
-            </g>
-            <path class="category-wing-border" d="${wingPath}" fill="none" stroke="#B47154" stroke-width="1.3" vector-effect="non-scaling-stroke" />
-          </svg>
+      <a href="${link}" class="category-circle-card category-card category-wing-card" data-category="${cat.slug || cat.id}" aria-label="Explore ${title} Collection">
+        <div class="category-circle-media-wrap category-wing-shape-wrap">
+          <div class="category-circle-ring">
+            <img src="${imgSrc}" alt="${title}" class="category-circle-img category-wing-img" loading="lazy" />
+          </div>
         </div>
-        <div class="category-wing-meta">
-          <h3 class="category-wing-title">${title}</h3>
-          <span class="category-wing-explore">Explore <span class="arrow" aria-hidden="true">&rarr;</span></span>
+        <div class="category-circle-meta category-wing-meta">
+          <h3 class="category-circle-title category-wing-title">${title}</h3>
+          <span class="category-circle-explore category-wing-explore">Explore <span class="arrow" aria-hidden="true">&rarr;</span></span>
         </div>
       </a>
     `;
@@ -191,6 +179,14 @@ document.addEventListener('click', (e) => {
     if (swatchesContainer) {
       swatchesContainer.querySelectorAll('.variant-img-swatch').forEach(btn => btn.classList.remove('active'));
       swatchBtn.classList.add('active');
+    }
+    const card = swatchBtn.closest('.product-card');
+    const swatchImg = swatchBtn.getAttribute('data-swatch-img');
+    if (card && swatchImg) {
+      const primaryImg = card.querySelector('.product-thumb-primary');
+      if (primaryImg) {
+        primaryImg.src = swatchImg;
+      }
     }
   }
 });

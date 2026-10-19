@@ -491,7 +491,8 @@
   align-items: start;
 }
 
-/* Wing Card Container */
+/* Circular Category Card Container */
+.category-circle-card,
 .category-wing-card {
   position: relative;
   display: flex;
@@ -503,59 +504,67 @@
   transition: transform var(--transition-normal);
 }
 
+.category-circle-card:focus-visible,
 .category-wing-card:focus-visible {
   outline: 2px solid var(--color-accent-terracotta, #B47154);
   outline-offset: 6px;
-  border-radius: var(--radius-xs, 4px);
+  border-radius: 50%;
 }
 
-/* SVG Wing Silhouette Container */
+/* Circular Media Wrapper */
+.category-circle-media-wrap,
 .category-wing-shape-wrap {
   width: 100%;
-  aspect-ratio: 100 / 130;
+  max-width: 160px;
+  aspect-ratio: 1 / 1;
   position: relative;
-  filter: drop-shadow(0 6px 16px rgba(38, 32, 29, 0.07));
-  transition: filter var(--transition-normal), transform var(--transition-normal);
-  transform: translateZ(0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
 }
 
-.category-wing-svg {
+.category-circle-ring {
   width: 100%;
   height: 100%;
-  display: block;
-  overflow: visible;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  background: #EFECE6;
+  border: 2px solid rgba(180, 113, 84, 0.22);
+  box-shadow: 0 8px 24px -4px rgba(38, 32, 29, 0.08);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
-.category-wing-border {
-  stroke: #B47154;
-  stroke-width: 1.3;
-  transition: stroke var(--transition-normal), stroke-width var(--transition-normal);
-}
-
+.category-circle-img,
 .category-wing-img {
-  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-  transform-origin: 50% 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* Hover Interactions */
+.category-circle-card:hover,
 .category-wing-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
 }
 
-.category-wing-card:hover .category-wing-shape-wrap {
-  filter: drop-shadow(0 14px 28px rgba(180, 113, 84, 0.22));
+.category-circle-card:hover .category-circle-ring {
+  border-color: #B47154;
+  box-shadow: 0 14px 32px -4px rgba(180, 113, 84, 0.28);
+  transform: scale(1.03);
 }
 
-.category-wing-card:hover .category-wing-border {
-  stroke: #8C4E37;
-  stroke-width: 1.6;
-}
-
+.category-circle-card:hover .category-circle-img,
 .category-wing-card:hover .category-wing-img {
-  transform: scale(1.04);
+  transform: scale(1.08);
 }
 
-/* Category Labels Positioned BELOW Wing */
+/* Category Labels Positioned BELOW Circle */
+.category-circle-meta,
 .category-wing-meta {
   margin-top: 14px;
   display: flex;
@@ -565,9 +574,10 @@
   gap: 4px;
 }
 
+.category-circle-title,
 .category-wing-title {
   font-family: var(--font-serif);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -576,10 +586,12 @@
   transition: color var(--transition-fast);
 }
 
+.category-circle-card:hover .category-circle-title,
 .category-wing-card:hover .category-wing-title {
   color: var(--color-accent-terracotta, #B47154);
 }
 
+.category-circle-explore,
 .category-wing-explore {
   font-family: var(--font-sans);
   font-size: 11px;
@@ -593,16 +605,19 @@
   transition: color var(--transition-fast), gap var(--transition-fast);
 }
 
+.category-circle-explore .arrow,
 .category-wing-explore .arrow {
   display: inline-block;
   transition: transform var(--transition-fast);
 }
 
+.category-circle-card:hover .category-circle-explore,
 .category-wing-card:hover .category-wing-explore {
   color: var(--color-text-primary, #26201D);
   gap: 7px;
 }
 
+.category-circle-card:hover .category-circle-explore .arrow,
 .category-wing-card:hover .category-wing-explore .arrow {
   transform: translateX(3px);
 }
@@ -1563,8 +1578,11 @@
 }
 
 .footer-logo-img {
-  height: 36px;
+  height: 34px;
   width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(0.96);
+  display: block;
 }
 
 .footer-mission {

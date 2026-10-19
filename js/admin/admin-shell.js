@@ -54,7 +54,7 @@ window.MB_ADMIN_SHELL = (() => {
     let html = `
       <div class="admin-sidebar-header">
         <a href="#/dashboard" class="admin-brand-link" aria-label="Marsh Barbary Operations Portal">
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 40'%3E%3Ctext x='50%25' y='28' text-anchor='middle' font-family='Cinzel, serif' font-size='22' font-weight='600' letter-spacing='0.22em' fill='%2326201D'%3EMARSH BARBARY%3C/text%3E%3C/svg%3E" alt="MARSH BARBARY" class="admin-brand-logo">
+          <img src="../assets/images/logo-horizontal.png" alt="MARSH BARBARY" class="admin-brand-logo" onerror="this.onerror=null;this.src='assets/images/logo-horizontal.png';">
           <span class="admin-brand-tag">PORTAL</span>
         </a>
       </div>
