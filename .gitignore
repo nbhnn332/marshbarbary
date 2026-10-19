@@ -18,4 +18,5 @@ Thumbs.db
 
 # Root visual QA testing screenshots
 /*.png
+!/apple-touch-icon.png
 /clean-cat-*.jpg
