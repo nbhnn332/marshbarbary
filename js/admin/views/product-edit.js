@@ -1,28 +1,28 @@
 /**
  * MARSH BARBARY — ADMIN VIEW: PRODUCT EDIT / CREATE (js/admin/views/product-edit.js)
- * Premium Size & Colour Variant Inventory Editor Redesign
- * Hierarchy: Product → Colour Variant → Size Variants → Inventory
- * - Clean collapsible colour accordion groups
- * - Shared colour swatch & image management per colour (URL + Upload + live preview)
- * - Compact size inventory table (Size | SKU | Stock | Actions)
- * - Sensible auto-SKU generation with custom SKU support
- * - Real-time duplicate SKU & duplicate size detection with inline validation
- * - Non-negative integer stock validation
- * - Duplicate colour action with unique auto-SKUs
- * - Confirmation dialogs for destructive actions (removing colours or sizes with stock)
- * - 100% backward compatible with flat variant schema in Supabase & localStorage
+ * Tabbed Product & Variant Builder Modal (Stack Shack Nutrition Interaction Pattern)
+ * 
+ * Hierarchy & Architecture:
+ * - Centred modal titled "Add Product" / "Edit Product" with fixed header, tabs, and footer
+ * - Tab 1: Basic Info (Product Name, Slug, Prices, Category, Description, Flags, Main Images max 5)
+ * - Tab 2: Variants (Main Images reuse, Colour Variants, Independent max 5 images per colour,
+ *                   Selectable Size Checkbox Grid, Checked-Only Size Inventory Table)
+ * - Checked sizes = Active sellable variants
+ * - Unchecked sizes = Inactive/unavailable, draft stock preserved in memory
+ * - 100% backward compatible with existing Supabase & localStorage persistence
  */
 
 window.MB_ADMIN_VIEWS = window.MB_ADMIN_VIEWS || {};
 
 window.MB_ADMIN_VIEWS['product-edit'] = {
-  title: 'Edit Garment',
+  title: 'Garment Builder',
 
   async render(container, params = {}) {
     const service = window.MB_ADMIN_SERVICE;
     const categories = await service.getCategories();
     const isNew = !params.id || params.id === 'new';
 
+    // Base product model
     let product = {
       id: '',
       name: '',
@@ -32,10 +32,11 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
       categoryId: '',
       price: 2999,
       salePrice: null,
-      stock: 10,
+      stock: 0,
       lowStockThreshold: 5,
       status: 'active',
       featured: false,
+      bestSeller: false,
       newArrival: true,
       shortDescription: '',
       description: '',
@@ -49,15 +50,29 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
       if (fetched) product = fetched;
     }
 
-    // Standard garment sizes
-    const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+    // Supported size list (standard luxury modest sizes + custom if existing)
+    const BASE_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+    const customExistingSizes = (product.variants || [])
+      .map(v => v.size)
+      .filter(sz => sz && !BASE_SIZES.includes(sz));
+    const ALL_SUPPORTED_SIZES = [...new Set([...BASE_SIZES, ...customExistingSizes])];
+
+    // Main product gallery (up to 5 images independently)
+    let mainImages = [];
+    if (Array.isArray(product.gallery) && product.gallery.length > 0) {
+      mainImages = product.gallery.filter(Boolean).slice(0, 5);
+    } else if (product.image) {
+      mainImages = [product.image];
+    } else {
+      mainImages = ['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'];
+    }
+
+    // Active Modal Tab state: 'basic' or 'variants'
+    let activeTab = 'basic';
 
     // Helper: Derives SKU prefix from product SKU or name
     function getProductSkuPrefix() {
-      if (product.sku && product.sku.trim()) {
-        return product.sku.trim().toUpperCase();
-      }
-      const nameInput = container.querySelector('#pe-name');
+      const nameInput = document.getElementById('pe-name');
       const title = (nameInput?.value || product.name || 'GARMENT').trim();
       const cleanTitle = title.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().substring(0, 3) || 'DRS';
       return `MB-${cleanTitle}`;
@@ -75,11 +90,48 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
       return sz.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
     }
 
-    function generateSku(prefix, col, sz) {
+    function generateDefaultSku(prefix, col, sz) {
       return `${prefix}-${getColCode(col)}-${getSizeCode(sz)}`;
     }
 
-    // Group flat database variants by Colour
+    // Sync input values from DOM into product model before tab switching or saving
+    function syncBasicInfoFromDom() {
+      const nameInp = document.getElementById('pe-name');
+      if (nameInp) product.name = nameInp.value;
+
+      const slugInp = document.getElementById('pe-slug');
+      if (slugInp) product.slug = slugInp.value;
+
+      const priceInp = document.getElementById('pe-price');
+      if (priceInp) product.price = parseFloat(priceInp.value) || 0;
+
+      const salePriceInp = document.getElementById('pe-sale-price');
+      if (salePriceInp) product.salePrice = salePriceInp.value ? parseFloat(salePriceInp.value) : null;
+
+      const catSelect = document.getElementById('pe-category');
+      if (catSelect) {
+        const opt = catSelect.options[catSelect.selectedIndex];
+        product.categoryId = opt?.value || '';
+        product.category = opt?.getAttribute('data-slug') || 'dresses';
+      }
+
+      const descInp = document.getElementById('pe-desc');
+      if (descInp) product.description = descInp.value;
+
+      const activeCheck = document.getElementById('pe-active');
+      if (activeCheck) product.status = activeCheck.checked ? 'active' : 'draft';
+
+      const featCheck = document.getElementById('pe-featured');
+      if (featCheck) product.featured = featCheck.checked;
+
+      const bsCheck = document.getElementById('pe-bestseller');
+      if (bsCheck) product.bestSeller = bsCheck.checked;
+
+      const newCheck = document.getElementById('pe-new');
+      if (newCheck) product.newArrival = newCheck.checked;
+    }
+
+    // Group existing flat variants by colour into structured Colour Variant Groups
     function groupVariants(vars) {
       const groups = new Map();
       const prefix = getProductSkuPrefix();
@@ -92,39 +144,63 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
               id: 'cg_' + Math.random().toString(36).substring(2, 9),
               color: col,
               color_code: v.color_code || '',
-              image_url: v.image_url || '',
+              images: v.image_url ? [v.image_url] : [],
               isExpanded: true,
-              sizes: []
+              sizeConfigs: new Map()
             });
           }
           const g = groups.get(col);
-          if (!g.image_url && v.image_url) g.image_url = v.image_url;
-          g.sizes.push({
-            id: 'sz_' + Math.random().toString(36).substring(2, 9),
-            size: v.size || 'M',
+          if (v.image_url && !g.images.includes(v.image_url) && g.images.length < 5) {
+            g.images.push(v.image_url);
+          }
+          const sz = v.size || 'M';
+          g.sizeConfigs.set(sz, {
+            checked: true,
             stock: v.stock ?? v.stock_qty ?? 5,
-            sku: v.sku || generateSku(prefix, col, v.size || 'M'),
+            draftStock: v.stock ?? v.stock_qty ?? 5,
+            sku: v.sku || generateDefaultSku(prefix, col, sz),
             customSku: Boolean(v.sku)
           });
         });
       }
 
+      // If new product or no variants, provide initial colour
       if (groups.size === 0) {
-        // Initial luxury default for new product
         const initialCol = 'Natural';
+        const defaultConfigs = new Map();
+        ALL_SUPPORTED_SIZES.forEach(sz => {
+          const isStandardChecked = ['S', 'M', 'L'].includes(sz);
+          defaultConfigs.set(sz, {
+            checked: isStandardChecked,
+            stock: isStandardChecked ? 10 : 5,
+            draftStock: 5,
+            sku: generateDefaultSku(prefix, initialCol, sz),
+            customSku: false
+          });
+        });
+
         groups.set(initialCol, {
           id: 'cg_' + Math.random().toString(36).substring(2, 9),
           color: initialCol,
           color_code: '#E5DFD7',
-          image_url: product.image || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85',
+          images: mainImages.length ? [mainImages[0]] : [],
           isExpanded: true,
-          sizes: [
-            { id: 'sz_1', size: 'XS', stock: 5, sku: generateSku(prefix, initialCol, 'XS'), customSku: false },
-            { id: 'sz_2', size: 'S', stock: 10, sku: generateSku(prefix, initialCol, 'S'), customSku: false },
-            { id: 'sz_3', size: 'M', stock: 15, sku: generateSku(prefix, initialCol, 'M'), customSku: false },
-            { id: 'sz_4', size: 'L', stock: 10, sku: generateSku(prefix, initialCol, 'L'), customSku: false },
-            { id: 'sz_5', size: 'XL', stock: 5, sku: generateSku(prefix, initialCol, 'XL'), customSku: false }
-          ]
+          sizeConfigs: defaultConfigs
+        });
+      } else {
+        // Ensure all supported sizes exist in each group's sizeConfigs (checked or unchecked)
+        groups.forEach((g, col) => {
+          ALL_SUPPORTED_SIZES.forEach(sz => {
+            if (!g.sizeConfigs.has(sz)) {
+              g.sizeConfigs.set(sz, {
+                checked: false,
+                stock: 5,
+                draftStock: 5,
+                sku: generateDefaultSku(prefix, col, sz),
+                customSku: false
+              });
+            }
+          });
         });
       }
 
@@ -133,28 +209,45 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
 
     let colorVariants = groupVariants(product.variants);
 
-    // Run deep validation on current variant state
+    // Validation checker
     function validateVariantState() {
       const errors = {
         hasErrors: false,
         duplicateSkus: new Set(),
-        duplicateSizesByGroup: new Map(), // groupId -> Set of duplicate sizes
         emptyColors: new Set(),
-        invalidStocks: new Set(), // Set of sizeIds
-        emptySkus: new Set()      // Set of sizeIds
+        noCheckedSizes: new Set(), // groupId
+        invalidStocks: new Set()   // sizeId
       };
 
       const skuOccurrences = new Map();
+
       colorVariants.forEach(cg => {
-        (cg.sizes || []).forEach(s => {
-          const skuTrim = (s.sku || '').trim().toUpperCase();
-          if (skuTrim) {
-            skuOccurrences.set(skuTrim, (skuOccurrences.get(skuTrim) || 0) + 1);
-          } else {
-            errors.emptySkus.add(s.id);
-            errors.hasErrors = true;
+        if (!cg.color || !cg.color.trim()) {
+          errors.emptyColors.add(cg.id);
+          errors.hasErrors = true;
+        }
+
+        let checkedCount = 0;
+        cg.sizeConfigs.forEach((cfg, sz) => {
+          if (cfg.checked) {
+            checkedCount++;
+            const skuTrim = (cfg.sku || '').trim().toUpperCase();
+            if (skuTrim) {
+              skuOccurrences.set(skuTrim, (skuOccurrences.get(skuTrim) || 0) + 1);
+            }
+
+            const stockNum = Number(cfg.stock);
+            if (isNaN(stockNum) || stockNum < 0 || !Number.isInteger(stockNum)) {
+              errors.invalidStocks.add(`${cg.id}_${sz}`);
+              errors.hasErrors = true;
+            }
           }
         });
+
+        if (checkedCount === 0) {
+          errors.noCheckedSizes.add(cg.id);
+          errors.hasErrors = true;
+        }
       });
 
       skuOccurrences.forEach((count, sku) => {
@@ -164,47 +257,16 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
         }
       });
 
-      colorVariants.forEach(cg => {
-        if (!cg.color || !cg.color.trim()) {
-          errors.emptyColors.add(cg.id);
-          errors.hasErrors = true;
-        }
-
-        const sizeCounts = new Map();
-        (cg.sizes || []).forEach(s => {
-          const sz = (s.size || '').trim().toUpperCase();
-          if (sz) {
-            sizeCounts.set(sz, (sizeCounts.get(sz) || 0) + 1);
-          }
-
-          const stockNum = Number(s.stock);
-          if (isNaN(stockNum) || stockNum < 0 || !Number.isInteger(stockNum)) {
-            errors.invalidStocks.add(s.id);
-            errors.hasErrors = true;
-          }
-        });
-
-        const dupSizes = new Set();
-        sizeCounts.forEach((cnt, sz) => {
-          if (cnt > 1) dupSizes.add(sz);
-        });
-
-        if (dupSizes.size > 0) {
-          errors.duplicateSizesByGroup.set(cg.id, dupSizes);
-          errors.hasErrors = true;
-        }
-      });
-
       return errors;
     }
 
-    // Modal Confirmation for Destructive Actions
+    // Modal Confirmation for destructive actions
     function showConfirmModal({ title, body, confirmText = 'Delete', isDestructive = true, onConfirm }) {
       const existing = document.getElementById('variant-confirm-modal');
       if (existing) existing.remove();
 
       const modalHtml = `
-        <div id="variant-confirm-modal" class="variant-modal-backdrop">
+        <div id="variant-confirm-modal" class="variant-modal-backdrop" style="z-index: 10050;">
           <div class="variant-modal-card">
             <h3 class="variant-modal-title">${title}</h3>
             <div class="variant-modal-body">${body}</div>
@@ -219,402 +281,692 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
       `;
 
       document.body.insertAdjacentHTML('beforeend', modalHtml);
-
       const modalEl = document.getElementById('variant-confirm-modal');
-      modalEl.querySelector('#btn-modal-cancel').addEventListener('click', () => {
-        modalEl.remove();
-      });
-
+      modalEl.querySelector('#btn-modal-cancel').addEventListener('click', () => modalEl.remove());
       modalEl.querySelector('#btn-modal-confirm').addEventListener('click', () => {
         modalEl.remove();
         if (typeof onConfirm === 'function') onConfirm();
       });
     }
 
-    function renderView() {
-      container.innerHTML = `
-        <!-- Page Header -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
-          <div>
-            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--mb-admin-muted); margin-bottom: 4px;">
-              <a href="#/products" style="color: inherit; text-decoration: none;">← Back to Garments</a>
+    // Assign main image to a colour variant modal
+    function promptAssignMainImageToColor(src) {
+      if (colorVariants.length === 0) {
+        window.MB_ADMIN_SHELL?.showToast('Please add a colour variant first', 'warning');
+        return;
+      }
+      if (colorVariants.length === 1) {
+        const cg = colorVariants[0];
+        cg.images = cg.images || [];
+        if (cg.images.length >= 5) {
+          window.MB_ADMIN_SHELL?.showToast(`Colour "${cg.color}" already has 5 images (maximum limit)`, 'warning');
+          return;
+        }
+        if (cg.images.includes(src)) {
+          window.MB_ADMIN_SHELL?.showToast(`Image is already in "${cg.color}" gallery`, 'info');
+          return;
+        }
+        cg.images.push(src);
+        renderTabContent();
+        window.MB_ADMIN_SHELL?.showToast(`Image assigned to colour "${cg.color}"`, 'success');
+        return;
+      }
+
+      const existing = document.getElementById('assign-image-modal');
+      if (existing) existing.remove();
+
+      const modalHtml = `
+        <div id="assign-image-modal" class="variant-modal-backdrop" style="z-index: 10050;">
+          <div class="variant-modal-card" style="max-width: 380px;">
+            <h3 class="variant-modal-title" style="font-size: 18px; margin-bottom: 6px;">Assign to Colour Variant</h3>
+            <p style="font-size: 12.5px; color: #655850; margin-bottom: 16px;">Select which colour gallery should receive this image:</p>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px;">
+              ${colorVariants.map((c, i) => `
+                <button type="button" class="btn-select-assign-col admin-btn admin-btn-outline" data-cidx="${i}" style="justify-content: flex-start; gap: 10px; padding: 8px 12px; font-size: 13px;">
+                  <span style="display: inline-block; width: 14px; height: 14px; border-radius: 50%; background-color: ${c.color_code || '#B47154'}; border: 1px solid rgba(0,0,0,0.15);"></span>
+                  <span style="font-weight: 600;">${c.color}</span>
+                  <span style="font-size: 11px; color: #8C7A6B; margin-left: auto;">${(c.images || []).length}/5 images</span>
+                </button>
+              `).join('')}
             </div>
-            <h1 style="font-family: var(--font-serif); font-size: 26px; font-weight: 500; margin: 0; color: var(--mb-admin-text);">
-              ${isNew ? 'Create New Garment' : `Edit: ${product.name}`}
-            </h1>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <a href="#/products" class="admin-btn admin-btn-outline admin-btn-sm">Cancel</a>
-            <button type="button" id="btn-save-product" class="admin-btn admin-btn-primary admin-btn-sm" style="padding: 7px 22px; font-weight: 600;">
-              ${isNew ? 'Publish Garment' : 'Save Changes'}
-            </button>
+            <div style="text-align: right;">
+              <button type="button" id="btn-close-assign-modal" class="admin-btn admin-btn-sm admin-btn-outline">Cancel</button>
+            </div>
           </div>
         </div>
-
-        <form id="product-simple-form">
-          <div style="display: grid; grid-template-columns: minmax(300px, 380px) 1fr; gap: 24px; align-items: start;">
-            
-            <!-- LEFT COLUMN: Garment Details & Primary Image -->
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-              
-              <!-- Card 1: Product Essentials -->
-              <div class="admin-card" style="background: #FFF; border: 1px solid var(--mb-admin-border); border-radius: 8px; padding: 20px;">
-                <div style="font-weight: 600; font-size: 14.5px; margin-bottom: 16px; color: var(--mb-admin-text); border-bottom: 1px solid var(--mb-admin-border); padding-bottom: 8px;">
-                  1. Garment Details
-                </div>
-
-                <div class="admin-form-group" style="margin-bottom: 14px;">
-                  <label class="admin-label" for="pe-name">Garment Title *</label>
-                  <input type="text" id="pe-name" class="admin-input" required value="${product.name}" placeholder="e.g. Sienna Linen Maxi Dress" style="width: 100%;">
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                  <div class="admin-form-group">
-                    <label class="admin-label" for="pe-category">Category *</label>
-                    <select id="pe-category" class="admin-select" style="width: 100%;">
-                      ${categories.map(c => `
-                        <option value="${c.id}" data-slug="${c.slug}" ${(product.categoryId === c.id || product.category === c.slug || product.category === c.id) ? 'selected' : ''}>${c.name}</option>
-                      `).join('')}
-                    </select>
-                  </div>
-                  <div class="admin-form-group">
-                    <label class="admin-label" for="pe-status">Store Visibility</label>
-                    <select id="pe-status" class="admin-select" style="width: 100%;">
-                      <option value="active" ${product.status === 'active' ? 'selected' : ''}>Active (Visible)</option>
-                      <option value="draft" ${product.status === 'draft' ? 'selected' : ''}>Draft (Hidden)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                  <div class="admin-form-group">
-                    <label class="admin-label" for="pe-price">Regular Price (INR ₹) *</label>
-                    <input type="number" id="pe-price" class="admin-input" required min="0" value="${product.price}" style="width: 100%;">
-                  </div>
-                  <div class="admin-form-group">
-                    <label class="admin-label" for="pe-sale-price">Sale Price (INR ₹)</label>
-                    <input type="number" id="pe-sale-price" class="admin-input" min="0" value="${product.salePrice || ''}" placeholder="Optional" style="width: 100%;">
-                  </div>
-                </div>
-
-                <div class="admin-form-group" style="margin-bottom: 14px;">
-                  <label class="admin-label" for="pe-desc">Description / Editorial Story</label>
-                  <textarea id="pe-desc" class="admin-textarea" rows="3" placeholder="Crafted in 100% pure organic flax linen with relaxed silhouette..." style="width: 100%; font-size: 12.5px;">${product.description || product.shortDescription || ''}</textarea>
-                </div>
-
-                <div style="display: flex; gap: 20px; align-items: center; padding-top: 10px; border-top: 1px solid var(--mb-admin-border);">
-                  <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--mb-admin-text); cursor: pointer;">
-                    <input type="checkbox" id="pe-featured" ${product.featured ? 'checked' : ''} style="accent-color: #B47154;">
-                    Feature on Homepage
-                  </label>
-                  <label style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--mb-admin-text); cursor: pointer;">
-                    <input type="checkbox" id="pe-new" ${product.newArrival ? 'checked' : ''} style="accent-color: #B47154;">
-                    Mark as New Arrival
-                  </label>
-                </div>
-              </div>
-
-              <!-- Card 2: Primary Garment Cover Image -->
-              <div class="admin-card" style="background: #FFF; border: 1px solid var(--mb-admin-border); border-radius: 8px; padding: 20px;">
-                <div style="font-weight: 600; font-size: 14.5px; margin-bottom: 16px; color: var(--mb-admin-text); border-bottom: 1px solid var(--mb-admin-border); padding-bottom: 8px;">
-                  2. Primary Product Image
-                </div>
-
-                <div class="admin-form-group">
-                  <label class="admin-label" for="pe-main-img-url">Cover Image URL *</label>
-                  <div style="display: flex; gap: 14px; align-items: center; margin-top: 6px;">
-                    <div id="main-img-preview-box" style="width: 70px; height: 90px; border-radius: 6px; overflow: hidden; background: #F6F4F0; border: 1px solid #DDD; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-                      <img src="${product.image || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';">
-                    </div>
-                    <div style="flex: 1;">
-                      <input type="url" id="pe-main-img-url" class="admin-input" required value="${product.image || ''}" placeholder="https://images.unsplash.com/..." style="width: 100%; padding: 8px 10px; font-size: 12.5px;">
-                      <div style="display: flex; gap: 8px; margin-top: 8px; align-items: center;">
-                        <label class="admin-btn admin-btn-outline admin-btn-sm" style="cursor: pointer; font-size: 11px; padding: 3px 8px;">
-                          Upload Image
-                          <input type="file" id="pe-main-file-input" accept="image/*" style="display: none;">
-                        </label>
-                        <span style="font-size: 11px; color: var(--mb-admin-muted);">Catalog cover photo.</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- RIGHT COLUMN: Size & Colour Variants Redesign -->
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-              <div class="variant-section-card">
-                
-                <!-- Section Header -->
-                <div class="variant-section-header">
-                  <div class="variant-section-title-wrap">
-                    <h2 class="variant-section-title">Size & Colour Variants</h2>
-                    <p class="variant-section-subtitle">Manage colours, sizes and inventory for this product.</p>
-                  </div>
-                  <button type="button" id="btn-add-colour" class="admin-btn admin-btn-primary admin-btn-sm" style="font-size: 12px; padding: 7px 16px; background: #26201D; display: inline-flex; align-items: center; gap: 6px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    <span>+ Add Colour</span>
-                  </button>
-                </div>
-
-                <!-- Colour Groups Accordion List -->
-                <div id="variant-color-groups-list">
-                  <!-- Rendered dynamically -->
-                </div>
-
-                <!-- Total Stock Summary Bar -->
-                <div class="variant-stock-summary-bar">
-                  <div>
-                    <div class="variant-summary-label">Total Inventory Stock</div>
-                    <div id="variant-summary-breakdown" class="variant-summary-detail">0 Colours • 0 Sizes</div>
-                  </div>
-                  <div id="total-stock-counter" class="variant-summary-count">0 Units</div>
-                </div>
-
-              </div>
-            </div>
-
-          </div>
-        </form>
       `;
 
-      renderColorGroups();
-      attachFormListeners();
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      const modalEl = document.getElementById('assign-image-modal');
+      modalEl.querySelector('#btn-close-assign-modal')?.addEventListener('click', () => modalEl.remove());
+      modalEl.querySelectorAll('.btn-select-assign-col').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const cIdx = parseInt(btn.getAttribute('data-cidx'), 10);
+          const cg = colorVariants[cIdx];
+          modalEl.remove();
+          if (!cg) return;
+          cg.images = cg.images || [];
+          if (cg.images.length >= 5) {
+            window.MB_ADMIN_SHELL?.showToast(`Colour "${cg.color}" already has 5 images (maximum limit)`, 'warning');
+            return;
+          }
+          if (cg.images.includes(src)) {
+            window.MB_ADMIN_SHELL?.showToast(`Image is already in "${cg.color}" gallery`, 'info');
+            return;
+          }
+          cg.images.push(src);
+          renderTabContent();
+          window.MB_ADMIN_SHELL?.showToast(`Image assigned to "${cg.color}"`, 'success');
+        });
+      });
     }
 
-    // Render all colour groups with compact size inventory tables
-    function renderColorGroups() {
-      const listEl = container.querySelector('#variant-color-groups-list');
-      if (!listEl) return;
-
-      const errors = validateVariantState();
-
-      listEl.innerHTML = colorVariants.map((cg, cIdx) => {
-        const totalUnitsInGroup = (cg.sizes || []).reduce((acc, s) => acc + (parseInt(s.stock, 10) || 0), 0);
-        const sizeCount = (cg.sizes || []).length;
-        const hasColorError = errors.emptyColors.has(cg.id);
-        const dupSizesForThisGroup = errors.duplicateSizesByGroup.get(cg.id) || new Set();
-
-        return `
-          <div class="variant-color-group ${cg.isExpanded ? 'is-expanded' : ''}" data-group-id="${cg.id}" data-cidx="${cIdx}">
+    // Render the Centred Product Builder Modal
+    function renderView() {
+      container.innerHTML = `
+        <div class="mb-product-modal-backdrop" id="product-modal-backdrop">
+          <div class="mb-product-modal-dialog" id="product-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-main-title">
             
-            <!-- Accordion Header -->
-            <div class="variant-group-header" data-action="toggle-group" data-cidx="${cIdx}">
-              <div class="variant-header-left">
-                <span class="variant-chevron">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-                </span>
-                
-                <!-- Swatch Thumbnail -->
-                <div class="variant-swatch-thumb">
-                  ${cg.image_url 
-                    ? `<img src="${cg.image_url}" alt="${cg.color}" onerror="this.style.opacity='0.4';">`
-                    : (cg.color_code 
-                        ? `<div style="width: 22px; height: 22px; border-radius: 50%; background-color: ${cg.color_code}; border: 1px solid rgba(0,0,0,0.15);"></div>`
-                        : `<span style="font-size: 10px; color: #8C7A6B;">Swatch</span>`
-                      )
-                  }
-                </div>
-
-                <div class="variant-header-info">
-                  <span class="variant-color-title">${cg.color || '<em style="color:#DC2626;">Unnamed Colour</em>'}</span>
-                  ${cg.color_code ? `<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${cg.color_code}; border:1px solid #CCC;" title="${cg.color_code}"></span>` : ''}
-                  <span class="variant-count-badge">${sizeCount} ${sizeCount === 1 ? 'size' : 'sizes'} • ${totalUnitsInGroup} units</span>
-                  ${hasColorError ? `<span class="variant-field-error" style="margin:0;">⚠ Colour name required</span>` : ''}
-                </div>
+            <!-- 1. Fixed Header -->
+            <div class="mb-product-modal-header">
+              <div>
+                <div class="mb-modal-kicker">Marsh Barbary Atelier Catalog</div>
+                <h2 class="mb-modal-title" id="modal-main-title">
+                  ${isNew ? 'Add Product' : `Edit: ${product.name}`}
+                </h2>
               </div>
-
-              <!-- Header Action Buttons -->
-              <div class="variant-header-actions" onclick="event.stopPropagation();">
-                <button type="button" class="variant-action-btn btn-duplicate-colour" data-cidx="${cIdx}" title="Duplicate this colour and its sizes">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                  <span>Duplicate</span>
-                </button>
-                <button type="button" class="variant-action-btn btn-delete btn-remove-colour" data-cidx="${cIdx}" title="Remove this colour group">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                  <span>Remove</span>
-                </button>
-              </div>
+              <button type="button" class="mb-modal-close-btn" id="btn-modal-close" title="Close & Cancel">
+                &times;
+              </button>
             </div>
 
-            <!-- Group Body (Settings & Size Inventory Table) -->
-            <div class="variant-group-body">
-              
-              <!-- Colour Details Row -->
-              <div class="variant-color-controls">
-                
-                <!-- Swatch / Image Preview -->
-                <div class="variant-image-preview-box">
-                  ${cg.image_url 
-                    ? `<img src="${cg.image_url}" alt="${cg.color}" onerror="this.style.opacity='0.4';">`
-                    : `<span style="font-size: 11px; color: #8C7A6B; text-align: center; padding: 4px;">No Photo</span>`
-                  }
-                </div>
+            <!-- 2. Fixed Tab Bar -->
+            <div class="mb-product-modal-tabs">
+              <button type="button" class="mb-product-modal-tab ${activeTab === 'basic' ? 'active' : ''}" data-tab="basic" id="tab-btn-basic">
+                <span>1. Basic Info</span>
+              </button>
+              <button type="button" class="mb-product-modal-tab ${activeTab === 'variants' ? 'active' : ''}" data-tab="variants" id="tab-btn-variants">
+                <span>2. Variants</span>
+                <span class="mb-tab-pill" id="tab-variants-pill">
+                  ${colorVariants.length} ${colorVariants.length === 1 ? 'colour' : 'colours'}
+                </span>
+              </button>
+            </div>
 
-                <!-- Colour Identity Inputs -->
-                <div>
-                  <div style="margin-bottom: 10px;">
-                    <label class="admin-label" style="font-size: 11px;">Colour Name *</label>
-                    <input type="text" class="variant-input-sm var-color-name ${hasColorError ? 'has-error' : ''}" data-cidx="${cIdx}" value="${cg.color || ''}" placeholder="e.g. Natural, Terracotta, Olive" required>
-                    ${hasColorError ? `<div class="variant-field-error">Colour name cannot be empty</div>` : ''}
-                  </div>
-                  <div>
-                    <label class="admin-label" style="font-size: 11px;">Colour Swatch Code / Hex (Optional)</label>
-                    <div style="display: flex; gap: 6px; align-items: center;">
-                      <input type="color" class="var-color-picker" data-cidx="${cIdx}" value="${cg.color_code || '#B47154'}" style="width: 32px; height: 32px; border: 1px solid #D5CBC2; border-radius: 4px; padding: 2px; cursor: pointer; background: transparent;">
-                      <input type="text" class="variant-input-sm var-color-code" data-cidx="${cIdx}" value="${cg.color_code || ''}" placeholder="#E5DFD7 or shade name" style="flex: 1;">
-                    </div>
-                  </div>
-                </div>
+            <!-- 3. Scrollable Modal Body -->
+            <div class="mb-product-modal-body" id="modal-body-container">
+              <!-- Rendered via renderTabContent() -->
+            </div>
 
-                <!-- Shared Swatch Image URL & File Upload -->
-                <div class="variant-image-inputs">
-                  <label class="admin-label" style="font-size: 11px;">Shared Colour Image URL *</label>
-                  <input type="url" class="variant-input-sm var-img-url" data-cidx="${cIdx}" value="${cg.image_url || ''}" placeholder="https://... direct image link">
-                  <div style="display: flex; gap: 8px; align-items: center; margin-top: 2px; flex-wrap: wrap;">
-                    <label class="admin-btn admin-btn-outline admin-btn-sm" style="cursor: pointer; font-size: 11px; padding: 3px 8px; display: inline-flex; align-items: center; gap: 4px;">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                      <span>Upload Swatch / Photo</span>
-                      <input type="file" class="var-file-upload" data-cidx="${cIdx}" accept="image/*" style="display: none;">
-                    </label>
-                    ${cg.image_url ? `
-                      <button type="button" class="variant-action-btn btn-clear-img" data-cidx="${cIdx}" style="padding: 2px 6px; font-size: 11px; color: #8C7A6B;">
-                        Clear
-                      </button>
-                    ` : ''}
-                  </div>
-                  <span style="font-size: 11px; color: var(--mb-admin-muted);">Shared photo for this colour. Displays when colour is selected in store.</span>
-                </div>
-
+            <!-- 4. Fixed Footer -->
+            <div class="mb-product-modal-footer">
+              <div class="mb-footer-summary">
+                <span>Total Inventory:</span>
+                <span id="footer-total-units" class="mb-footer-stock-highlight">0 Units</span>
+                <span style="color: #A09387;">•</span>
+                <span id="footer-active-variants-count">0 Active Variants</span>
               </div>
-
-              <!-- Compact Size Inventory Table -->
-              <div class="variant-size-table-wrap">
-                <table class="variant-size-table">
-                  <thead>
-                    <tr>
-                      <th style="width: 140px;">Size</th>
-                      <th>SKU</th>
-                      <th style="width: 110px; text-align: center;">Stock</th>
-                      <th style="width: 90px; text-align: right;">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${(cg.sizes || []).map((s, sIdx) => {
-                      const cleanSku = (s.sku || '').trim().toUpperCase();
-                      const isDupSku = errors.duplicateSkus.has(cleanSku);
-                      const isEmptySku = errors.emptySkus.has(s.id);
-                      const isDupSize = dupSizesForThisGroup.has((s.size || '').trim().toUpperCase());
-                      const isInvalidStock = errors.invalidStocks.has(s.id);
-
-                      const isStandardSize = STANDARD_SIZES.includes(s.size);
-
-                      return `
-                        <tr data-size-id="${s.id}" data-sidx="${sIdx}">
-                          <!-- Size Column -->
-                          <td>
-                            ${isStandardSize ? `
-                              <select class="variant-input-sm var-size-select ${isDupSize ? 'has-error' : ''}" data-cidx="${cIdx}" data-sidx="${sIdx}">
-                                ${STANDARD_SIZES.map(opt => `
-                                  <option value="${opt}" ${s.size === opt ? 'selected' : ''}>${opt}</option>
-                                `).join('')}
-                                <option value="__custom__">Custom Size...</option>
-                              </select>
-                            ` : `
-                              <div style="display: flex; gap: 4px; align-items: center;">
-                                <input type="text" class="variant-input-sm var-size-custom-input ${isDupSize ? 'has-error' : ''}" data-cidx="${cIdx}" data-sidx="${sIdx}" value="${s.size}" placeholder="e.g. 38, Petite">
-                                <button type="button" class="btn-reset-size-select" data-cidx="${cIdx}" data-sidx="${sIdx}" title="Reset to standard dropdown" style="background:none; border:none; color:#8C7A6B; cursor:pointer; font-size:14px;">✕</button>
-                              </div>
-                            `}
-                            ${isDupSize ? `<div class="variant-field-error">Duplicate size "${s.size}"</div>` : ''}
-                          </td>
-
-                          <!-- SKU Column -->
-                          <td>
-                            <input type="text" class="variant-input-sm variant-sku-input var-sku-input ${isDupSku || isEmptySku ? 'has-error' : ''}" data-cidx="${cIdx}" data-sidx="${sIdx}" value="${s.sku || ''}" placeholder="e.g. MB-DRS-001-NAT-M">
-                            ${isDupSku ? `<div class="variant-field-error">⚠ Duplicate SKU across variants</div>` : ''}
-                            ${isEmptySku ? `<div class="variant-field-error">SKU is required</div>` : ''}
-                          </td>
-
-                          <!-- Stock Column -->
-                          <td style="text-align: center;">
-                            <input type="number" min="0" step="1" class="variant-input-sm variant-stock-input var-stock-input ${isInvalidStock ? 'has-error' : ''}" data-cidx="${cIdx}" data-sidx="${sIdx}" value="${s.stock}">
-                            ${isInvalidStock ? `<div class="variant-field-error">Min 0</div>` : ''}
-                          </td>
-
-                          <!-- Actions Column -->
-                          <td style="text-align: right;">
-                            <button type="button" class="variant-btn-remove-row btn-remove-size" data-cidx="${cIdx}" data-sidx="${sIdx}" title="Remove this size variant">
-                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                              <span style="margin-left: 4px;">Remove</span>
-                            </button>
-                          </td>
-                        </tr>
-                      `;
-                    }).join('')}
-                  </tbody>
-                </table>
-
-                <!-- Table Footer: Add Size Button & Quick Shortcuts -->
-                <div class="variant-table-footer">
-                  <button type="button" class="admin-btn admin-btn-outline admin-btn-sm btn-add-size" data-cidx="${cIdx}" style="font-size: 11.5px; padding: 4px 12px; background: #FFF;">
-                    + Add Size
-                  </button>
-
-                  <div class="variant-quick-sizes">
-                    <span style="font-size: 11px; color: var(--mb-admin-muted);">Quick Add:</span>
-                    ${STANDARD_SIZES.filter(sz => !(cg.sizes || []).some(s => s.size === sz)).map(sz => `
-                      <button type="button" class="variant-quick-chip btn-quick-add-size" data-cidx="${cIdx}" data-size="${sz}">
-                        + ${sz}
-                      </button>
-                    `).join('')}
-                  </div>
-                </div>
+              <div class="mb-footer-actions">
+                <button type="button" id="btn-footer-cancel" class="admin-btn admin-btn-outline admin-btn-sm" style="padding: 7px 18px;">
+                  Cancel
+                </button>
+                <button type="button" id="btn-save-product" class="admin-btn admin-btn-primary admin-btn-sm" style="padding: 7px 22px; font-weight: 600;">
+                  ${isNew ? 'Publish Product' : 'Save Product'}
+                </button>
               </div>
-
             </div>
 
           </div>
-        `;
-      }).join('');
+        </div>
+      `;
 
-      updateTotalStockDisplay();
-      attachVariantListeners();
+      renderTabContent();
+      attachGlobalModalListeners();
+      updateFooterStockSummary();
     }
 
-    function updateTotalStockDisplay() {
-      let totalUnits = 0;
-      let totalVariants = 0;
+    // Render Tab Content (Preserves all state between tab switches)
+    function renderTabContent() {
+      const bodyEl = container.querySelector('#modal-body-container');
+      if (!bodyEl) return;
 
-      colorVariants.forEach(cg => {
-        (cg.sizes || []).forEach(s => {
-          totalUnits += parseInt(s.stock, 10) || 0;
-          totalVariants += 1;
-        });
-      });
-
-      const totalStockEl = container.querySelector('#total-stock-counter');
-      if (totalStockEl) totalStockEl.textContent = `${totalUnits} Units`;
-
-      const breakdownEl = container.querySelector('#variant-summary-breakdown');
-      if (breakdownEl) {
-        const colCount = colorVariants.length;
-        breakdownEl.textContent = `${colCount} ${colCount === 1 ? 'Colour' : 'Colours'} • ${totalVariants} Variant Combinations`;
+      if (activeTab === 'basic') {
+        renderBasicInfoTab(bodyEl);
+      } else {
+        renderVariantsTab(bodyEl);
       }
     }
 
-    // Attach event listeners for all variant interactions
-    function attachVariantListeners() {
-      // Toggle Accordion Group
+    /* --------------------------------------------------------------------------
+       TAB 1: BASIC INFO
+       -------------------------------------------------------------------------- */
+    function renderBasicInfoTab(bodyEl) {
+      const isMaxMainImages = mainImages.length >= 5;
+
+      bodyEl.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <!-- Section A: Main Product Images (Max 5 images) -->
+          <div class="mb-image-section-card">
+            <div class="mb-image-section-header">
+              <div>
+                <span class="mb-size-section-label">Main Product Images</span>
+                <div style="font-size: 12px; color: #8C7A6B; margin-top: 2px;">
+                  Upload up to 5 photos for the main product. The first photo is the primary cover image.
+                </div>
+              </div>
+              <span class="mb-image-counter-pill ${isMaxMainImages ? 'limit-reached' : ''}">
+                ${mainImages.length}/5 images ${isMaxMainImages ? '(Limit Reached)' : ''}
+              </span>
+            </div>
+
+            <!-- Image Add Bar -->
+            <div class="mb-image-input-bar">
+              <input type="url" id="inp-main-img-url" class="admin-input" placeholder="https://images.unsplash.com/... or direct image link" style="flex: 1; min-width: 260px;" ${isMaxMainImages ? 'disabled' : ''}>
+              <button type="button" id="btn-add-main-url" class="admin-btn admin-btn-outline admin-btn-sm" ${isMaxMainImages ? 'disabled' : ''}>
+                + Add URL
+              </button>
+              <label class="admin-btn admin-btn-outline admin-btn-sm" style="cursor: ${isMaxMainImages ? 'not-allowed' : 'pointer'}; opacity: ${isMaxMainImages ? '0.5' : '1'}; display: inline-flex; align-items: center; gap: 6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <span>Upload Image</span>
+                <input type="file" id="inp-main-img-file" accept="image/*" style="display: none;" ${isMaxMainImages ? 'disabled' : ''}>
+              </label>
+            </div>
+
+            <!-- Image Gallery Grid -->
+            <div class="mb-gallery-grid" id="main-gallery-grid">
+              ${mainImages.map((src, idx) => `
+                <div class="mb-gallery-card ${idx === 0 ? 'is-primary' : ''}">
+                  <div class="mb-gallery-card-img-wrap">
+                    <img src="${src}" alt="Main view ${idx + 1}" onerror="this.src='https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';">
+                    ${idx === 0 ? '<span class="mb-primary-badge">★ Primary Cover</span>' : ''}
+                  </div>
+                  <div class="mb-gallery-card-actions">
+                    ${idx !== 0 ? `
+                      <button type="button" class="mb-btn-set-primary btn-set-main-primary" data-idx="${idx}">
+                        Set Primary
+                      </button>
+                    ` : '<span style="font-size:10px; font-weight:700; color:#B47154;">Primary</span>'}
+                    <button type="button" class="mb-btn-remove-gallery-img btn-del-main-img" data-idx="${idx}" title="Remove image">
+                      &times;
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Section B: General Information -->
+          <div class="admin-card" style="padding: 20px; border: 1px solid #E6DDD5; border-radius: 8px;">
+            <div style="font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: #443E3A; margin-bottom: 16px; border-bottom: 1px solid #EFEAE3; padding-bottom: 8px;">
+              Product Details & Attributes
+            </div>
+
+            <!-- Product Title & Slug -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
+              <div class="admin-form-group" style="margin: 0;">
+                <label class="admin-label" for="pe-name">Product Name *</label>
+                <input type="text" id="pe-name" class="admin-input" required value="${product.name}" placeholder="e.g. Sienna Linen Maxi Dress" style="width: 100%;">
+              </div>
+              <div class="admin-form-group" style="margin: 0;">
+                <label class="admin-label" for="pe-slug">URL Slug *</label>
+                <input type="text" id="pe-slug" class="admin-input" required value="${product.slug || ''}" placeholder="sienna-linen-maxi-dress" style="width: 100%;">
+              </div>
+            </div>
+
+            <!-- Price, Compare-At Price, Category -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 14px;">
+              <div class="admin-form-group" style="margin: 0;">
+                <label class="admin-label" for="pe-price">Base Price (INR ₹) *</label>
+                <input type="number" id="pe-price" class="admin-input" required min="0" value="${product.price}" style="width: 100%;">
+              </div>
+              <div class="admin-form-group" style="margin: 0;">
+                <label class="admin-label" for="pe-sale-price">Compare-at Price (INR ₹)</label>
+                <input type="number" id="pe-sale-price" class="admin-input" min="0" value="${product.salePrice || ''}" placeholder="Leave blank if no sale" style="width: 100%;">
+              </div>
+              <div class="admin-form-group" style="margin: 0;">
+                <label class="admin-label" for="pe-category">Category *</label>
+                <select id="pe-category" class="admin-select" style="width: 100%;">
+                  ${categories.map(c => `
+                    <option value="${c.id}" data-slug="${c.slug}" ${(product.categoryId === c.id || product.category === c.slug || product.category === c.id) ? 'selected' : ''}>${c.name}</option>
+                  `).join('')}
+                </select>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="admin-form-group" style="margin-bottom: 16px;">
+              <label class="admin-label" for="pe-desc">Description / Editorial Story</label>
+              <textarea id="pe-desc" class="admin-textarea" rows="3" placeholder="Crafted from 100% pure organic flax linen with a relaxed silhouette..." style="width: 100%; font-size: 13px;">${product.description || product.shortDescription || ''}</textarea>
+            </div>
+
+            <!-- Storefront Flags -->
+            <div style="display: flex; gap: 24px; align-items: center; padding-top: 12px; border-top: 1px solid #EFEAE3; flex-wrap: wrap;">
+              <label style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 500; color: #26201D; cursor: pointer;">
+                <input type="checkbox" id="pe-active" ${product.status === 'active' ? 'checked' : ''} style="accent-color: #B47154; width: 15px; height: 15px;">
+                Enabled & Visible in Store
+              </label>
+              <label style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 500; color: #26201D; cursor: pointer;">
+                <input type="checkbox" id="pe-featured" ${product.featured ? 'checked' : ''} style="accent-color: #B47154; width: 15px; height: 15px;">
+                Featured Product
+              </label>
+              <label style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 500; color: #26201D; cursor: pointer;">
+                <input type="checkbox" id="pe-bestseller" ${product.bestSeller ? 'checked' : ''} style="accent-color: #B47154; width: 15px; height: 15px;">
+                Best Seller
+              </label>
+              <label style="display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 500; color: #26201D; cursor: pointer;">
+                <input type="checkbox" id="pe-new" ${product.newArrival ? 'checked' : ''} style="accent-color: #B47154; width: 15px; height: 15px;">
+                New Arrival
+              </label>
+            </div>
+          </div>
+
+        </div>
+      `;
+
+      attachBasicInfoListeners();
+    }
+
+    function attachBasicInfoListeners() {
+      const nameInp = document.getElementById('pe-name');
+      const slugInp = document.getElementById('pe-slug');
+
+      nameInp?.addEventListener('input', (e) => {
+        product.name = e.target.value;
+        const autoSlug = e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        if (slugInp && (!product.slug || product.slug === autoSlug.slice(0, -1))) {
+          slugInp.value = autoSlug;
+          product.slug = autoSlug;
+        }
+
+        // Auto-update non-custom variant SKUs
+        const prefix = getProductSkuPrefix();
+        colorVariants.forEach(cg => {
+          cg.sizeConfigs.forEach((cfg, sz) => {
+            if (!cfg.customSku) {
+              cfg.sku = generateDefaultSku(prefix, cg.color, sz);
+            }
+          });
+        });
+      });
+
+      slugInp?.addEventListener('input', (e) => {
+        product.slug = e.target.value.trim();
+      });
+
+      // Add main image via direct URL
+      const addUrlBtn = document.getElementById('btn-add-main-url');
+      const urlInp = document.getElementById('inp-main-img-url');
+
+      const handleAddMainUrl = () => {
+        const url = urlInp?.value.trim();
+        if (!url) return;
+        if (mainImages.length >= 5) {
+          window.MB_ADMIN_SHELL?.showToast('Main product gallery can contain a maximum of 5 images', 'warning');
+          return;
+        }
+        mainImages.push(url);
+        urlInp.value = '';
+        renderTabContent();
+      };
+
+      addUrlBtn?.addEventListener('click', handleAddMainUrl);
+      urlInp?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          handleAddMainUrl();
+        }
+      });
+
+      // Upload main image via file picker
+      const fileInp = document.getElementById('inp-main-img-file');
+      fileInp?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (mainImages.length >= 5) {
+          window.MB_ADMIN_SHELL?.showToast('Main product gallery can contain a maximum of 5 images', 'warning');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          mainImages.push(evt.target.result);
+          renderTabContent();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Set as primary cover image
+      container.querySelectorAll('.btn-set-main-primary').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.getAttribute('data-idx'), 10);
+          if (idx > 0 && idx < mainImages.length) {
+            const [selected] = mainImages.splice(idx, 1);
+            mainImages.unshift(selected);
+            renderTabContent();
+            window.MB_ADMIN_SHELL?.showToast('Primary cover image updated', 'info');
+          }
+        });
+      });
+
+      // Delete main image
+      container.querySelectorAll('.btn-del-main-img').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const idx = parseInt(e.target.getAttribute('data-idx'), 10);
+          if (mainImages.length <= 1) {
+            window.MB_ADMIN_SHELL?.showToast('A product requires at least one cover image', 'warning');
+            return;
+          }
+          mainImages.splice(idx, 1);
+          renderTabContent();
+        });
+      });
+    }
+
+    /* --------------------------------------------------------------------------
+       TAB 2: VARIANTS
+       -------------------------------------------------------------------------- */
+    function renderVariantsTab(bodyEl) {
+      const errors = validateVariantState();
+
+      bodyEl.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <!-- Section 1: Main Product Images Reuse Panel -->
+          <div class="mb-variant-main-images-panel">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <div>
+                <span class="mb-size-section-label">Main Product Images</span>
+                <div style="font-size: 12px; color: #8C7A6B;">
+                  Click "+ Use in Colour" on any main image below to assign it to a colour variant without re-uploading.
+                </div>
+              </div>
+              <span class="mb-counter-badge" style="font-size: 11px; color: #8C7A6B;">
+                ${mainImages.length} available
+              </span>
+            </div>
+
+            <div class="mb-main-images-strip">
+              ${mainImages.map((src, idx) => `
+                <div class="mb-main-image-thumb-card">
+                  <img src="${src}" alt="Main view ${idx + 1}" onerror="this.src='https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';">
+                  <button type="button" class="mb-btn-use-main-img btn-reuse-main-img" data-src="${src}">
+                    + Use in Colour
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Section 2: Product Variants Header -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-bottom: 12px; border-bottom: 1px solid #E6DDD5; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <h3 style="font-family: var(--admin-font-serif); font-size: 22px; font-weight: 600; color: #26201D; margin: 0 0 4px 0;">
+                Product Variants
+              </h3>
+              <p style="font-size: 12.5px; color: #8C7A6B; margin: 0;">
+                Add colours and select which sizes are available for each colour.
+              </p>
+            </div>
+            <button type="button" id="btn-add-colour-variant" class="admin-btn admin-btn-primary admin-btn-sm" style="font-size: 12px; padding: 7px 16px; background: #26201D; display: inline-flex; align-items: center; gap: 6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>+ Add Colour Variant</span>
+            </button>
+          </div>
+
+          <!-- Section 3: Colour Variant Cards Accordion -->
+          <div id="colour-variants-cards-list" style="display: flex; flex-direction: column; gap: 16px;">
+            ${colorVariants.map((cg, cIdx) => {
+              const checkedSizes = [];
+              let totalUnitsInGroup = 0;
+              cg.sizeConfigs.forEach((cfg, sz) => {
+                if (cfg.checked) {
+                  checkedSizes.push({ size: sz, ...cfg });
+                  totalUnitsInGroup += parseInt(cfg.stock, 10) || 0;
+                }
+              });
+
+              const isMaxColorImages = (cg.images || []).length >= 5;
+              const hasNoCheckedSizes = errors.noCheckedSizes.has(cg.id);
+              const hasColorNameError = errors.emptyColors.has(cg.id);
+
+              return `
+                <div class="variant-color-group ${cg.isExpanded ? 'is-expanded' : ''}" data-cidx="${cIdx}" data-group-id="${cg.id}">
+                  
+                  <!-- Card Header Bar -->
+                  <div class="variant-group-header" data-action="toggle-colour-group" data-cidx="${cIdx}">
+                    <div class="variant-header-left">
+                      <span class="variant-chevron">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                      </span>
+                      
+                      <!-- Swatch Thumbnail -->
+                      <div class="variant-swatch-thumb">
+                        ${cg.images && cg.images.length > 0
+                          ? `<img src="${cg.images[0]}" alt="${cg.color}" onerror="this.style.opacity='0.4';">`
+                          : (cg.color_code 
+                              ? `<div style="width: 22px; height: 22px; border-radius: 50%; background-color: ${cg.color_code}; border: 1px solid rgba(0,0,0,0.15);"></div>`
+                              : `<span style="font-size: 10px; color: #8C7A6B;">Swatch</span>`
+                            )
+                        }
+                      </div>
+
+                      <div class="variant-header-info">
+                        <span class="variant-color-title">${cg.color || '<em style="color:#DC2626;">Unnamed Colour</em>'}</span>
+                        ${cg.color_code ? `<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${cg.color_code}; border:1px solid #CCC;" title="${cg.color_code}"></span>` : ''}
+                        <span class="variant-count-badge">${(cg.images || []).length}/5 images • ${checkedSizes.length} active sizes • ${totalUnitsInGroup} units</span>
+                        ${hasNoCheckedSizes ? `<span class="variant-field-error" style="margin:0;">⚠ No sizes selected</span>` : ''}
+                      </div>
+                    </div>
+
+                    <!-- Header Action Buttons -->
+                    <div class="variant-header-actions" onclick="event.stopPropagation();">
+                      <button type="button" class="variant-action-btn btn-duplicate-colour" data-cidx="${cIdx}" title="Duplicate this colour and checked sizes">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        <span>Duplicate</span>
+                      </button>
+                      <button type="button" class="variant-action-btn btn-delete btn-remove-colour" data-cidx="${cIdx}" title="Remove colour">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        <span>Remove</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Card Body -->
+                  <div class="variant-group-body">
+                    
+                    <!-- Colour Identity & Images Row -->
+                    <div style="display: grid; grid-template-columns: 240px 1fr; gap: 20px; align-items: start; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #F0EAE2;">
+                      
+                      <!-- Left: Colour Name & Hex -->
+                      <div>
+                        <div style="margin-bottom: 12px;">
+                          <label class="admin-label" style="font-size: 11px;">Colour Name *</label>
+                          <input type="text" class="variant-input-sm var-color-name-input ${hasColorNameError ? 'has-error' : ''}" data-cidx="${cIdx}" value="${cg.color || ''}" placeholder="e.g. Natural, Noir Black" required>
+                          ${hasColorNameError ? `<div class="variant-field-error">Colour name is required</div>` : ''}
+                        </div>
+                        <div>
+                          <label class="admin-label" style="font-size: 11px;">Swatch Tone / Hex (Optional)</label>
+                          <div style="display: flex; gap: 6px; align-items: center;">
+                            <input type="color" class="var-color-picker" data-cidx="${cIdx}" value="${cg.color_code || '#B47154'}" style="width: 32px; height: 32px; border: 1px solid #D5CBC2; border-radius: 4px; padding: 2px; cursor: pointer; background: transparent;">
+                            <input type="text" class="variant-input-sm var-color-code-input" data-cidx="${cIdx}" value="${cg.color_code || ''}" placeholder="#E5DFD7">
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Right: Colour Variant Images (Independent Max 5 images) -->
+                      <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                          <label class="admin-label" style="font-size: 11px; margin: 0;">Colour Photos (${(cg.images || []).length}/5 images)</label>
+                          <span class="mb-image-counter-pill ${isMaxColorImages ? 'limit-reached' : ''}" style="font-size: 10px;">
+                            ${isMaxColorImages ? 'Max 5 Reached' : 'Up to 5 images'}
+                          </span>
+                        </div>
+
+                        <div class="mb-image-input-bar" style="margin-bottom: 8px;">
+                          <input type="url" class="variant-input-sm var-img-url-input" data-cidx="${cIdx}" placeholder="https://... direct image link" style="flex: 1;" ${isMaxColorImages ? 'disabled' : ''}>
+                          <button type="button" class="admin-btn admin-btn-outline admin-btn-sm btn-add-color-img-url" data-cidx="${cIdx}" ${isMaxColorImages ? 'disabled' : ''}>
+                            + Add URL
+                          </button>
+                          <label class="admin-btn admin-btn-outline admin-btn-sm" style="cursor: ${isMaxColorImages ? 'not-allowed' : 'pointer'}; opacity: ${isMaxColorImages ? '0.5' : '1'}; display: inline-flex; align-items: center; gap: 4px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                            <span>Upload</span>
+                            <input type="file" class="var-img-file-input" data-cidx="${cIdx}" accept="image/*" style="display: none;" ${isMaxColorImages ? 'disabled' : ''}>
+                          </label>
+                        </div>
+
+                        <!-- Colour Images Thumbnails Strip -->
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                          ${(cg.images || []).map((imgUrl, imgIdx) => `
+                            <div style="width: 60px; height: 75px; border-radius: 4px; overflow: hidden; border: 1px solid #DDD3C8; position: relative; background: #FAF8F5;">
+                              <img src="${imgUrl}" alt="Colour photo ${imgIdx + 1}" style="width: 100%; height: 100%; object-fit: cover;">
+                              <button type="button" class="btn-del-color-img" data-cidx="${cIdx}" data-imgidx="${imgIdx}" title="Remove photo" style="position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.65); color: #FFF; border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;">
+                                &times;
+                              </button>
+                            </div>
+                          `).join('')}
+                          ${(!cg.images || cg.images.length === 0) ? `
+                            <span style="font-size: 11.5px; color: #8C7A6B; align-self: center;">No photos added yet for this colour.</span>
+                          ` : ''}
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <!-- AVAILABLE SIZES CHECKBOX GRID -->
+                    <div class="mb-size-checkbox-section">
+                      <div class="mb-size-section-label">Available Sizes</div>
+                      <div class="mb-size-section-sub">
+                        Select which sizes are available for <strong>${cg.color || 'this colour'}</strong>. Only checked sizes have active stock and become purchasable in store.
+                      </div>
+
+                      <div class="mb-size-checkbox-grid">
+                        ${ALL_SUPPORTED_SIZES.map(sz => {
+                          const cfg = cg.sizeConfigs.get(sz) || { checked: false, stock: 5 };
+                          const isChecked = cfg.checked;
+
+                          return `
+                            <label class="mb-size-tile ${isChecked ? 'is-checked' : ''}" data-cidx="${cIdx}" data-size="${sz}">
+                              <input type="checkbox" class="mb-size-tile-checkbox var-size-checkbox" data-cidx="${cIdx}" data-size="${sz}" ${isChecked ? 'checked' : ''}>
+                              <span>${sz}</span>
+                            </label>
+                          `;
+                        }).join('')}
+                      </div>
+                    </div>
+
+                    <!-- STOCK CONFIGURATION FOR CHECKED SIZES ONLY -->
+                    <div class="mb-checked-sizes-table-wrap">
+                      ${checkedSizes.length > 0 ? `
+                        <table class="mb-checked-sizes-table">
+                          <thead>
+                            <tr>
+                              <th style="width: 120px;">Size</th>
+                              <th>SKU</th>
+                              <th style="width: 130px; text-align: center;">Stock Qty</th>
+                              <th style="width: 90px; text-align: right;">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            ${checkedSizes.map(s => {
+                              const cleanSku = (s.sku || '').trim().toUpperCase();
+                              const isDupSku = errors.duplicateSkus.has(cleanSku);
+                              const isInvalidStock = errors.invalidStocks.has(`${cg.id}_${s.size}`);
+
+                              return `
+                                <tr>
+                                  <td>
+                                    <span class="mb-size-badge-pill">${s.size}</span>
+                                  </td>
+                                  <td>
+                                    <input type="text" class="variant-input-sm variant-sku-input var-sku-input ${isDupSku ? 'has-error' : ''}" data-cidx="${cIdx}" data-size="${s.size}" value="${s.sku || ''}" placeholder="e.g. MB-DRS-001-NAT-${s.size}">
+                                    ${isDupSku ? `<div class="variant-field-error">⚠ Duplicate SKU across variants</div>` : ''}
+                                  </td>
+                                  <td style="text-align: center;">
+                                    <input type="number" min="0" step="1" class="variant-input-sm variant-stock-input var-stock-input ${isInvalidStock ? 'has-error' : ''}" data-cidx="${cIdx}" data-size="${s.size}" value="${s.stock}">
+                                    ${isInvalidStock ? `<div class="variant-field-error">Min 0</div>` : ''}
+                                  </td>
+                                  <td style="text-align: right;">
+                                    <button type="button" class="variant-btn-remove-row btn-uncheck-size" data-cidx="${cIdx}" data-size="${s.size}" title="Mark size unavailable">
+                                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                      <span>Remove</span>
+                                    </button>
+                                  </td>
+                                </tr>
+                              `;
+                            }).join('')}
+                          </tbody>
+                        </table>
+                      ` : `
+                        <div style="padding: 24px; text-align: center; color: #8C7A6B; font-size: 13px;">
+                          No sizes selected for this colour. Check one or more available sizes above to configure inventory and SKUs.
+                        </div>
+                      `}
+                    </div>
+
+                  </div>
+
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+        </div>
+      `;
+
+      attachVariantsTabListeners();
+    }
+
+    function attachVariantsTabListeners() {
+      const prefix = getProductSkuPrefix();
+
+      // + Add Colour Variant Button
+      document.getElementById('btn-add-colour-variant')?.addEventListener('click', () => {
+        const existingColNames = new Set(colorVariants.map(c => c.color.toLowerCase()));
+        const candidateNames = ['Black', 'Olive', 'Sage Green', 'Terracotta', 'Noir Black', 'Ivory Cream', 'Rose Sand'];
+        let newColName = 'Black';
+        for (const cand of candidateNames) {
+          if (!existingColNames.has(cand.toLowerCase())) {
+            newColName = cand;
+            break;
+          }
+        }
+
+        const newSizeConfigs = new Map();
+        ALL_SUPPORTED_SIZES.forEach(sz => {
+          const isStandard = ['S', 'M', 'L'].includes(sz);
+          newSizeConfigs.set(sz, {
+            checked: isStandard,
+            stock: isStandard ? 10 : 5,
+            draftStock: 5,
+            sku: generateDefaultSku(prefix, newColName, sz),
+            customSku: false
+          });
+        });
+
+        const newGroup = {
+          id: 'cg_' + Math.random().toString(36).substring(2, 9),
+          color: newColName,
+          color_code: '#8C7A6B',
+          images: [],
+          isExpanded: true,
+          sizeConfigs: newSizeConfigs
+        };
+
+        colorVariants.push(newGroup);
+        renderTabContent();
+        updateFooterStockSummary();
+        window.MB_ADMIN_SHELL?.showToast(`Added colour "${newColName}"`, 'success');
+      });
+
+      // Expand / Collapse Colour Card
       container.querySelectorAll('.variant-group-header').forEach(header => {
         header.addEventListener('click', (e) => {
-          // Ignore clicks on action buttons
           if (e.target.closest('.variant-header-actions')) return;
           const cIdx = parseInt(header.getAttribute('data-cidx'), 10);
           if (colorVariants[cIdx]) {
             colorVariants[cIdx].isExpanded = !colorVariants[cIdx].isExpanded;
-            renderColorGroups();
+            renderTabContent();
           }
         });
       });
@@ -627,32 +979,35 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
           const orig = colorVariants[cIdx];
           if (!orig) return;
 
-          const prefix = getProductSkuPrefix();
-          const newColorName = `${orig.color} (Copy)`;
-          const clonedSizes = (orig.sizes || []).map(s => ({
-            id: 'sz_' + Math.random().toString(36).substring(2, 9),
-            size: s.size,
-            stock: s.stock,
-            sku: generateSku(prefix, newColorName, s.size),
-            customSku: false
-          }));
+          const newName = `${orig.color} (Copy)`;
+          const clonedConfigs = new Map();
+          orig.sizeConfigs.forEach((cfg, sz) => {
+            clonedConfigs.set(sz, {
+              checked: cfg.checked,
+              stock: cfg.stock,
+              draftStock: cfg.draftStock,
+              sku: generateDefaultSku(prefix, newName, sz),
+              customSku: false
+            });
+          });
 
           const clonedGroup = {
             id: 'cg_' + Math.random().toString(36).substring(2, 9),
-            color: newColorName,
+            color: newName,
             color_code: orig.color_code || '',
-            image_url: orig.image_url || '',
+            images: [...(orig.images || [])],
             isExpanded: true,
-            sizes: clonedSizes
+            sizeConfigs: clonedConfigs
           };
 
           colorVariants.splice(cIdx + 1, 0, clonedGroup);
-          renderColorGroups();
+          renderTabContent();
+          updateFooterStockSummary();
           window.MB_ADMIN_SHELL?.showToast(`Duplicated colour "${orig.color}"`, 'success');
         });
       });
 
-      // Remove Colour Action (with destructive confirmation if stock exists)
+      // Remove Colour Action (with confirmation modal if it has stock)
       container.querySelectorAll('.btn-remove-colour').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -661,69 +1016,75 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
           if (!cg) return;
 
           if (colorVariants.length <= 1) {
-            window.MB_ADMIN_SHELL?.showToast('A garment must have at least one colour variant', 'warning');
+            window.MB_ADMIN_SHELL?.showToast('A product requires at least one colour variant', 'warning');
             return;
           }
 
-          const totalStock = (cg.sizes || []).reduce((acc, s) => acc + (parseInt(s.stock, 10) || 0), 0);
-          const sizeCount = (cg.sizes || []).length;
+          let totalStock = 0;
+          let activeSizes = 0;
+          cg.sizeConfigs.forEach(cfg => {
+            if (cfg.checked) {
+              activeSizes++;
+              totalStock += parseInt(cfg.stock, 10) || 0;
+            }
+          });
 
           if (totalStock > 0) {
             showConfirmModal({
               title: `Remove Colour "${cg.color}"?`,
-              body: `This colour variant has <strong>${sizeCount} sizes</strong> with a total of <strong>${totalStock} units</strong> in stock. Removing it will permanently delete this inventory allocation.`,
+              body: `Colour "${cg.color}" contains <strong>${activeSizes} active sizes</strong> with <strong>${totalStock} units in stock</strong>. Are you sure you want to remove it?`,
               confirmText: 'Remove Colour',
               isDestructive: true,
               onConfirm: () => {
                 colorVariants.splice(cIdx, 1);
-                renderColorGroups();
+                renderTabContent();
+                updateFooterStockSummary();
                 window.MB_ADMIN_SHELL?.showToast(`Colour "${cg.color}" removed`, 'info');
               }
             });
           } else {
             colorVariants.splice(cIdx, 1);
-            renderColorGroups();
+            renderTabContent();
+            updateFooterStockSummary();
           }
         });
       });
 
-      // Colour Name Input
-      container.querySelectorAll('.var-color-name').forEach(inp => {
+      // Colour Name input
+      container.querySelectorAll('.var-color-name-input').forEach(inp => {
         inp.addEventListener('input', (e) => {
           const cIdx = parseInt(e.target.getAttribute('data-cidx'), 10);
           const val = e.target.value;
           if (colorVariants[cIdx]) {
             colorVariants[cIdx].color = val;
-            
-            // Auto-update non-custom SKUs in this group
-            const prefix = getProductSkuPrefix();
-            (colorVariants[cIdx].sizes || []).forEach(s => {
-              if (!s.customSku) {
-                s.sku = generateSku(prefix, val, s.size);
+            // Update non-custom SKUs
+            colorVariants[cIdx].sizeConfigs.forEach((cfg, sz) => {
+              if (!cfg.customSku) {
+                cfg.sku = generateDefaultSku(prefix, val, sz);
               }
             });
           }
         });
 
         inp.addEventListener('blur', () => {
-          renderColorGroups();
+          renderTabContent();
         });
       });
 
-      // Colour Code / Hex Input & Picker
+      // Colour Code / Hex picker & input
       container.querySelectorAll('.var-color-picker').forEach(picker => {
         picker.addEventListener('input', (e) => {
           const cIdx = parseInt(e.target.getAttribute('data-cidx'), 10);
           const hex = e.target.value;
           if (colorVariants[cIdx]) {
             colorVariants[cIdx].color_code = hex;
-            const textInp = container.querySelector(`.var-color-code[data-cidx="${cIdx}"]`);
+            const textInp = container.querySelector(`.var-color-code-input[data-cidx="${cIdx}"]`);
             if (textInp) textInp.value = hex;
           }
         });
       });
 
-      container.querySelectorAll('.var-color-code').forEach(textInp => {
+      container.querySelectorAll('.var-color-code-input').forEach(textInp => {
         textInp.addEventListener('input', (e) => {
           const cIdx = parseInt(e.target.getAttribute('data-cidx'), 10);
           const val = e.target.value.trim();
@@ -737,395 +1098,297 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
         });
       });
 
-      // Shared Image URL input & Live Preview
-      container.querySelectorAll('.var-img-url').forEach(inp => {
-        inp.addEventListener('input', (e) => {
-          const cIdx = parseInt(e.target.getAttribute('data-cidx'), 10);
-          const url = e.target.value.trim();
-          if (colorVariants[cIdx]) {
-            colorVariants[cIdx].image_url = url;
-            const groupEl = e.target.closest('.variant-color-group');
-            const previewImg = groupEl?.querySelector('.variant-image-preview-box img');
-            if (previewImg) previewImg.src = url || '';
-          }
-        });
+      // Add Colour Image URL
+      container.querySelectorAll('.btn-add-color-img-url').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const cIdx = parseInt(btn.getAttribute('data-cidx'), 10);
+          const group = colorVariants[cIdx];
+          if (!group) return;
 
-        inp.addEventListener('blur', () => {
-          renderColorGroups();
+          const urlInp = container.querySelector(`.var-img-url-input[data-cidx="${cIdx}"]`);
+          const url = urlInp?.value.trim();
+          if (!url) return;
+
+          if ((group.images || []).length >= 5) {
+            window.MB_ADMIN_SHELL?.showToast('A colour variant can contain up to 5 images', 'warning');
+            return;
+          }
+
+          group.images = group.images || [];
+          group.images.push(url);
+          urlInp.value = '';
+          renderTabContent();
         });
       });
 
-      // File upload for colour swatch / photo
-      container.querySelectorAll('.var-file-upload').forEach(fileInp => {
+      // Upload Colour Image File
+      container.querySelectorAll('.var-img-file-input').forEach(fileInp => {
         fileInp.addEventListener('change', (e) => {
-          const cIdx = parseInt(e.target.getAttribute('data-cidx'), 10);
+          const cIdx = parseInt(fileInp.getAttribute('data-cidx'), 10);
+          const group = colorVariants[cIdx];
           const file = e.target.files?.[0];
-          if (!file || !colorVariants[cIdx]) return;
+          if (!file || !group) return;
+
+          if ((group.images || []).length >= 5) {
+            window.MB_ADMIN_SHELL?.showToast('A colour variant can contain up to 5 images', 'warning');
+            return;
+          }
 
           const reader = new FileReader();
           reader.onload = (evt) => {
-            const dataUrl = evt.target.result;
-            colorVariants[cIdx].image_url = dataUrl;
-            renderColorGroups();
+            group.images = group.images || [];
+            group.images.push(evt.target.result);
+            renderTabContent();
           };
           reader.readAsDataURL(file);
         });
       });
 
-      // Clear image button
-      container.querySelectorAll('.btn-clear-img').forEach(btn => {
+      // Delete Colour Image
+      container.querySelectorAll('.btn-del-color-img').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const cIdx = parseInt(btn.getAttribute('data-cidx'), 10);
-          if (colorVariants[cIdx]) {
-            colorVariants[cIdx].image_url = '';
-            renderColorGroups();
+          const imgIdx = parseInt(btn.getAttribute('data-imgidx'), 10);
+          const group = colorVariants[cIdx];
+          if (group && group.images) {
+            group.images.splice(imgIdx, 1);
+            renderTabContent();
           }
         });
       });
 
-      // Add Size Button
-      container.querySelectorAll('.btn-add-size').forEach(btn => {
+      // Reuse Main Image in Colour Variant
+      container.querySelectorAll('.btn-reuse-main-img').forEach(btn => {
         btn.addEventListener('click', (e) => {
-          const cIdx = parseInt(btn.getAttribute('data-cidx'), 10);
+          const src = btn.getAttribute('data-src');
+          if (src) promptAssignMainImageToColor(src);
+        });
+      });
+
+      // TOGGLE SIZE CHECKBOX (Mandatory checkbox behaviour)
+      container.querySelectorAll('.var-size-checkbox').forEach(chk => {
+        chk.addEventListener('change', (e) => {
+          const cIdx = parseInt(chk.getAttribute('data-cidx'), 10);
+          const sz = chk.getAttribute('data-size');
           const cg = colorVariants[cIdx];
           if (!cg) return;
 
-          const prefix = getProductSkuPrefix();
-          // Pick next unselected standard size if available
-          const existingSizes = new Set((cg.sizes || []).map(s => s.size));
-          const nextAvailable = STANDARD_SIZES.find(sz => !existingSizes.has(sz)) || 'M';
+          const cfg = cg.sizeConfigs.get(sz);
+          if (!cfg) return;
 
-          cg.sizes.push({
-            id: 'sz_' + Math.random().toString(36).substring(2, 9),
-            size: nextAvailable,
-            stock: 5,
-            sku: generateSku(prefix, cg.color, nextAvailable),
-            customSku: false
-          });
-
-          renderColorGroups();
-        });
-      });
-
-      // Quick Add Size Chip
-      container.querySelectorAll('.btn-quick-add-size').forEach(chip => {
-        chip.addEventListener('click', (e) => {
-          const cIdx = parseInt(chip.getAttribute('data-cidx'), 10);
-          const sz = chip.getAttribute('data-size');
-          const cg = colorVariants[cIdx];
-          if (!cg || !sz) return;
-
-          const prefix = getProductSkuPrefix();
-          cg.sizes.push({
-            id: 'sz_' + Math.random().toString(36).substring(2, 9),
-            size: sz,
-            stock: 5,
-            sku: generateSku(prefix, cg.color, sz),
-            customSku: false
-          });
-
-          renderColorGroups();
-        });
-      });
-
-      // Remove Size Variant Row (with confirmation if stock > 0)
-      container.querySelectorAll('.btn-remove-size').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const cIdx = parseInt(btn.getAttribute('data-cidx'), 10);
-          const sIdx = parseInt(btn.getAttribute('data-sidx'), 10);
-          const cg = colorVariants[cIdx];
-          if (!cg || !cg.sizes?.[sIdx]) return;
-
-          if (cg.sizes.length <= 1) {
-            window.MB_ADMIN_SHELL?.showToast('A colour variant must have at least one size', 'warning');
-            return;
-          }
-
-          const s = cg.sizes[sIdx];
-          const stock = parseInt(s.stock, 10) || 0;
-
-          if (stock > 0) {
-            showConfirmModal({
-              title: `Remove Size "${s.size}"?`,
-              body: `This size has <strong>${stock} units</strong> in stock (SKU: <code>${s.sku}</code>). Are you sure you want to remove it?`,
-              confirmText: 'Remove Size',
-              isDestructive: true,
-              onConfirm: () => {
-                cg.sizes.splice(sIdx, 1);
-                renderColorGroups();
-              }
-            });
+          const isNowChecked = chk.checked;
+          if (!isNowChecked) {
+            // Unchecking: preserve stock as draftStock, mark unavailable
+            cfg.draftStock = cfg.stock;
+            cfg.checked = false;
+            window.MB_ADMIN_SHELL?.showToast(`Size ${sz} marked unavailable for ${cg.color}`, 'info');
           } else {
-            cg.sizes.splice(sIdx, 1);
-            renderColorGroups();
+            // Checking: restore previous draftStock, generate SKU if not set
+            cfg.checked = true;
+            cfg.stock = cfg.draftStock || 5;
+            if (!cfg.sku) {
+              cfg.sku = generateDefaultSku(prefix, cg.color, sz);
+            }
           }
+
+          renderTabContent();
+          updateFooterStockSummary();
         });
       });
 
-      // Size Select Dropdown change
-      container.querySelectorAll('.var-size-select').forEach(sel => {
-        sel.addEventListener('change', (e) => {
-          const cIdx = parseInt(e.target.getAttribute('data-cidx'), 10);
-          const sIdx = parseInt(e.target.getAttribute('data-sidx'), 10);
-          const cg = colorVariants[cIdx];
-          if (!cg || !cg.sizes?.[sIdx]) return;
-
-          const val = e.target.value;
-          if (val === '__custom__') {
-            cg.sizes[sIdx].size = 'Custom';
-            renderColorGroups();
-            return;
-          }
-
-          cg.sizes[sIdx].size = val;
-          if (!cg.sizes[sIdx].customSku) {
-            cg.sizes[sIdx].sku = generateSku(getProductSkuPrefix(), cg.color, val);
-          }
-          renderColorGroups();
-        });
-      });
-
-      // Custom Size text input
-      container.querySelectorAll('.var-size-custom-input').forEach(inp => {
-        inp.addEventListener('input', (e) => {
-          const cIdx = parseInt(e.target.getAttribute('data-cidx'), 10);
-          const sIdx = parseInt(e.target.getAttribute('data-sidx'), 10);
-          const cg = colorVariants[cIdx];
-          if (!cg || !cg.sizes?.[sIdx]) return;
-
-          const val = e.target.value.trim();
-          cg.sizes[sIdx].size = val;
-          if (!cg.sizes[sIdx].customSku) {
-            cg.sizes[sIdx].sku = generateSku(getProductSkuPrefix(), cg.color, val);
-          }
-        });
-
-        inp.addEventListener('blur', () => {
-          renderColorGroups();
-        });
-      });
-
-      // Reset Custom Size back to standard dropdown
-      container.querySelectorAll('.btn-reset-size-select').forEach(btn => {
+      // Uncheck / Remove size row from inventory table
+      container.querySelectorAll('.btn-uncheck-size').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const cIdx = parseInt(btn.getAttribute('data-cidx'), 10);
-          const sIdx = parseInt(btn.getAttribute('data-sidx'), 10);
+          const sz = btn.getAttribute('data-size');
           const cg = colorVariants[cIdx];
-          if (cg && cg.sizes?.[sIdx]) {
-            cg.sizes[sIdx].size = 'M';
-            renderColorGroups();
+          if (!cg) return;
+
+          const cfg = cg.sizeConfigs.get(sz);
+          if (cfg) {
+            cfg.draftStock = cfg.stock;
+            cfg.checked = false;
+            renderTabContent();
+            updateFooterStockSummary();
+            window.MB_ADMIN_SHELL?.showToast(`Size ${sz} marked unavailable`, 'info');
           }
         });
       });
 
-      // SKU input change
+      // SKU input
       container.querySelectorAll('.var-sku-input').forEach(inp => {
         inp.addEventListener('input', (e) => {
-          const cIdx = parseInt(e.target.getAttribute('data-cidx'), 10);
-          const sIdx = parseInt(e.target.getAttribute('data-sidx'), 10);
+          const cIdx = parseInt(inp.getAttribute('data-cidx'), 10);
+          const sz = inp.getAttribute('data-size');
           const cg = colorVariants[cIdx];
-          if (!cg || !cg.sizes?.[sIdx]) return;
+          if (!cg) return;
 
-          cg.sizes[sIdx].sku = e.target.value.trim().toUpperCase();
-          cg.sizes[sIdx].customSku = true; // User manually customized this SKU
+          const cfg = cg.sizeConfigs.get(sz);
+          if (cfg) {
+            cfg.sku = e.target.value.trim().toUpperCase();
+            cfg.customSku = true; // User manually edited SKU
+          }
         });
 
         inp.addEventListener('blur', () => {
-          renderColorGroups();
+          renderTabContent();
         });
       });
 
-      // Stock input change
+      // Stock input
       container.querySelectorAll('.var-stock-input').forEach(inp => {
         inp.addEventListener('input', (e) => {
-          const cIdx = parseInt(e.target.getAttribute('data-cidx'), 10);
-          const sIdx = parseInt(e.target.getAttribute('data-sidx'), 10);
+          const cIdx = parseInt(inp.getAttribute('data-cidx'), 10);
+          const sz = inp.getAttribute('data-size');
           const cg = colorVariants[cIdx];
-          if (!cg || !cg.sizes?.[sIdx]) return;
+          if (!cg) return;
 
-          const val = parseInt(e.target.value, 10);
-          cg.sizes[sIdx].stock = isNaN(val) ? 0 : Math.max(0, val);
-          updateTotalStockDisplay();
+          const cfg = cg.sizeConfigs.get(sz);
+          if (cfg) {
+            const val = parseInt(e.target.value, 10);
+            cfg.stock = isNaN(val) ? 0 : Math.max(0, val);
+            cfg.draftStock = cfg.stock;
+            updateFooterStockSummary();
+          }
         });
 
         inp.addEventListener('blur', () => {
-          renderColorGroups();
+          renderTabContent();
         });
       });
     }
 
-    function attachFormListeners() {
-      // Primary cover image live preview
-      const mainImgInp = container.querySelector('#pe-main-img-url');
-      const mainPreviewBox = container.querySelector('#main-img-preview-box');
-      mainImgInp?.addEventListener('input', (e) => {
-        const url = e.target.value.trim();
-        if (mainPreviewBox) {
-          mainPreviewBox.innerHTML = `<img src="${url || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85'}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';">`;
+    // Attach global modal listeners (Tabs, Cancel, Save, Close)
+    function attachGlobalModalListeners() {
+      // Tab Switching (Preserves all state!)
+      container.querySelector('#tab-btn-basic')?.addEventListener('click', () => {
+        if (activeTab === 'basic') syncBasicInfoFromDom();
+        activeTab = 'basic';
+        container.querySelector('#tab-btn-basic').classList.add('active');
+        container.querySelector('#tab-btn-variants').classList.remove('active');
+        renderTabContent();
+      });
+
+      container.querySelector('#tab-btn-variants')?.addEventListener('click', () => {
+        if (activeTab === 'basic') syncBasicInfoFromDom();
+        activeTab = 'variants';
+        container.querySelector('#tab-btn-variants').classList.add('active');
+        container.querySelector('#tab-btn-basic').classList.remove('active');
+        renderTabContent();
+      });
+
+      // Cancel / Close Buttons
+      const handleClose = () => {
+        window.location.hash = '#/products';
+      };
+
+      container.querySelector('#btn-modal-close')?.addEventListener('click', handleClose);
+      container.querySelector('#btn-footer-cancel')?.addEventListener('click', handleClose);
+      container.querySelector('#product-modal-backdrop')?.addEventListener('click', (e) => {
+        if (e.target.id === 'product-modal-backdrop') {
+          handleClose();
         }
       });
 
-      // Primary cover image file upload
-      const mainFileInput = container.querySelector('#pe-main-file-input');
-      mainFileInput?.addEventListener('change', (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          const dataUrl = evt.target.result;
-          if (mainImgInp) mainImgInp.value = dataUrl;
-          if (mainPreviewBox) {
-            mainPreviewBox.innerHTML = `<img src="${dataUrl}" alt="Preview" style="width: 100%; height: 100%; object-fit: cover;">`;
-          }
-        };
-        reader.readAsDataURL(file);
-      });
-
-      // When Garment Title changes, update auto-generated SKUs
-      const nameInp = container.querySelector('#pe-name');
-      nameInp?.addEventListener('blur', () => {
-        const prefix = getProductSkuPrefix();
-        colorVariants.forEach(cg => {
-          (cg.sizes || []).forEach(s => {
-            if (!s.customSku) {
-              s.sku = generateSku(prefix, cg.color, s.size);
-            }
-          });
-        });
-        renderColorGroups();
-      });
-
-      // + Add Colour Button
-      container.querySelector('#btn-add-colour')?.addEventListener('click', () => {
-        const prefix = getProductSkuPrefix();
-        const existingColorNames = new Set(colorVariants.map(c => c.color.toLowerCase()));
-        
-        let newName = 'Olive';
-        const candidateNames = ['Olive', 'Terracotta', 'Sage Green', 'Noir Black', 'Ivory Cream', 'Rose Sand'];
-        for (const cand of candidateNames) {
-          if (!existingColorNames.has(cand.toLowerCase())) {
-            newName = cand;
-            break;
-          }
-        }
-
-        const newGroup = {
-          id: 'cg_' + Math.random().toString(36).substring(2, 9),
-          color: newName,
-          color_code: '#8C7A6B',
-          image_url: '',
-          isExpanded: true,
-          sizes: [
-            { id: 'sz_' + Math.random().toString(36).substring(2, 9), size: 'XS', stock: 5, sku: generateSku(prefix, newName, 'XS'), customSku: false },
-            { id: 'sz_' + Math.random().toString(36).substring(2, 9), size: 'S', stock: 10, sku: generateSku(prefix, newName, 'S'), customSku: false },
-            { id: 'sz_' + Math.random().toString(36).substring(2, 9), size: 'M', stock: 15, sku: generateSku(prefix, newName, 'M'), customSku: false },
-            { id: 'sz_' + Math.random().toString(36).substring(2, 9), size: 'L', stock: 10, sku: generateSku(prefix, newName, 'L'), customSku: false },
-            { id: 'sz_' + Math.random().toString(36).substring(2, 9), size: 'XL', stock: 5, sku: generateSku(prefix, newName, 'XL'), customSku: false }
-          ]
-        };
-
-        colorVariants.push(newGroup);
-        renderColorGroups();
-
-        // Focus colour name input on the newly added group
-        setTimeout(() => {
-          const newInp = container.querySelector(`.variant-color-group[data-group-id="${newGroup.id}"] .var-color-name`);
-          if (newInp) {
-            newInp.focus();
-            newInp.select();
-          }
-        }, 50);
-      });
-
-      // Save Garment Handler
+      // Save Product Handler
       const saveHandler = async (e) => {
         if (e) e.preventDefault();
 
-        const name = container.querySelector('#pe-name')?.value.trim();
+        // Sync inputs from Tab 1 if currently open or previously populated
+        syncBasicInfoFromDom();
+
+        // 1. Validate Product Name
+        const name = (product.name || '').trim();
         if (!name) {
-          window.MB_ADMIN_SHELL?.showToast('Please provide a garment title', 'warning');
-          container.querySelector('#pe-name')?.focus();
+          activeTab = 'basic';
+          renderTabContent();
+          window.MB_ADMIN_SHELL?.showToast('Please provide a product name', 'warning');
+          document.getElementById('pe-name')?.focus();
           return;
         }
 
-        // Validate variants
+        // 2. Validate Price
+        const price = Number(product.price);
+        if (isNaN(price) || price < 0) {
+          activeTab = 'basic';
+          renderTabContent();
+          window.MB_ADMIN_SHELL?.showToast('Please enter a valid base price (≥ 0)', 'warning');
+          document.getElementById('pe-price')?.focus();
+          return;
+        }
+
+        // 3. Category & Slug
+        const categorySlug = product.category || 'dresses';
+        const categoryId = product.categoryId || '';
+        const slug = (product.slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+
+        // 4. Validate Variants
         const validation = validateVariantState();
         if (validation.hasErrors) {
+          activeTab = 'variants';
           // Expand all groups that have errors
           colorVariants.forEach(cg => {
-            if (
-              validation.emptyColors.has(cg.id) || 
-              validation.duplicateSizesByGroup.has(cg.id) ||
-              (cg.sizes || []).some(s => validation.duplicateSkus.has((s.sku || '').trim().toUpperCase()) || validation.invalidStocks.has(s.id) || validation.emptySkus.has(s.id))
-            ) {
+            if (validation.emptyColors.has(cg.id) || validation.noCheckedSizes.has(cg.id)) {
               cg.isExpanded = true;
             }
           });
-          renderColorGroups();
+          renderTabContent();
 
           let msg = 'Please resolve variant validation errors before saving';
-          if (validation.duplicateSkus.size > 0) {
+          if (validation.emptyColors.size > 0) {
+            msg = 'All colour variants must have a colour name.';
+          } else if (validation.noCheckedSizes.size > 0) {
+            msg = 'Each colour variant must have at least one checked available size.';
+          } else if (validation.duplicateSkus.size > 0) {
             msg = `Duplicate SKU found: ${Array.from(validation.duplicateSkus).join(', ')}. All SKUs must be unique.`;
-          } else if (validation.duplicateSizesByGroup.size > 0) {
-            msg = 'Duplicate size variants found within the same colour.';
-          } else if (validation.emptyColors.size > 0) {
-            msg = 'Please provide a name for all colour variants.';
+          } else if (validation.invalidStocks.size > 0) {
+            msg = 'Stock quantities must be non-negative integers (≥ 0).';
           }
+
           window.MB_ADMIN_SHELL?.showToast(msg, 'error');
           return;
         }
 
-        const price = parseFloat(container.querySelector('#pe-price')?.value) || 0;
-        const salePriceVal = container.querySelector('#pe-sale-price')?.value;
-        const salePrice = salePriceVal ? parseFloat(salePriceVal) : null;
-        const catSelect = container.querySelector('#pe-category');
-        const selectedOpt = catSelect?.options[catSelect.selectedIndex];
-        const categoryId = selectedOpt?.value || '';
-        const categorySlug = selectedOpt?.getAttribute('data-slug') || 'dresses';
-        const status = container.querySelector('#pe-status')?.value || 'active';
-        const desc = container.querySelector('#pe-desc')?.value.trim() || '';
-        const featured = container.querySelector('#pe-featured')?.checked || false;
-        const newArrival = container.querySelector('#pe-new')?.checked || false;
-        const mainImage = container.querySelector('#pe-main-img-url')?.value.trim() || 
-          colorVariants[0]?.image_url || 
-          'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';
-
-        // Flatten colour-grouped variants back into database-compatible flat variants
+        // 5. Build purchasable variants from ONLY checked sizes
         const flatVariants = [];
-        let totalStock = 0;
+        let totalStockUnits = 0;
         const cleanSkuBase = getProductSkuPrefix();
+        const mainCover = mainImages[0] || 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';
 
-        colorVariants.forEach((cg, cIdx) => {
-          const colName = (cg.color || `Colour ${cIdx + 1}`).trim();
-          const colImg = cg.image_url?.trim() || mainImage;
+        colorVariants.forEach(cg => {
+          const colName = cg.color.trim();
+          const colImg = (cg.images && cg.images.length > 0) ? cg.images[0] : mainCover;
 
-          (cg.sizes || []).forEach(s => {
-            const stockQty = parseInt(s.stock, 10) || 0;
-            totalStock += stockQty;
-            const finalSku = (s.sku || generateSku(cleanSkuBase, colName, s.size)).trim().toUpperCase();
+          cg.sizeConfigs.forEach((cfg, sz) => {
+            if (cfg.checked) {
+              const stockNum = parseInt(cfg.stock, 10) || 0;
+              totalStockUnits += stockNum;
+              const sku = (cfg.sku || generateDefaultSku(cleanSkuBase, colName, sz)).trim().toUpperCase();
 
-            flatVariants.push({
-              size: s.size,
-              color: colName,
-              color_code: cg.color_code || null,
-              stock: stockQty,
-              stock_qty: stockQty,
-              sku: finalSku,
-              image_url: colImg
-            });
+              flatVariants.push({
+                size: sz,
+                color: colName,
+                color_code: cg.color_code || null,
+                stock: stockNum,
+                stock_qty: stockNum,
+                sku: sku,
+                image_url: colImg
+              });
+            }
           });
         });
 
-        // Assemble Gallery: Cover image + distinct variant images
-        const gallery = [mainImage];
+        // 6. Assemble Complete Gallery (Main product images + distinct colour variant images)
+        const combinedGallery = [...mainImages];
         colorVariants.forEach(cg => {
-          if (cg.image_url && cg.image_url.trim() && !gallery.includes(cg.image_url.trim())) {
-            gallery.push(cg.image_url.trim());
-          }
+          (cg.images || []).forEach(img => {
+            if (img && !combinedGallery.includes(img)) {
+              combinedGallery.push(img);
+            }
+          });
         });
 
-        const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
+        // 7. Build complete updated Product object
         const updatedProduct = {
           id: product.id || `prod-${Date.now()}`,
           name,
@@ -1134,44 +1397,72 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
           category: categorySlug,
           categoryId: categoryId,
           price,
-          salePrice,
-          stock: totalStock,
+          salePrice: product.salePrice,
+          stock: totalStockUnits,
           lowStockThreshold: 5,
-          status,
-          featured,
-          newArrival,
-          shortDescription: desc,
-          description: desc,
+          status: product.status || 'active',
+          featured: Boolean(product.featured),
+          bestSeller: Boolean(product.bestSeller),
+          newArrival: Boolean(product.newArrival),
+          shortDescription: product.description || '',
+          description: product.description || '',
           fabric: product.fabric || '100% Sustainable Linen Cotton',
           care: product.care || 'Hand wash cold or gentle machine cycle. Dry flat.',
           fit: product.fit || 'Relaxed elegant fit.',
-          image: mainImage,
-          gallery,
+          image: mainCover,
+          gallery: combinedGallery,
           variants: flatVariants
         };
 
+        // 8. Persist using existing backend service
+        const saveBtn = container.querySelector('#btn-save-product');
+        if (saveBtn) {
+          saveBtn.disabled = true;
+          saveBtn.textContent = 'Saving Product...';
+        }
+
         try {
-          const saveBtn = container.querySelector('#btn-save-product');
-          if (saveBtn) {
-            saveBtn.disabled = true;
-            saveBtn.textContent = 'Saving...';
-          }
           await service.saveProduct(updatedProduct);
-          window.MB_ADMIN_SHELL?.showToast(`Garment "${name}" successfully saved!`, 'success');
+          window.MB_ADMIN_SHELL?.showToast(`Product "${name}" successfully saved!`, 'success');
           window.location.hash = '#/products';
         } catch (err) {
-          console.error('[ProductEdit] Save error:', err);
-          window.MB_ADMIN_SHELL?.showToast(err.message || 'Error saving garment', 'error');
-          const saveBtn = container.querySelector('#btn-save-product');
+          console.error('[ProductBuilderModal] Save error:', err);
+          window.MB_ADMIN_SHELL?.showToast(err.message || 'Error saving product', 'error');
           if (saveBtn) {
             saveBtn.disabled = false;
-            saveBtn.textContent = 'Save Changes';
+            saveBtn.textContent = isNew ? 'Publish Product' : 'Save Product';
           }
         }
       };
 
       container.querySelector('#btn-save-product')?.addEventListener('click', saveHandler);
-      container.querySelector('#product-simple-form')?.addEventListener('submit', saveHandler);
+    }
+
+    function updateFooterStockSummary() {
+      let totalUnits = 0;
+      let activeVariantsCount = 0;
+
+      colorVariants.forEach(cg => {
+        cg.sizeConfigs.forEach(cfg => {
+          if (cfg.checked) {
+            activeVariantsCount++;
+            totalUnits += parseInt(cfg.stock, 10) || 0;
+          }
+        });
+      });
+
+      const unitsEl = container.querySelector('#footer-total-units');
+      if (unitsEl) unitsEl.textContent = `${totalUnits} Units`;
+
+      const variantsEl = container.querySelector('#footer-active-variants-count');
+      if (variantsEl) {
+        variantsEl.textContent = `${activeVariantsCount} Active Size ${activeVariantsCount === 1 ? 'Variant' : 'Variants'}`;
+      }
+
+      const tabPill = container.querySelector('#tab-variants-pill');
+      if (tabPill) {
+        tabPill.textContent = `${colorVariants.length} ${colorVariants.length === 1 ? 'colour' : 'colours'} • ${activeVariantsCount} sizes`;
+      }
     }
 
     renderView();
