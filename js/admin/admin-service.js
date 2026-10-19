@@ -154,6 +154,14 @@ window.MB_ADMIN_SERVICE = (() => {
     }
 
     let list = getCollection(STORAGE_KEYS.PRODUCTS, []);
+    if ((!list || list.length === 0) && window.MB_DATA && Array.isArray(window.MB_DATA.products) && window.MB_DATA.products.length > 0) {
+      list = window.MB_DATA.products.map(p => ({
+        ...p,
+        variants: p.variants || []
+      }));
+      setCollection(STORAGE_KEYS.PRODUCTS, list);
+    }
+
     if (filters.category && filters.category !== 'all') {
       list = list.filter(p => p.category.toLowerCase() === filters.category.toLowerCase());
     }
@@ -182,7 +190,11 @@ window.MB_ADMIN_SERVICE = (() => {
 
   async function getProductById(id) {
     const list = getCollection(STORAGE_KEYS.PRODUCTS, []);
-    return list.find(p => p.id === id) || null;
+    let item = list.find(p => p.id === id);
+    if (!item && window.MB_DATA && Array.isArray(window.MB_DATA.products)) {
+      item = window.MB_DATA.products.find(p => p.id === id);
+    }
+    return item || null;
   }
 
   async function saveProduct(productData) {

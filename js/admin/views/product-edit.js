@@ -22,6 +22,8 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
     const categories = await service.getCategories();
     const isNew = !params.id || params.id === 'new';
 
+    const FALLBACK_GARMENT_SVG = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjUwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI0Y0RUZFQSIvPjxwYXRoIGQ9Ik03MCAzMCBRMTAwIDUwIDEzMCAzMCBMMTYwIDcwIEwxNDAgODUgTDEzMCA3NSBMMTM1IDIyMCBMNjUgMjIwIEw3MCA3NSBMNjAgODUgTDQwIDcwIFoiIGZpbGw9IiNENUNCQzIiIHN0cm9rZT0iI0I0NzE1NCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iMTAwIiB5PSIxNDUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBmaWxsPSIjOEM3QTZCIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNjAwIj5BVEVMSUVSIFBJRUNFPC90ZXh0Pjwvc3ZnPg==";
+
     // Base product model
     let product = {
       id: '',
@@ -372,7 +374,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
               <div>
                 <div class="mb-modal-kicker">Marsh Barbary Atelier Catalog</div>
                 <h2 class="mb-modal-title" id="modal-main-title">
-                  ${isNew ? 'Add Product' : `Edit: ${product.name}`}
+                  ${isNew ? 'Add Product' : `Edit: ${product.name || 'Garment'}`}
                 </h2>
               </div>
               <button type="button" class="mb-modal-close-btn" id="btn-modal-close" title="Close & Cancel">
@@ -478,7 +480,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
               ${mainImages.map((src, idx) => `
                 <div class="mb-gallery-card ${idx === 0 ? 'is-primary' : ''}">
                   <div class="mb-gallery-card-img-wrap">
-                    <img src="${src}" alt="Main view ${idx + 1}" onerror="this.src='https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';">
+                    <img src="${src}" alt="Main view ${idx + 1}" onerror="this.onerror=null; this.src='${FALLBACK_GARMENT_SVG}';">
                     ${idx === 0 ? '<span class="mb-primary-badge">★ Primary Cover</span>' : ''}
                   </div>
                   <div class="mb-gallery-card-actions">
@@ -689,7 +691,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
             <div class="mb-main-images-strip">
               ${mainImages.map((src, idx) => `
                 <div class="mb-main-image-thumb-card">
-                  <img src="${src}" alt="Main view ${idx + 1}" onerror="this.src='https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=800&q=85';">
+                  <img src="${src}" alt="Main view ${idx + 1}" onerror="this.onerror=null; this.src='${FALLBACK_GARMENT_SVG}';">
                   <button type="button" class="mb-btn-use-main-img btn-reuse-main-img" data-src="${src}">
                     + Use in Colour
                   </button>
@@ -743,7 +745,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
                       <!-- Swatch Thumbnail -->
                       <div class="variant-swatch-thumb">
                         ${cg.images && cg.images.length > 0
-                          ? `<img src="${cg.images[0]}" alt="${cg.color}" onerror="this.style.opacity='0.4';">`
+                          ? `<img src="${cg.images[0]}" alt="${cg.color}" onerror="this.onerror=null; this.src='${FALLBACK_GARMENT_SVG}';">`
                           : (cg.color_code 
                               ? `<div style="width: 22px; height: 22px; border-radius: 50%; background-color: ${cg.color_code}; border: 1px solid rgba(0,0,0,0.15);"></div>`
                               : `<span style="font-size: 10px; color: #8C7A6B;">Swatch</span>`
@@ -819,7 +821,7 @@ window.MB_ADMIN_VIEWS['product-edit'] = {
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                           ${(cg.images || []).map((imgUrl, imgIdx) => `
                             <div style="width: 60px; height: 75px; border-radius: 4px; overflow: hidden; border: 1px solid #DDD3C8; position: relative; background: #FAF8F5;">
-                              <img src="${imgUrl}" alt="Colour photo ${imgIdx + 1}" style="width: 100%; height: 100%; object-fit: cover;">
+                              <img src="${imgUrl}" alt="Colour photo ${imgIdx + 1}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.src='${FALLBACK_GARMENT_SVG}';">
                               <button type="button" class="btn-del-color-img" data-cidx="${cIdx}" data-imgidx="${imgIdx}" title="Remove photo" style="position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.65); color: #FFF; border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1;">
                                 &times;
                               </button>

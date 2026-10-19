@@ -11,6 +11,7 @@ window.MB_ADMIN_VIEWS.products = {
   async render(container, params = {}) {
     const service = window.MB_ADMIN_SERVICE;
     const categories = await service.getCategories();
+    const FALLBACK_GARMENT_SVG = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjUwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI0Y0RUZFQSIvPjxwYXRoIGQ9Ik03MCAzMCBRMTAwIDUwIDEzMCAzMCBMMTYwIDcwIEwxNDAgODUgTDEzMCA3NSBMMTM1IDIyMCBMNjUgMjIwIEw3MCA3NSBMNjAgODUgTDQwIDcwIFoiIGZpbGw9IiNENUNCQzIiIHN0cm9rZT0iI0I0NzE1NCIgc3Ryb2tlLXdpZHRoPSIyIi8+PHRleHQgeD0iMTAwIiB5PSIxNDUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjExIiBmaWxsPSIjOEM3QTZCIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNjAwIj5BVEVMSUVSIFBJRUNFPC90ZXh0Pjwvc3ZnPg==";
 
     // Query state
     const urlParams = new URLSearchParams(window.location.hash.split('?')[1] || '');
@@ -110,7 +111,7 @@ window.MB_ADMIN_VIEWS.products = {
       tbody.innerHTML = items.map(p => `
         <tr>
           <td>
-            <img src="${window.MB_IMAGE_SOURCE ? window.MB_IMAGE_SOURCE.resolveDisplayUrl(p.image) : '../' + p.image}" alt="" style="width: 44px; height: 56px; object-fit: cover; border-radius: 2px; border: 1px solid var(--mb-admin-border);">
+            <img src="${window.MB_IMAGE_SOURCE ? window.MB_IMAGE_SOURCE.resolveDisplayUrl(p.image) : (p.image ? '../' + p.image : '')}" alt="${p.name || ''}" style="width: 44px; height: 56px; object-fit: cover; border-radius: 3px; border: 1px solid var(--mb-admin-border);" onerror="this.onerror=null; this.src='${FALLBACK_GARMENT_SVG}';">
           </td>
           <td>
             <a href="#/products/${p.id}/edit" style="font-weight: 500; color: var(--mb-admin-text); text-decoration: none; display: block;">
