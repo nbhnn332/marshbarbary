@@ -117,16 +117,34 @@ window.MB_DATA.loadLiveCatalog = async function() {
       const liveProds = await prodRes.json();
       if (Array.isArray(liveProds)) {
         window.MB_DATA.products = liveProds.map(p => {
-          // Resolve product images (Strict separation: main vs color variants)
-          const sortedImgs = (p.images || []).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-          const mainImgs = sortedImgs.filter(i => !i.alt_text || !i.alt_text.startsWith('color:'));
-          const colorImgs = sortedImgs.filter(i => i.alt_text && i.alt_text.startsWith('color:'));
+          function parseImgMeta(altText, fallbackIdx) {
+            if (!altText) return { role: 'main', index: fallbackIdx };
+            if (altText.startsWith('{') && altText.endsWith('}')) {
+              try {
+                const parsed = JSON.parse(altText);
+                if (parsed.role) return parsed;
+              } catch(e) {}
+            }
+            if (altText.startsWith('color:')) {
+              const cName = altText.replace(/^color:/, '').trim() || 'Standard';
+              return { role: 'color', colorName: cName, index: fallbackIdx };
+            }
+            return { role: 'main', index: fallbackIdx };
+          }
 
+          const sortedImgs = (p.images || []).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+          const mainImgs = [];
           const colorGalleries = {};
-          colorImgs.forEach(i => {
-            const colName = i.alt_text.replace(/^color:/, '').trim() || 'Standard';
-            colorGalleries[colName] = colorGalleries[colName] || [];
-            colorGalleries[colName].push(i.storage_path);
+
+          sortedImgs.forEach((img, idx) => {
+            const meta = parseImgMeta(img.alt_text, idx);
+            if (meta.role === 'color' && meta.colorName) {
+              const cName = meta.colorName;
+              colorGalleries[cName] = colorGalleries[cName] || [];
+              colorGalleries[cName].push(img.storage_path);
+            } else {
+              mainImgs.push(img);
+            }
           });
 
           const mainImg = mainImgs[0]?.storage_path || (window.MB_FALLBACK_SVG || '');

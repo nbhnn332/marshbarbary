@@ -115,16 +115,35 @@ window.MB_ADMIN_SERVICE = (() => {
             cats.forEach(c => catMap.set(c.id, c.slug));
           }
 
+          function parseImgMeta(altText, fallbackIdx) {
+            if (!altText) return { role: 'main', index: fallbackIdx };
+            if (altText.startsWith('{') && altText.endsWith('}')) {
+              try {
+                const parsed = JSON.parse(altText);
+                if (parsed.role) return parsed;
+              } catch(e) {}
+            }
+            if (altText.startsWith('color:')) {
+              const cName = altText.replace(/^color:/, '').trim() || 'Standard';
+              return { role: 'color', colorName: cName, index: fallbackIdx };
+            }
+            return { role: 'main', index: fallbackIdx };
+          }
+
           const mapped = liveProds.map(p => {
             const sortedImgs = (p.images || []).sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-            const mainImgs = sortedImgs.filter(i => !i.alt_text || !i.alt_text.startsWith('color:'));
-            const colorImgs = sortedImgs.filter(i => i.alt_text && i.alt_text.startsWith('color:'));
-
+            const mainImgs = [];
             const colorGalleries = {};
-            colorImgs.forEach(i => {
-              const colName = i.alt_text.replace(/^color:/, '').trim() || 'Standard';
-              colorGalleries[colName] = colorGalleries[colName] || [];
-              colorGalleries[colName].push(i.storage_path);
+
+            sortedImgs.forEach((img, idx) => {
+              const meta = parseImgMeta(img.alt_text, idx);
+              if (meta.role === 'color' && meta.colorName) {
+                const cName = meta.colorName;
+                colorGalleries[cName] = colorGalleries[cName] || [];
+                colorGalleries[cName].push(img.storage_path);
+              } else {
+                mainImgs.push(img);
+              }
             });
 
             const mainImg = mainImgs[0]?.storage_path || (window.MB_FALLBACK_SVG || '');
@@ -358,35 +377,85 @@ window.MB_ADMIN_SERVICE = (() => {
           }
         }
 
-        // Sync Variants to product_variants table in Supabase
-        if (targetId && Array.isArray(productData.variants) && productData.variants.length > 0) {
+        // Differential Sync Variants to product_variants table in Supabase (Never Blind DELETE)
+        if (targetId && Array.isArray(productData.variants)) {
           try {
-            await fetch(`${url}/rest/v1/product_variants?product_id=eq.${targetId}`, { method: 'DELETE', headers });
-            const varsPayload = productData.variants.map((v, idx) => {
-              const item = {
-                product_id: targetId,
-                sku: v.sku || `${productData.sku || 'MB'}-${v.size || idx}`,
-                size: v.size || 'M',
-                color: v.color || 'Standard',
-                stock_qty: Number(v.stock ?? v.stock_qty ?? 0),
-                is_active: true
-              };
-              if (v.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v.id)) {
-                item.id = v.id;
+            const varFetchRes = await fetch(`${url}/rest/v1/product_variants?product_id=eq.${targetId}`, { headers });
+            const liveVariants = varFetchRes.ok ? await varFetchRes.json() : [];
+
+            const matchedLiveIds = new Set();
+            const toUpdate = [];
+            const toInsert = [];
+
+            productData.variants.forEach(des => {
+              const desColor = (des.color || 'Standard').trim().toLowerCase();
+              const desSize = (des.size || 'M').trim().toUpperCase();
+              let matched = null;
+              if (des.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(des.id)) {
+                matched = liveVariants.find(lv => lv.id === des.id);
               }
-              return item;
+              if (!matched) {
+                matched = liveVariants.find(lv => 
+                  !matchedLiveIds.has(lv.id) &&
+                  (lv.color || 'Standard').trim().toLowerCase() === desColor &&
+                  (lv.size || 'M').trim().toUpperCase() === desSize
+                );
+              }
+
+              if (matched) {
+                matchedLiveIds.add(matched.id);
+                toUpdate.push({
+                  id: matched.id,
+                  sku: des.sku || matched.sku,
+                  color: des.color || matched.color,
+                  size: des.size || matched.size,
+                  stock_qty: Number(des.stock ?? des.stock_qty ?? 0),
+                  is_active: true
+                });
+              } else {
+                toInsert.push({
+                  product_id: targetId,
+                  sku: des.sku || `${productData.sku || 'MB'}-${des.size || 'M'}`,
+                  color: des.color || 'Standard',
+                  size: des.size || 'M',
+                  stock_qty: Number(des.stock ?? des.stock_qty ?? 0),
+                  is_active: true
+                });
+              }
             });
 
-            const varRes = await fetch(`${url}/rest/v1/product_variants`, {
-              method: 'POST',
-              headers,
-              body: JSON.stringify(varsPayload)
-            });
-            if (!varRes.ok) {
-              const errText = await varRes.text();
-              console.error('[AdminService] product_variants POST error:', varRes.status, errText);
-            } else {
-              console.log('[AdminService] Successfully synced', varsPayload.length, 'variants to Supabase');
+            // Deactivate missing variants instead of hard delete
+            const toDeactivate = liveVariants.filter(lv => !matchedLiveIds.has(lv.id));
+
+            for (const u of toUpdate) {
+              await fetch(`${url}/rest/v1/product_variants?id=eq.${u.id}`, {
+                method: 'PATCH',
+                headers,
+                body: JSON.stringify({
+                  sku: u.sku,
+                  color: u.color,
+                  size: u.size,
+                  stock_qty: u.stock_qty,
+                  is_active: true,
+                  updated_at: new Date().toISOString()
+                })
+              });
+            }
+
+            if (toInsert.length > 0) {
+              await fetch(`${url}/rest/v1/product_variants`, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(toInsert)
+              });
+            }
+
+            for (const d of toDeactivate) {
+              await fetch(`${url}/rest/v1/product_variants?id=eq.${d.id}`, {
+                method: 'PATCH',
+                headers,
+                body: JSON.stringify({ is_active: false, updated_at: new Date().toISOString() })
+              });
             }
           } catch (ve) {
             console.warn('[AdminService] Supabase product_variants sync warning:', ve);
