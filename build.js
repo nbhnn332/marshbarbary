@@ -60,7 +60,7 @@ for (const file of files) {
     const ext = path.extname(file).toLowerCase();
 
     // Copy all HTML files and root images/icons
-    if (ext === '.html' || ext === '.ico' || ext === '.svg' || ext === '.webmanifest') {
+    if (ext === '.html' || ext === '.ico' || ext === '.svg' || ext === '.webmanifest' || file === 'apple-touch-icon.png') {
       fs.copyFileSync(fullPath, path.join(distDir, file));
       console.log(`[FILE] Copied: ${file} -> dist/${file}`);
       copiedFilesCount++;
