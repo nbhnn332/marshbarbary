@@ -29,9 +29,9 @@ window.MB_ADMIN_VIEWS.products = {
           </p>
         </div>
         <div style="display: flex; gap: 8px;">
-          <a href="#/products/new" class="admin-btn admin-btn-primary admin-btn-sm">
+          <a href="#/products/new" class="admin-btn admin-btn-primary admin-btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Add New Garment
+            Add Product
           </a>
         </div>
       </div>
