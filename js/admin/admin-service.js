@@ -878,7 +878,7 @@ window.MB_ADMIN_SERVICE = (() => {
   // ORDERS CRUD
   // ORDERS CRUD
   async function getOrders(filters = {}) {
-    let rawList = [];
+    const orderMap = new Map();
 
     // 1. Fetch directly from live Supabase orders table
     if (window.MB_SUPABASE_CONFIG && window.MB_SUPABASE_CONFIG.isLiveConfigured()) {
@@ -889,7 +889,7 @@ window.MB_ADMIN_SERVICE = (() => {
         if (res.ok) {
           const liveOrders = await res.json();
           if (Array.isArray(liveOrders)) {
-            rawList = liveOrders.map(o => {
+            liveOrders.forEach(o => {
               const shipAddr = o.shipping_address || {};
               const customerName = shipAddr.full_name || shipAddr.name || 'Patron';
               const items = (o.order_items || []).map(i => ({
@@ -904,9 +904,10 @@ window.MB_ADMIN_SERVICE = (() => {
                 image: (i.image_url && !i.image_url.includes('unsplash.com')) ? i.image_url : (window.MB_FALLBACK_SVG || '')
               }));
 
-              return {
+              const orderKey = o.order_number || o.id;
+              orderMap.set(orderKey, {
                 id: o.id,
-                orderNumber: o.order_number || o.id,
+                orderNumber: orderKey,
                 date: (o.created_at || '').replace('T', ' ').substring(0, 16),
                 status: o.order_status || 'PROCESSING',
                 paymentStatus: o.payment_status || 'PENDING',
@@ -941,9 +942,9 @@ window.MB_ADMIN_SERVICE = (() => {
                 subtotal: Number(o.subtotal || 0),
                 timeline: [
                   { title: 'Order Placed', time: (o.created_at || '').replace('T', ' ').substring(0, 16), done: true },
-                  { title: 'Payment Status: ' + (o.payment_status || 'PENDING'), time: '', done: o.payment_status === 'PAID' }
+                  { title: 'Payment: ' + (o.payment_status || 'PENDING'), time: '', done: o.payment_status === 'PAID' }
                 ]
-              };
+              });
             });
           }
         }
@@ -952,65 +953,96 @@ window.MB_ADMIN_SERVICE = (() => {
       }
     }
 
-    // Merge storefront orders placed in dev storage
+    // 2. Merge existing admin stored orders (mb_admin_orders)
+    try {
+      const stored = getCollection(STORAGE_KEYS.ORDERS, []);
+      if (Array.isArray(stored)) {
+        stored.forEach(so => {
+          const key = so.orderNumber || so.id;
+          if (key && !orderMap.has(key)) {
+            orderMap.set(key, so);
+          }
+        });
+      }
+    } catch (e) {}
+
+    // 3. Merge storefront orders placed in dev storage (mb_dev_orders)
     try {
       const devRaw = localStorage.getItem('mb_dev_orders');
       if (devRaw) {
         const devOrders = JSON.parse(devRaw);
-        devOrders.forEach(devO => {
-          const exists = rawList.some(o => (o.orderNumber === devO.order_number) || (o.id === devO.order_number) || (o.id === devO.id));
-          if (!exists) {
-            rawList.unshift({
-              id: devO.order_number || devO.id,
-              orderNumber: devO.order_number || devO.id,
-              customer: {
-                name: devO.shipping_full_name || 'Atelier Patron',
-                email: devO.customer_email || 'patron@marshbarbary.com',
-                phone: devO.shipping_phone || '',
-                city: devO.shipping_city || 'Bengaluru'
-              },
-              shippingAddress: {
-                name: devO.shipping_full_name,
-                phone: devO.shipping_phone,
-                line1: devO.shipping_address_line_1,
-                line2: devO.shipping_address_line_2 || '',
-                city: devO.shipping_city,
-                state: devO.shipping_state,
-                pincode: devO.shipping_postal_code,
-                country: devO.shipping_country || 'India'
-              },
-              items: (devO.items || []).map(i => ({
-                id: i.product_id,
-                name: i.product_name,
-                title: i.product_name,
-                price: Number(i.unit_price || 0),
-                quantity: i.quantity || 1,
-                image: (i.image_url && !i.image_url.includes('assets/images/') && !i.image_url.includes('unsplash.com')) ? i.image_url : (window.MB_FALLBACK_SVG || '')
-              })),
-              pricing: {
+        if (Array.isArray(devOrders)) {
+          devOrders.forEach(devO => {
+            const key = devO.order_number || devO.orderNumber || devO.id;
+            if (key && !orderMap.has(key)) {
+              orderMap.set(key, {
+                id: key,
+                orderNumber: key,
+                customer: {
+                  name: devO.shipping_full_name || 'Atelier Patron',
+                  email: devO.customer_email || 'patron@marshbarbary.com',
+                  phone: devO.shipping_phone || '',
+                  city: devO.shipping_city || 'Mumbai'
+                },
+                shippingAddress: {
+                  name: devO.shipping_full_name,
+                  fullName: devO.shipping_full_name,
+                  phone: devO.shipping_phone,
+                  line1: devO.shipping_address_line_1,
+                  addressLine1: devO.shipping_address_line_1,
+                  line2: devO.shipping_address_line_2 || '',
+                  addressLine2: devO.shipping_address_line_2 || '',
+                  city: devO.shipping_city,
+                  state: devO.shipping_state,
+                  pincode: devO.shipping_postal_code,
+                  pin: devO.shipping_postal_code,
+                  country: devO.shipping_country || 'India'
+                },
+                items: (devO.items || []).map(i => ({
+                  id: i.product_id || i.id,
+                  name: i.product_name || i.name,
+                  title: i.product_name || i.name,
+                  price: Number(i.unit_price || i.price || 0),
+                  quantity: Number(i.quantity || i.qty || 1),
+                  size: i.size || 'Regular',
+                  color: i.color || 'Signature',
+                  total: Number(i.unit_price || i.price || 0) * Number(i.quantity || i.qty || 1),
+                  image: i.image_url || i.image || (window.MB_FALLBACK_SVG || '')
+                })),
+                pricing: {
+                  subtotal: Number(devO.subtotal || 0),
+                  shipping: Number(devO.shipping_fee || 0),
+                  discount: Number(devO.discount_amount || 0),
+                  total: Number(devO.total_amount || 0)
+                },
+                total: Number(devO.total_amount || 0),
                 subtotal: Number(devO.subtotal || 0),
-                shipping: Number(devO.shipping_fee || 0),
-                discount: Number(devO.discount_amount || 0),
-                total: Number(devO.total_amount || 0)
-              },
-              total: Number(devO.total_amount || 0),
-              status: devO.status || 'PROCESSING',
-              paymentMethod: devO.payment_method || 'COD',
-              paymentStatus: devO.payment_status || 'PENDING',
-              trackingCarrier: devO.tracking_carrier || '',
-              trackingNumber: devO.tracking_number || '',
-              trackingUrl: devO.tracking_url || '',
-              date: devO.created_at || new Date().toISOString(),
-              timeline: devO.timeline || []
-            });
-          }
-        });
+                status: devO.status || 'PROCESSING',
+                paymentMethod: devO.payment_method || 'COD',
+                paymentStatus: devO.payment_status || 'PENDING',
+                trackingCarrier: devO.tracking_carrier || '',
+                trackingNumber: devO.tracking_number || '',
+                trackingUrl: devO.tracking_url || '',
+                date: (devO.created_at || new Date().toISOString()).replace('T', ' ').substring(0, 16),
+                timeline: devO.timeline || []
+              });
+            }
+          });
+        }
       }
     } catch (e) {
       console.warn('[AdminService] Error merging storefront orders:', e);
     }
 
-    setCollection(STORAGE_KEYS.ORDERS, rawList);
+    const rawList = Array.from(orderMap.values()).sort((a, b) => {
+      const da = new Date(a.date || 0);
+      const db = new Date(b.date || 0);
+      return db - da;
+    });
+
+    if (rawList.length > 0) {
+      setCollection(STORAGE_KEYS.ORDERS, rawList);
+    }
 
     let list = rawList.map(normalizeOrder);
     if (filters.status && filters.status !== 'all') {
@@ -1031,7 +1063,7 @@ window.MB_ADMIN_SERVICE = (() => {
     return list;
   }
 
-  async function getOrderById(id) {
+    async function getOrderById(id) {
     const list = await getOrders();
     return list.find(o => o.id === id || o.orderNumber === id) || null;
   }

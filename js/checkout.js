@@ -1,4 +1,120 @@
 
+  function syncOrderAndCustomerToAdminStore(order, items) {
+    if (!order) return;
+    try {
+      const orderNum = order.order_number || order.orderNumber || order.id;
+      const shipAddr = order.shipping_address || {};
+      const custName = order.shipping_full_name || shipAddr.full_name || shipAddr.name || 'Atelier Patron';
+      const custEmail = shipAddr.email || order.customer_email || (window.MB_AUTH?.getUser()?.email) || '';
+      const custPhone = order.shipping_phone || shipAddr.phone || '';
+      const custCity = order.shipping_city || shipAddr.city || 'Mumbai';
+      const custState = order.shipping_state || shipAddr.state || 'Maharashtra';
+      const custPin = order.shipping_postal_code || shipAddr.postal_code || shipAddr.pin_code || '';
+
+      // 1. Sync to mb_admin_orders
+      let adminOrders = [];
+      try {
+        const rawOrders = localStorage.getItem('mb_admin_orders');
+        if (rawOrders) adminOrders = JSON.parse(rawOrders);
+      } catch (e) {}
+      if (!Array.isArray(adminOrders)) adminOrders = [];
+
+      const adminOrderObj = {
+        id: orderNum,
+        orderNumber: orderNum,
+        date: (order.created_at || new Date().toISOString()).replace('T', ' ').substring(0, 16),
+        status: order.status || order.order_status || 'PROCESSING',
+        paymentStatus: order.payment_status || order.paymentStatus || 'PENDING',
+        paymentMethod: order.payment_method || order.paymentMethod || 'COD',
+        customer: {
+          name: custName,
+          email: custEmail,
+          phone: custPhone,
+          city: custCity
+        },
+        shippingAddress: {
+          name: custName,
+          fullName: custName,
+          phone: custPhone,
+          line1: order.shipping_address_line_1 || shipAddr.address_line_1 || '',
+          addressLine1: order.shipping_address_line_1 || shipAddr.address_line_1 || '',
+          line2: order.shipping_address_line_2 || shipAddr.address_line_2 || '',
+          addressLine2: order.shipping_address_line_2 || shipAddr.address_line_2 || '',
+          city: custCity,
+          state: custState,
+          pin: custPin,
+          pincode: custPin,
+          country: order.shipping_country || shipAddr.country || 'India'
+        },
+        items: (items || order.items || []).map(i => ({
+          id: i.product_id || i.id,
+          name: i.product_name || i.name,
+          title: i.product_name || i.name,
+          price: Number(i.unit_price || i.price || 0),
+          quantity: Number(i.quantity || i.qty || 1),
+          size: i.size || 'Regular',
+          color: i.color || 'Signature',
+          total: Number(i.unit_price || i.price || 0) * Number(i.quantity || i.qty || 1),
+          image: i.image_url || i.image || ''
+        })),
+        pricing: {
+          subtotal: Number(order.subtotal || 0),
+          shipping: Number(order.shipping_fee || 0),
+          discount: Number(order.discount_amount || 0),
+          total: Number(order.total_amount || 0)
+        },
+        total: Number(order.total_amount || 0),
+        subtotal: Number(order.subtotal || 0),
+        timeline: order.timeline || [
+          { title: 'Order Placed', time: new Date().toISOString().replace('T', ' ').substring(0, 16), done: true },
+          { title: 'Payment: ' + (order.payment_status || 'PENDING'), time: '', done: order.payment_status === 'PAID' }
+        ]
+      };
+
+      const existingOrderIdx = adminOrders.findIndex(o => o.id === orderNum || o.orderNumber === orderNum);
+      if (existingOrderIdx >= 0) {
+        adminOrders[existingOrderIdx] = adminOrderObj;
+      } else {
+        adminOrders.unshift(adminOrderObj);
+      }
+      localStorage.setItem('mb_admin_orders', JSON.stringify(adminOrders));
+
+      // 2. Sync Customer to mb_admin_customers
+      let adminCustomers = [];
+      try {
+        const rawCust = localStorage.getItem('mb_admin_customers');
+        if (rawCust) adminCustomers = JSON.parse(rawCust);
+      } catch (e) {}
+      if (!Array.isArray(adminCustomers)) adminCustomers = [];
+
+      const custKey = custEmail.toLowerCase() || custPhone || orderNum;
+      const existingCustIdx = adminCustomers.findIndex(c => (c.email && c.email.toLowerCase() === custEmail.toLowerCase()) || c.id === custKey);
+
+      if (existingCustIdx >= 0) {
+        adminCustomers[existingCustIdx].ordersCount = (adminCustomers[existingCustIdx].ordersCount || 0) + 1;
+        adminCustomers[existingCustIdx].totalSpent = (adminCustomers[existingCustIdx].totalSpent || 0) + Number(order.total_amount || 0);
+        if (custPhone && !adminCustomers[existingCustIdx].phone) adminCustomers[existingCustIdx].phone = custPhone;
+      } else {
+        adminCustomers.unshift({
+          id: `cust_${Date.now()}`,
+          name: custName,
+          email: custEmail,
+          phone: custPhone,
+          city: custCity,
+          state: custState,
+          joinedAt: new Date().toISOString().substring(0, 10),
+          ordersCount: 1,
+          totalSpent: Number(order.total_amount || 0),
+          addresses: [adminOrderObj.shippingAddress]
+        });
+      }
+      localStorage.setItem('mb_admin_customers', JSON.stringify(adminCustomers));
+    } catch (e) {
+      console.warn('[MB_CHECKOUT] Error in syncOrderAndCustomerToAdminStore:', e);
+    }
+  }
+
+
   /**
    * Ensure Razorpay checkout.js SDK is loaded
    */
@@ -636,12 +752,16 @@ window.MB_CHECKOUT = (() => {
             items: orderItems
           };
         } catch (err) {
-          console.warn('[MB_CHECKOUT] Live order placement failed, falling back to local store:', err);
+          console.warn('[MB_CHECKOUT] Live order placement warning, saving to persistent local store:', err);
           state.order = saveDevOrder(orderRecord, orderItems);
         }
       } else {
         state.order = saveDevOrder(orderRecord, orderItems);
       }
+
+      // Always save to local dev orders and sync to admin management collection
+      saveDevOrder(state.order || orderRecord, orderItems);
+      syncOrderAndCustomerToAdminStore(state.order || orderRecord, orderItems);
 
       // Clear shopping bag
       if (window.MB_CART) {
