@@ -262,9 +262,39 @@ window.MB_AUTH = (() => {
     resetPassword,
     requireAuth,
     syncCustomerToAdminStore,
-    getUser: () => currentUser,
+    getUser: () => {
+      if (currentUser) return currentUser;
+      try {
+        const devRaw = localStorage.getItem('mb_dev_customer_session');
+        if (devRaw) {
+          const parsed = JSON.parse(devRaw);
+          if (parsed && parsed.user) return parsed.user;
+        }
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+            const parsed = JSON.parse(localStorage.getItem(key));
+            if (parsed && parsed.user) return parsed.user;
+          }
+        }
+      } catch (e) {}
+      return null;
+    },
     getSession: () => currentSession,
-    isAuthenticated: () => !!currentUser
+    isAuthenticated: () => {
+      if (currentUser) return true;
+      try {
+        if (localStorage.getItem('mb_dev_customer_session')) return true;
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+            const parsed = JSON.parse(localStorage.getItem(key));
+            if (parsed && (parsed.user || parsed.access_token)) return true;
+          }
+        }
+      } catch (e) {}
+      return false;
+    }
   };
 })();
 
