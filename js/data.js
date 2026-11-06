@@ -241,6 +241,14 @@ window.MB_DATA.loadLiveCatalog = async function() {
         try {
           if (liveHero[0].desktop_image_path) {
             localStorage.setItem('mb_hero_image', liveHero[0].desktop_image_path);
+            const raw = localStorage.getItem('mb_admin_homepage');
+            if (raw) {
+              const cfg = JSON.parse(raw);
+              if (cfg && cfg.hero) {
+                cfg.hero.image = liveHero[0].desktop_image_path;
+                localStorage.setItem('mb_admin_homepage', JSON.stringify(cfg));
+              }
+            }
           }
         } catch(e) {}
       }

@@ -155,19 +155,34 @@
         <a href="shop.html" class="hero-mobile-cta">Shop Collection &rarr;</a>
       </div>
       <script>
-        // Apply admin/Supabase hero image immediately on parse
+        // Apply admin/Supabase hero image immediately on parse, purging any stale/corrupted legacy URLs
         (function() {
           try {
+            var defaultHero = 'https://i.postimg.cc/tJqvWWww/Maven-Pro-Landscape-Poster-1-jpg.jpg';
             var el = document.querySelector('.hero-main-visual');
+            var isStale = function(url) {
+              return !url || url.indexOf('cdninstagram') !== -1 || url.indexOf('fbcdn') !== -1 || url.indexOf('unsplash') !== -1;
+            };
             var saved = localStorage.getItem('mb_hero_image');
-            if (!saved) {
-              var raw = localStorage.getItem('mb_admin_homepage');
-              if (raw) {
-                var cfg = JSON.parse(raw);
-                if (cfg && cfg.hero && cfg.hero.image) saved = cfg.hero.image;
-              }
+            if (isStale(saved)) {
+              saved = null;
+              try { localStorage.removeItem('mb_hero_image'); } catch(e) {}
             }
-            if (saved && el) {
+            var raw = localStorage.getItem('mb_admin_homepage');
+            if (raw) {
+              try {
+                var cfg = JSON.parse(raw);
+                if (cfg && cfg.hero) {
+                  if (isStale(cfg.hero.image)) {
+                    cfg.hero.image = defaultHero;
+                    localStorage.setItem('mb_admin_homepage', JSON.stringify(cfg));
+                  } else if (!saved) {
+                    saved = cfg.hero.image;
+                  }
+                }
+              } catch(e) {}
+            }
+            if (saved && el && !isStale(saved)) {
               el.src = saved;
             }
           } catch(e) {}

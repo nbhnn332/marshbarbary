@@ -1374,7 +1374,11 @@ window.MB_ADMIN_SERVICE = (() => {
   async function getHomepageConfig() {
     const config = getCollection(STORAGE_KEYS.HOMEPAGE, window.MB_ADMIN_MODELS?.seedHomepageConfig);
     const cachedHero = typeof localStorage !== 'undefined' ? localStorage.getItem('mb_hero_image') : null;
-    if (cachedHero && (!config.hero || !config.hero.image)) {
+    const isStale = (u) => !u || u.includes('cdninstagram') || u.includes('fbcdn') || u.includes('unsplash');
+    if (config.hero && isStale(config.hero.image)) {
+      config.hero.image = '';
+    }
+    if (cachedHero && !isStale(cachedHero) && (!config.hero || !config.hero.image)) {
       config.hero = config.hero || {};
       config.hero.image = cachedHero;
     }

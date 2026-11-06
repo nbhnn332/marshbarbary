@@ -33,7 +33,17 @@ function hydrateHomepageFromAdmin() {
     if (heroSection) {
       heroSection.style.display = config.hero.enabled === false ? 'none' : '';
     }
-    const heroImg = config.hero.image || localStorage.getItem('mb_hero_image');
+    // Authoritative hero: always prioritize live Supabase hero if loaded
+    const isStaleUrl = (u) => !u || u.includes('cdninstagram') || u.includes('fbcdn') || u.includes('unsplash');
+    let heroImg = window.MB_DATA?.hero?.desktop_image_path;
+    if (!heroImg && config.hero.image && !isStaleUrl(config.hero.image)) {
+      heroImg = config.hero.image;
+    }
+    if (!heroImg) {
+      const cached = localStorage.getItem('mb_hero_image');
+      if (cached && !isStaleUrl(cached)) heroImg = cached;
+    }
+
     if (heroVisual && heroImg) {
       heroVisual.src = cleanImagePath(heroImg);
       heroVisual.style.display = 'block';
