@@ -99,6 +99,9 @@ window.MB_PROFILE = (() => {
 
     // Persist in dev storage
     try {
+      if (window.MB_AUTH && typeof window.MB_AUTH.syncCustomerToAdminStore === 'function') {
+        window.MB_AUTH.syncCustomerToAdminStore(user, { firstName: cleanFirst, lastName: cleanLast, phone: cleanPhone });
+      }
       const devSessionRaw = localStorage.getItem('mb_dev_customer_session');
       if (devSessionRaw) {
         const session = JSON.parse(devSessionRaw);

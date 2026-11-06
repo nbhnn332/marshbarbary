@@ -66,6 +66,55 @@ window.MB_AUTH = (() => {
   }
 
   /**
+   * Synchronize customer details to admin customer collection so admin panel displays all clients
+   */
+  function syncCustomerToAdminStore(user, extra = {}) {
+    if (!user || !user.email) return;
+    try {
+      const meta = user.user_metadata || {};
+      const firstName = extra.firstName || meta.first_name || '';
+      const lastName = extra.lastName || meta.last_name || '';
+      const fullName = [firstName, lastName].filter(Boolean).join(' ') || extra.fullName || meta.full_name || user.email.split('@')[0];
+      const phone = extra.phone || meta.phone || '';
+
+      let customers = [];
+      try {
+        const raw = localStorage.getItem('mb_admin_customers');
+        if (raw) customers = JSON.parse(raw);
+      } catch (e) {}
+      if (!Array.isArray(customers)) customers = [];
+
+      const existingIdx = customers.findIndex(c => (user.id && c.id === user.id) || (c.email && c.email.toLowerCase() === user.email.toLowerCase()));
+      const nowIso = new Date().toISOString().substring(0, 10);
+
+      if (existingIdx >= 0) {
+        customers[existingIdx].name = fullName || customers[existingIdx].name;
+        if (phone) customers[existingIdx].phone = phone;
+        if (user.id) customers[existingIdx].id = user.id;
+        if (extra.city) customers[existingIdx].city = extra.city;
+        if (extra.state) customers[existingIdx].state = extra.state;
+      } else {
+        customers.unshift({
+          id: user.id || `cust-${Date.now()}`,
+          name: fullName,
+          email: user.email,
+          phone: phone,
+          city: extra.city || 'Mumbai',
+          state: extra.state || 'Maharashtra',
+          joinedAt: (user.created_at || nowIso).substring(0, 10),
+          ordersCount: 0,
+          totalSpent: 0,
+          addresses: []
+        });
+      }
+
+      localStorage.setItem('mb_admin_customers', JSON.stringify(customers));
+    } catch (err) {
+      console.warn('[MB_AUTH] Error syncing to admin customer store:', err);
+    }
+  }
+
+  /**
    * Attach global click handler for Account buttons
    */
   function setupAccountClickHandlers() {
@@ -75,11 +124,11 @@ window.MB_AUTH = (() => {
 
       e.preventDefault();
       if (currentUser) {
-        window.location.href = 'account/index.html';
+        window.location.href = '/account/index.html';
       } else {
         const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-        const returnUrl = currentPath === 'login.html' ? 'index.html' : currentPath;
-        window.location.href = `login.html?redirect=${encodeURIComponent(returnUrl)}`;
+        const returnUrl = currentPath === 'login.html' ? '/index.html' : window.location.pathname;
+        window.location.href = `/login.html?redirect=${encodeURIComponent(returnUrl)}`;
       }
     });
   }
@@ -102,6 +151,9 @@ window.MB_AUTH = (() => {
       const { data } = await supabase.auth.getSession();
       currentSession = data?.session || null;
       currentUser = currentSession?.user || null;
+      if (currentUser) {
+        syncCustomerToAdminStore(currentUser);
+      }
     } catch (err) {
       console.warn('[MB_AUTH] Error restoring session:', err);
     }
@@ -110,6 +162,9 @@ window.MB_AUTH = (() => {
     supabase.auth.onAuthStateChange((event, session) => {
       currentSession = session || null;
       currentUser = session?.user || null;
+      if (currentUser) {
+        syncCustomerToAdminStore(currentUser);
+      }
       syncDom();
       notifySubscribers();
     });
@@ -138,6 +193,9 @@ window.MB_AUTH = (() => {
     });
 
     if (error) throw error;
+    if (data?.user) {
+      syncCustomerToAdminStore(data.user, { firstName, lastName, phone });
+    }
     return data;
   }
 
@@ -154,6 +212,9 @@ window.MB_AUTH = (() => {
     });
 
     if (error) throw error;
+    if (data?.user) {
+      syncCustomerToAdminStore(data.user);
+    }
     return data;
   }
 
@@ -200,6 +261,7 @@ window.MB_AUTH = (() => {
     signOut,
     resetPassword,
     requireAuth,
+    syncCustomerToAdminStore,
     getUser: () => currentUser,
     getSession: () => currentSession,
     isAuthenticated: () => !!currentUser

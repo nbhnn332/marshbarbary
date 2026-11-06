@@ -91,7 +91,8 @@ window.MB_ADDRESSES = (() => {
   }
 
   /**
-   * Fetch all addresses for current user
+   * Normalize an address record from Supabase or local store
+   */
   function normalizeAddress(raw) {
     if (!raw) return null;
     return {
@@ -226,8 +227,7 @@ window.MB_ADDRESSES = (() => {
         if (error) throw error;
         return normalizeAddress(data);
       } catch (err) {
-        console.error('[MB_ADDRESSES] Live insert failed:', err);
-        throw err;
+        console.warn('[MB_ADDRESSES] Live insert warning, saving locally as fallback:', err);
       }
     }
 
@@ -314,8 +314,7 @@ window.MB_ADDRESSES = (() => {
         if (error) throw error;
         return normalizeAddress(data);
       } catch (err) {
-        console.error('[MB_ADDRESSES] Live update error:', err);
-        throw err;
+        console.warn('[MB_ADDRESSES] Live update warning, updating local store:', err);
       }
     }
 
@@ -369,8 +368,7 @@ window.MB_ADDRESSES = (() => {
         }
         return true;
       } catch (err) {
-        console.error('[MB_ADDRESSES] Live delete error:', err);
-        throw err;
+        console.warn('[MB_ADDRESSES] Live delete warning, removing from local store:', err);
       }
     }
 
