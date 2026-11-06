@@ -155,14 +155,15 @@ window.MB_ADMIN_VIEWS.settings = {
               </div>
 
               <div class="admin-form-group">
-                <label class="admin-label" for="rzp-secret">Key Secret (Masked)</label>
-                <input type="password" id="rzp-secret" class="admin-input" value="••••••••••••••••••••••••" ${!canManagePayments ? 'disabled' : ''} placeholder="••••••••••••••••">
-                <div style="font-size: 10px; color: var(--admin-text-muted); margin-top: 4px;">Protected via Supabase Vault in production</div>
+                <label class="admin-label" for="rzp-secret">Key Secret</label>
+                <input type="password" id="rzp-secret" class="admin-input" value="${rzp.secret || ''}" ${!canManagePayments ? 'disabled' : ''} placeholder="Enter Razorpay Secret Key">
+                <div style="font-size: 10px; color: var(--admin-text-muted); margin-top: 4px;">Stored in payment settings. Kept confidential.</div>
               </div>
 
               <div class="admin-form-group">
                 <label class="admin-label" for="rzp-webhook">Webhook Verification Secret</label>
-                <input type="password" id="rzp-webhook" class="admin-input" value="••••••••••••••••" ${!canManagePayments ? 'disabled' : ''}>
+                <input type="text" id="rzp-webhook" class="admin-input" value="${rzp.webhookSecret || ''}" ${!canManagePayments ? 'disabled' : ''} placeholder="Enter Webhook Secret (e.g. mb_rzp_wh_secret)">
+                <div style="font-size: 10px; color: var(--admin-text-muted); margin-top: 4px;">Must match RAZORPAY_WEBHOOK_SECRET in Vercel Environment Variables.</div>
               </div>
             </div>
 
@@ -429,7 +430,9 @@ window.MB_ADMIN_VIEWS.settings = {
               ...(currentPayments.razorpay || {}),
               enabled: document.getElementById('rzp-enabled').checked,
               mode: document.getElementById('rzp-env').value,
-              keyId: document.getElementById('rzp-key').value.trim()
+              keyId: document.getElementById('rzp-key').value.trim(),
+              secret: document.getElementById('rzp-secret').value.trim() || currentPayments.razorpay?.secret || '',
+              webhookSecret: document.getElementById('rzp-webhook').value.trim() || currentPayments.razorpay?.webhookSecret || ''
             },
             phonepe: {
               ...(currentPayments.phonepe || {}),
