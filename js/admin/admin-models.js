@@ -130,7 +130,9 @@ window.MB_ADMIN_MODELS = (() => {
   const seedPaymentSettings = {
     razorpay: {
       enabled: true,
-      keyId: 'rzp_test_mbAtelier9102',
+      keyId: 'rzp_test_Twr4873ZsjpyVK',
+      secret: 'cJcGkzyCp0H3FjzoagU2eAxD',
+      webhookSecret: '212113',
       secretMasked: '••••••••••••••••••••••••',
       mode: 'test'
     },

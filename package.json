@@ -6,9 +6,9 @@
     "vite": "./build.js"
   },
   "scripts": {
-    "dev": "node build.js",
+    "dev": "node dev-server.js",
     "build": "node build.js",
-    "preview": "node build.js",
+    "preview": "node dev-server.js",
     "vite": "node build.js",
     "postinstall": "node -e \"const fs=require('fs');fs.mkdirSync('node_modules/.bin',{recursive:true});try{fs.symlinkSync('../../build.js','node_modules/.bin/vite')}catch(e){fs.copyFileSync('build.js','node_modules/.bin/vite')};try{fs.chmodSync('node_modules/.bin/vite',0o755)}catch(e){}\""
   },
