@@ -1176,6 +1176,78 @@ window.MB_ADMIN_SERVICE = (() => {
           });
         }
 
+        // 2. Merge local admin customers (mb_admin_customers)
+        try {
+          const stored = getCollection(STORAGE_KEYS.CUSTOMERS, []);
+          if (Array.isArray(stored)) {
+            stored.forEach(cust => {
+              const key = cust.id || (cust.email || '').toLowerCase();
+              if (key && !customerMap.has(key)) {
+                customerMap.set(key, cust);
+              } else if (key && customerMap.has(key)) {
+                const existing = customerMap.get(key);
+                if (!existing.phone && cust.phone) existing.phone = cust.phone;
+                if ((!existing.name || existing.name === 'Patron') && cust.name) existing.name = cust.name;
+              }
+            });
+          }
+        } catch(e) {}
+
+        // 3. Merge registered users from dev / local auth
+        try {
+          const devUsersRaw = localStorage.getItem('mb_dev_registered_users');
+          if (devUsersRaw) {
+            const devUsers = JSON.parse(devUsersRaw);
+            if (Array.isArray(devUsers)) {
+              devUsers.forEach(u => {
+                const email = (u.email || '').toLowerCase();
+                const meta = u.user_metadata || {};
+                const name = [meta.first_name, meta.last_name].filter(Boolean).join(' ') || u.name || 'Patron';
+                const key = u.id || email;
+                if (key && !customerMap.has(key)) {
+                  customerMap.set(key, {
+                    id: key,
+                    name: name,
+                    email: email,
+                    phone: meta.phone || u.phone || '',
+                    city: 'Mumbai',
+                    state: 'Maharashtra',
+                    joinedAt: (u.created_at || new Date().toISOString()).substring(0, 10),
+                    ordersCount: 0,
+                    totalSpent: 0,
+                    addresses: []
+                  });
+                }
+              });
+            }
+          }
+        } catch(e) {}
+
+        // 4. Merge current customer session if logged in
+        try {
+          const activeUser = window.MB_AUTH ? window.MB_AUTH.getUser() : null;
+          if (activeUser && activeUser.email) {
+            const email = activeUser.email.toLowerCase();
+            const meta = activeUser.user_metadata || {};
+            const name = [meta.first_name, meta.last_name].filter(Boolean).join(' ') || email.split('@')[0];
+            const key = activeUser.id || email;
+            if (!customerMap.has(key)) {
+              customerMap.set(key, {
+                id: key,
+                name: name,
+                email: email,
+                phone: meta.phone || '',
+                city: 'Mumbai',
+                state: 'Maharashtra',
+                joinedAt: (activeUser.created_at || new Date().toISOString()).substring(0, 10),
+                ordersCount: 0,
+                totalSpent: 0,
+                addresses: []
+              });
+            }
+          }
+        } catch(e) {}
+
         rawList = Array.from(customerMap.values());
       } catch (err) {
         console.warn('[AdminService] Supabase getCustomers error:', err);
