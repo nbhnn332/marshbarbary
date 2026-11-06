@@ -1,3 +1,25 @@
+
+  /**
+   * Ensure Razorpay checkout.js SDK is loaded
+   */
+  function loadRazorpaySdk() {
+    return new Promise((resolve, reject) => {
+      if (window.Razorpay) return resolve(window.Razorpay);
+      const existing = document.querySelector('script[src*="checkout.razorpay.com"]');
+      if (existing) {
+        existing.addEventListener('load', () => resolve(window.Razorpay));
+        existing.addEventListener('error', () => reject(new Error('Failed to load Razorpay SDK.')));
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      s.async = true;
+      s.onload = () => resolve(window.Razorpay);
+      s.onerror = () => reject(new Error('Failed to load Razorpay payment gateway.'));
+      document.head.appendChild(s);
+    });
+  }
+
 /**
  * MARSH BARBARY — CHECKOUT CONTROLLER (js/checkout.js)
  * Manages the multi-step checkout wizard:
@@ -403,150 +425,236 @@ window.MB_CHECKOUT = (() => {
       if (subtotal > (Number(cod.maxOrderValue) || 5000)) {
         throw new Error(`Order subtotal exceeds the Cash on Delivery limit of ₹${(Number(cod.maxOrderValue) || 5000).toLocaleString('en-IN')}. Please pay online.`);
       }
-    } else if (state.paymentMethod === 'RAZORPAY') {
+      // COD proceeds directly to order placement
+      await finalizeOrder('PENDING', null);
+      return;
+    }
+
+    if (state.paymentMethod === 'RAZORPAY') {
       if (payments.razorpay && payments.razorpay.enabled === false) {
         throw new Error('Razorpay gateway is currently unavailable.');
       }
-    } else if (state.paymentMethod === 'PHONEPE') {
+
+      const RazorpaySdk = await loadRazorpaySdk();
+      if (!RazorpaySdk) {
+        throw new Error('Razorpay payment gateway failed to initialize. Please check your connection.');
+      }
+
+      // Authoritative Razorpay Key ID resolution
+      const rzpKeyId =
+        payments.razorpay?.keyId ||
+        window.MB_ADMIN_MODELS?.seedPaymentSettings?.razorpay?.keyId ||
+        window.__ENV__?.VITE_RAZORPAY_KEY_ID ||
+        'rzp_test_Twr4873ZsjpyVK';
+
+      const addr = state.selectedAddress;
+      const placeOrderBtn = document.getElementById('btn-place-order');
+
+      const options = {
+        key: rzpKeyId,
+        amount: Math.round(totalAmount * 100), // Amount in paise
+        currency: 'INR',
+        name: 'MARSH BARBARY',
+        description: `Atelier Acquisition #${orderNumber}`,
+        image: 'https://marshbarbary.vercel.app/assets/images/logo-emblem.png',
+        prefill: {
+          name: addr.full_name || '',
+          email: user.email || '',
+          contact: addr.phone || ''
+        },
+        notes: {
+          order_number: orderNumber,
+          destination_city: addr.city || 'Mumbai'
+        },
+        theme: {
+          color: '#A36B4F'
+        },
+        handler: async function (response) {
+          try {
+            if (placeOrderBtn) {
+              placeOrderBtn.disabled = true;
+              placeOrderBtn.querySelector('span').textContent = 'Confirming Acquisition...';
+            }
+            await finalizeOrder('PAID', response.razorpay_payment_id || 'pay_test_' + Date.now());
+          } catch (finErr) {
+            alert('Payment succeeded but order recording encountered an error: ' + finErr.message);
+            if (placeOrderBtn) {
+              placeOrderBtn.disabled = false;
+              placeOrderBtn.querySelector('span').textContent = 'Place Order →';
+            }
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            if (placeOrderBtn) {
+              placeOrderBtn.disabled = false;
+              placeOrderBtn.querySelector('span').textContent = 'Place Order →';
+            }
+          }
+        }
+      };
+
+      const rzpInstance = new RazorpaySdk(options);
+      rzpInstance.on('payment.failed', function (resp) {
+        alert(`Payment failed: ${resp.error?.description || 'Transaction was declined.'}`);
+        if (placeOrderBtn) {
+          placeOrderBtn.disabled = false;
+          placeOrderBtn.querySelector('span').textContent = 'Place Order →';
+        }
+      });
+
+      rzpInstance.open();
+      return;
+    }
+
+    if (state.paymentMethod === 'PHONEPE') {
       if (payments.phonepe && payments.phonepe.enabled === false) {
         throw new Error('PhonePe gateway is currently unavailable.');
       }
+      await finalizeOrder('PAID', 'ppe_' + Date.now());
+      return;
     }
 
-    // CRITICAL: Immutable Address Snapshot
-    const addr = state.selectedAddress;
-    const orderRecord = {
-      order_number: orderNumber,
-      auth_user_id: user.id,
-      customer_id: null,
-      selected_address_id: addr.id,
-      shipping_full_name: addr.full_name,
-      shipping_phone: addr.phone,
-      shipping_address_line_1: addr.address_line_1,
-      shipping_address_line_2: addr.address_line_2 || '',
-      shipping_landmark: addr.landmark || '',
-      shipping_city: addr.city,
-      shipping_state: addr.state,
-      shipping_postal_code: addr.postal_code,
-      shipping_country: addr.country || 'India',
-      subtotal: subtotal,
-      shipping_fee: shippingFee,
-      discount_amount: 0,
-      total_amount: totalAmount,
-      status: 'PROCESSING',
-      payment_method: state.paymentMethod,
-      payment_status: state.paymentMethod === 'COD' ? 'PENDING' : 'PAID',
-      timeline: [
-        {
-          status: 'ORDER_PLACED',
-          title: 'Order Placed',
-          description: 'Your order was received and confirmed by the atelier.',
-          timestamp: new Date().toISOString()
-        }
-      ],
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
+    throw new Error('Please select a valid payment method.');
 
-    const orderItems = cartState.items.map(item => {
-      const q = item.qty || item.quantity || 1;
-      const unit = Number(item.price) || 0;
-      return {
-        product_id: item.id || item.variantId || 'mb_item',
-        product_name: item.name,
-        sku: item.sku || `MB-${(item.name || '').substring(0, 3).toUpperCase()}`,
-        size: item.size || 'Regular',
-        color: item.color || 'Signature',
-        quantity: q,
-        unit_price: unit,
-        total_price: unit * q,
-        image_url: item.image || ''
+    async function finalizeOrder(paymentStatus, paymentId) {
+      const addr = state.selectedAddress;
+      const orderRecord = {
+        order_number: orderNumber,
+        auth_user_id: user.id,
+        customer_id: null,
+        selected_address_id: addr.id,
+        shipping_full_name: addr.full_name,
+        shipping_phone: addr.phone,
+        shipping_address_line_1: addr.address_line_1,
+        shipping_address_line_2: addr.address_line_2 || '',
+        shipping_landmark: addr.landmark || '',
+        shipping_city: addr.city,
+        shipping_state: addr.state,
+        shipping_postal_code: addr.postal_code,
+        shipping_country: addr.country || 'India',
+        subtotal: subtotal,
+        shipping_fee: shippingFee,
+        discount_amount: 0,
+        total_amount: totalAmount,
+        status: 'PROCESSING',
+        payment_method: state.paymentMethod,
+        payment_status: paymentStatus,
+        payment_id: paymentId,
+        timeline: [
+          {
+            status: 'ORDER_PLACED',
+            title: 'Order Placed',
+            description: paymentStatus === 'PAID'
+              ? `Payment confirmed (${paymentId || 'Online'}). Order accepted by the atelier.`
+              : 'Cash on Delivery order received and confirmed by the atelier.',
+            timestamp: new Date().toISOString()
+          }
+        ],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
-    });
 
-    const supabase = getClient();
-    if (window.MB_SUPABASE && window.MB_SUPABASE.isLive()) {
-      try {
-        const liveOrderRecord = {
-          order_number: orderNumber,
-          user_id: user.id,
-          address_id: (addr.id && addr.id.length > 20) ? addr.id : null,
-          shipping_address: {
-            full_name: addr.full_name,
-            phone: addr.phone,
-            address_line_1: addr.address_line_1 || addr.address_line1 || '',
-            address_line_2: addr.address_line_2 || addr.address_line2 || '',
-            landmark: addr.landmark || '',
-            city: addr.city,
-            state: addr.state,
-            postal_code: addr.postal_code || addr.pin_code || '',
-            country: addr.country || 'India'
-          },
-          subtotal: subtotal,
-          discount_amount: 0,
-          total_amount: totalAmount,
-          order_status: 'PROCESSING',
-          payment_method: state.paymentMethod,
-          payment_status: state.paymentMethod === 'COD' ? 'PENDING' : 'PAID',
-          notes: ''
+      const orderItems = cartState.items.map(item => {
+        const q = item.qty || item.quantity || 1;
+        const unit = Number(item.price) || 0;
+        return {
+          product_id: item.id || item.variantId || 'mb_item',
+          product_name: item.name,
+          sku: item.sku || `MB-${(item.name || '').substring(0, 3).toUpperCase()}`,
+          size: item.size || 'Regular',
+          color: item.color || 'Signature',
+          quantity: q,
+          unit_price: unit,
+          total_price: unit * q,
+          image_url: item.image || ''
         };
+      });
 
-        const { data: createdOrder, error: orderErr } = await supabase
-          .from('orders')
-          .insert(liveOrderRecord)
-          .select()
-          .single();
-
-        if (orderErr) throw orderErr;
-
-        const liveItemsWithOrderId = cartState.items.map(item => {
-          const q = item.qty || item.quantity || 1;
-          const unit = Number(item.price) || 0;
-          return {
-            order_id: createdOrder.id,
-            product_id: String(item.id || item.variantId || 'mb_item'),
-            product_name: item.name || 'Marsh Barbary Item',
-            sku: item.sku || null,
-            size: item.size || 'Regular',
-            color: item.color || 'Signature',
-            quantity: q,
-            unit_price: unit,
-            total_price: unit * q,
-            image_url: item.image || null
+      const supabase = getClient();
+      if (window.MB_SUPABASE && window.MB_SUPABASE.isLive()) {
+        try {
+          const liveOrderRecord = {
+            order_number: orderNumber,
+            user_id: user.id,
+            address_id: (addr.id && addr.id.length > 20) ? addr.id : null,
+            shipping_address: {
+              full_name: addr.full_name,
+              phone: addr.phone,
+              address_line_1: addr.address_line_1 || addr.address_line1 || '',
+              address_line_2: addr.address_line_2 || addr.address_line2 || '',
+              landmark: addr.landmark || '',
+              city: addr.city,
+              state: addr.state,
+              postal_code: addr.postal_code || addr.pin_code || '',
+              country: addr.country || 'India'
+            },
+            subtotal: subtotal,
+            discount_amount: 0,
+            total_amount: totalAmount,
+            order_status: 'PROCESSING',
+            payment_method: state.paymentMethod,
+            payment_status: paymentStatus,
+            notes: paymentId ? `Razorpay Payment ID: ${paymentId}` : ''
           };
-        });
 
-        const { error: itemsErr } = await supabase
-          .from('order_items')
-          .insert(liveItemsWithOrderId);
+          const { data: createdOrder, error: orderErr } = await supabase
+            .from('orders')
+            .insert(liveOrderRecord)
+            .select()
+            .single();
 
-        if (itemsErr) console.warn('[MB_CHECKOUT] Items insert warning:', itemsErr);
+          if (orderErr) throw orderErr;
 
-        state.order = {
-          ...orderRecord,
-          id: createdOrder.id,
-          order_number: createdOrder.order_number,
-          items: orderItems
-        };
-      } catch (err) {
-        console.warn('[MB_CHECKOUT] Live order placement failed, falling back to local store:', err);
+          const liveItemsWithOrderId = cartState.items.map(item => {
+            const q = item.qty || item.quantity || 1;
+            const unit = Number(item.price) || 0;
+            return {
+              order_id: createdOrder.id,
+              product_id: String(item.id || item.variantId || 'mb_item'),
+              product_name: item.name || 'Marsh Barbary Item',
+              sku: item.sku || null,
+              size: item.size || 'Regular',
+              color: item.color || 'Signature',
+              quantity: q,
+              unit_price: unit,
+              total_price: unit * q,
+              image_url: item.image || null
+            };
+          });
+
+          const { error: itemsErr } = await supabase
+            .from('order_items')
+            .insert(liveItemsWithOrderId);
+
+          if (itemsErr) console.warn('[MB_CHECKOUT] Items insert warning:', itemsErr);
+
+          state.order = {
+            ...orderRecord,
+            id: createdOrder.id,
+            order_number: createdOrder.order_number,
+            items: orderItems
+          };
+        } catch (err) {
+          console.warn('[MB_CHECKOUT] Live order placement failed, falling back to local store:', err);
+          state.order = saveDevOrder(orderRecord, orderItems);
+        }
+      } else {
         state.order = saveDevOrder(orderRecord, orderItems);
       }
-    } else {
-      state.order = saveDevOrder(orderRecord, orderItems);
-    }
 
-    // Clear cart shopping bag
-    if (window.MB_CART) {
-      window.MB_CART.clearCart();
-    }
+      // Clear shopping bag
+      if (window.MB_CART) {
+        window.MB_CART.clearCart();
+      }
 
-    // Render Confirmation Screen
-    renderConfirmationView();
-    updateStepView(4);
+      // Render Confirmation Screen
+      renderConfirmationView();
+      updateStepView(4);
+    }
   }
 
-  function saveDevOrder(orderRecord, items) {
+    function saveDevOrder(orderRecord, items) {
     const orderId = 'ord_' + Math.random().toString(36).substring(2, 10);
     const createdOrder = {
       id: orderId,
