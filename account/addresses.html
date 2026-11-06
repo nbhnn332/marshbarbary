@@ -218,7 +218,7 @@
       // 1. Guard route: redirect to login if not authenticated
       if (!window.MB_AUTH.isAuthenticated()) {
         const returnUrl = window.location.href;
-        window.location.href = `../login.html?redirect=${encodeURIComponent(returnUrl)}`;
+        window.location.href = `/login.html?redirect=${encodeURIComponent(returnUrl)}`;
         return;
       }
 
