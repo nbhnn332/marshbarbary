@@ -904,12 +904,35 @@ window.MB_ADMIN_SERVICE = (() => {
                 image: (i.image_url && !i.image_url.includes('unsplash.com')) ? i.image_url : (window.MB_FALLBACK_SVG || '')
               }));
 
+              let trackingCarrier = o.tracking_carrier || o.carrier_name || '';
+              let trackingNumber = o.tracking_number || '';
+              let trackingUrl = o.tracking_url || '';
+              if (o.notes && typeof o.notes === 'string') {
+                const tMatch = o.notes.match(/\[MB_TRACKING:({.*?})\]/);
+                if (tMatch && tMatch[1]) {
+                  try {
+                    const parsed = JSON.parse(tMatch[1]);
+                    if (!trackingCarrier && parsed.carrier) trackingCarrier = parsed.carrier;
+                    if (!trackingNumber && parsed.number) trackingNumber = parsed.number;
+                    if (!trackingUrl && parsed.url) trackingUrl = parsed.url;
+                  } catch (e) {}
+                }
+              }
+
               const orderKey = o.order_number || o.id;
               orderMap.set(orderKey, {
                 id: o.id,
                 orderNumber: orderKey,
                 date: (o.created_at || '').replace('T', ' ').substring(0, 16),
-                status: o.order_status || 'PROCESSING',
+                status: o.order_status || o.status || 'PROCESSING',
+                order_status: o.order_status || o.status || 'PROCESSING',
+                trackingCarrier,
+                trackingNumber,
+                trackingUrl,
+                tracking_carrier: trackingCarrier,
+                tracking_number: trackingNumber,
+                tracking_url: trackingUrl,
+                notes: o.notes || '',
                 paymentStatus: o.payment_status || 'PENDING',
                 paymentMethod: o.payment_method || 'COD',
                 customer: {
@@ -1085,41 +1108,140 @@ window.MB_ADMIN_SERVICE = (() => {
 
     const oldStatus = order.status;
     order.status = newStatus;
-    if (trackingInfo.carrier) order.trackingCarrier = trackingInfo.carrier;
-    if (trackingInfo.trackingNumber) order.trackingNumber = trackingInfo.trackingNumber;
-    if (trackingInfo.trackingUrl) order.trackingUrl = trackingInfo.trackingUrl;
+    order.order_status = newStatus;
+
+    if (trackingInfo.carrier) {
+      order.trackingCarrier = trackingInfo.carrier;
+      order.tracking_carrier = trackingInfo.carrier;
+      order.carrier_name = trackingInfo.carrier;
+    }
+    if (trackingInfo.trackingNumber) {
+      order.trackingNumber = trackingInfo.trackingNumber;
+      order.tracking_number = trackingInfo.trackingNumber;
+    }
+
+    // Auto-generate tracking URL if missing
+    let finalTrackingUrl = trackingInfo.trackingUrl || order.trackingUrl || '';
+    const carrierName = order.trackingCarrier || '';
+    const awbNum = order.trackingNumber || '';
+    if (!finalTrackingUrl && awbNum) {
+      const c = carrierName.toLowerCase();
+      const encoded = encodeURIComponent(awbNum.trim());
+      if (c.includes('blue') || c.includes('dart')) finalTrackingUrl = 'https://www.bluedart.com/tracking?awb=' + encoded;
+      else if (c.includes('delhivery')) finalTrackingUrl = 'https://www.delhivery.com/track/package/' + encoded;
+      else if (c.includes('dtdc')) finalTrackingUrl = 'https://www.dtdc.in/tracking/tracking_results.asp?pin=' + encoded;
+      else if (c.includes('post') || c.includes('speed')) finalTrackingUrl = 'https://www.indiapost.gov.in/_layouts/15/dpt.cept.tracking/trackconsignment.aspx';
+      else if (c.includes('shadowfax')) finalTrackingUrl = 'https://tracker.shadowfax.in/#/track/' + encoded;
+      else if (c.includes('ecom')) finalTrackingUrl = 'https://ecomexpress.in/tracking/?awb=' + encoded;
+    }
+    if (finalTrackingUrl) {
+      order.trackingUrl = finalTrackingUrl;
+      order.tracking_url = finalTrackingUrl;
+    }
 
     const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
     order.timeline = order.timeline || [];
     order.timeline.push({
       status: newStatus,
       time: now,
-      note: trackingInfo.note || `Order status updated to ${newStatus}`
+      note: trackingInfo.note || ('Order status updated to ' + newStatus)
     });
 
     setCollection(STORAGE_KEYS.ORDERS, list);
 
-    // Sync to Supabase orders table
+    // 1. Sync to mb_dev_orders (storefront customer order store)
+    try {
+      const devRaw = localStorage.getItem('mb_dev_orders');
+      if (devRaw) {
+        const devOrders = JSON.parse(devRaw);
+        if (Array.isArray(devOrders)) {
+          let updatedDev = false;
+          devOrders.forEach(devO => {
+            if (devO.order_number === order.orderNumber || devO.id === order.id || devO.order_number === id || devO.id === id) {
+              devO.status = newStatus;
+              devO.order_status = newStatus;
+              if (order.trackingCarrier) devO.tracking_carrier = order.trackingCarrier;
+              if (order.trackingNumber) devO.tracking_number = order.trackingNumber;
+              if (order.trackingUrl) devO.tracking_url = order.trackingUrl;
+              devO.updated_at = new Date().toISOString();
+              devO.timeline = order.timeline;
+              updatedDev = true;
+            }
+          });
+          if (updatedDev) {
+            localStorage.setItem('mb_dev_orders', JSON.stringify(devOrders));
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[AdminService] Error updating mb_dev_orders:', e);
+    }
+
+    // 2. Sync to Supabase orders table
     if (window.MB_SUPABASE_CONFIG && window.MB_SUPABASE_CONFIG.isLiveConfigured()) {
       const { url, anonKey } = window.MB_SUPABASE_CONFIG;
       const headers = { 'apikey': anonKey, 'Authorization': 'Bearer ' + anonKey, 'Content-Type': 'application/json' };
       try {
         const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(order.id);
-        const query = isUUID ? `id=eq.${order.id}` : `order_number=eq.${order.orderNumber}`;
-        await fetch(`${url}/rest/v1/orders?${query}`, {
+        const query = isUUID ? ('id=eq.' + order.id) : ('order_number=eq.' + (order.orderNumber || id));
+
+        const trackingTag = '[MB_TRACKING:' + JSON.stringify({
+          carrier: order.trackingCarrier || '',
+          number: order.trackingNumber || '',
+          url: order.trackingUrl || '',
+          status: newStatus
+        }) + ']';
+        const existingNotes = (order.notes || '').replace(/\[MB_TRACKING:.*?\]/g, '').trim();
+        const updatedNotes = existingNotes ? (existingNotes + '\n' + trackingTag) : trackingTag;
+
+        // Try primary update with tracking columns
+        const fullPayload = {
+          order_status: newStatus,
+          status: newStatus,
+          notes: updatedNotes,
+          tracking_carrier: order.trackingCarrier || '',
+          tracking_number: order.trackingNumber || '',
+          tracking_url: order.trackingUrl || '',
+          updated_at: new Date().toISOString()
+        };
+
+        const res = await fetch(url + '/rest/v1/orders?' + query, {
           method: 'PATCH',
           headers,
-          body: JSON.stringify({
-            order_status: newStatus,
-            updated_at: new Date().toISOString()
-          })
+          body: JSON.stringify(fullPayload)
         });
+
+        // Fallback without tracking columns if PGRST204 column missing
+        if (!res.ok) {
+          await fetch(url + '/rest/v1/orders?' + query, {
+            method: 'PATCH',
+            headers,
+            body: JSON.stringify({
+              order_status: newStatus,
+              notes: updatedNotes,
+              updated_at: new Date().toISOString()
+            })
+          });
+        }
       } catch (err) {
         console.warn('[AdminService] Supabase updateOrderStatus warning:', err);
       }
     }
 
-    logAction('ORDER_STATUS_UPDATED', 'Order', order.orderNumber, `Status updated from ${oldStatus} to ${newStatus}`);
+    // 3. Dispatch broadcast event for immediate real-time sync across open customer views
+    try {
+      window.dispatchEvent(new CustomEvent('mb:order-updated', {
+        detail: {
+          orderNumber: order.orderNumber,
+          status: newStatus,
+          trackingCarrier: order.trackingCarrier,
+          trackingNumber: order.trackingNumber,
+          trackingUrl: order.trackingUrl
+        }
+      }));
+    } catch (e) {}
+
+    logAction('ORDER_STATUS_UPDATED', 'Order', order.orderNumber, 'Status updated from ' + oldStatus + ' to ' + newStatus);
     return order;
   }
 

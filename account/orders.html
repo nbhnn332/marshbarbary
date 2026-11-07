@@ -173,7 +173,10 @@
       function renderOrders() {
         const filtered = activeFilter === 'all' 
           ? ordersList 
-          : ordersList.filter(o => (o.status || '').toUpperCase() === activeFilter.toUpperCase());
+          : ordersList.filter(o => {
+              const st = (o.status || o.order_status || '').toUpperCase();
+              return st === activeFilter.toUpperCase();
+            });
 
         if (filtered.length === 0) {
           container.innerHTML = `
@@ -248,6 +251,13 @@
                     Total (${itemsCount} ${itemsCount === 1 ? 'item' : 'items'}): <strong>₹${Number(o.total_amount).toLocaleString('en-IN')}</strong>
                     <span style="font-size: 11px; color: #8C827A; margin-left: 8px;">&bull; ${escapeHtml(o.payment_method)} (${escapeHtml(o.payment_status)})</span>
                   </div>
+                  ${o.tracking_number ? `
+                    <div style="margin-top: 6px; font-size: 11.5px; color: #7A5C43; background: #FAF7F2; border: 1px solid #ECE5DD; padding: 4px 8px; border-radius: 3px; display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                      <span>Carrier: <strong>${escapeHtml(o.tracking_carrier || 'Blue Dart Express')}</strong></span>
+                      <span>AWB / Tracking: <strong>${escapeHtml(o.tracking_number)}</strong></span>
+                      ${o.tracking_url ? `<a href="${escapeHtml(o.tracking_url)}" target="_blank" rel="noopener noreferrer" style="color: #B47154; text-decoration: underline; font-weight: 500;">Track Live &rarr;</a>` : ''}
+                    </div>
+                  ` : ''}
                 </div>
                 <button type="button" class="auth-btn-secondary btn-inspect-order" data-id="${o.id}">
                   Inspect Order
@@ -286,6 +296,11 @@
           </div>
         ` : '';
 
+        const currentStatus = (o.status || o.order_status || 'PROCESSING').toUpperCase();
+        const isCancelled = currentStatus === 'CANCELLED';
+        const isShippedOrDelivered = ['SHIPPED', 'DELIVERED'].includes(currentStatus);
+        const isDelivered = currentStatus === 'DELIVERED';
+
         const timelineHtml = `
           <div class="order-timeline-track">
             <div class="order-timeline-point active">
@@ -293,20 +308,20 @@
               <div class="order-timeline-title">Order Placed & Confirmed</div>
               <div class="order-timeline-desc">Received at our atelier. Payment: ${escapeHtml(o.payment_method)} (${escapeHtml(o.payment_status)}).</div>
             </div>
-            <div class="order-timeline-point ${o.status !== 'CANCELLED' ? 'active' : ''}">
+            <div class="order-timeline-point ${!isCancelled ? 'active' : ''}">
               <div class="order-timeline-dot"></div>
               <div class="order-timeline-title">Hand-Crafted Inspection</div>
-              <div class="order-timeline-desc">Garment undergo individual quality control and luxury packaging.</div>
+              <div class="order-timeline-desc">Garments undergo individual quality control and luxury packaging.</div>
             </div>
-            <div class="order-timeline-point ${['SHIPPED', 'DELIVERED'].includes(o.status) ? 'active' : ''}">
+            <div class="order-timeline-point ${isShippedOrDelivered ? 'active' : ''}">
               <div class="order-timeline-dot"></div>
               <div class="order-timeline-title">Dispatched with Courier</div>
-              <div class="order-timeline-desc">${o.tracking_number ? `In transit with ${o.tracking_carrier || 'Carrier'}.` : 'Preparing for carrier handover.'}</div>
+              <div class="order-timeline-desc">${o.tracking_number ? `In transit with ${o.tracking_carrier || 'Carrier'} (AWB: ${escapeHtml(o.tracking_number)}).` : 'Preparing for courier handover.'}</div>
             </div>
-            <div class="order-timeline-point ${o.status === 'DELIVERED' ? 'active' : ''}">
+            <div class="order-timeline-point ${isDelivered ? 'active' : ''}">
               <div class="order-timeline-dot"></div>
               <div class="order-timeline-title">Delivered</div>
-              <div class="order-timeline-desc">Received at customer destination.</div>
+              <div class="order-timeline-desc">Package safely received at customer destination.</div>
             </div>
           </div>
         `;
@@ -369,6 +384,16 @@
           .replace(/"/g, '&quot;')
           .replace(/'/g, '&#039;');
       }
+
+      // Real-time listener: refresh view when admin changes order status or tracking in another tab
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'mb_admin_orders' || e.key === 'mb_dev_orders') {
+          fetchAndRender();
+        }
+      });
+      window.addEventListener('mb:order-updated', () => {
+        fetchAndRender();
+      });
 
       // Initial fetch
       await fetchAndRender();

@@ -237,6 +237,11 @@ window.MB_ADMIN_VIEWS['order-detail'] = {
                 </div>
 
                 <div class="admin-form-group">
+                  <label class="admin-label" for="ful-url">Carrier Tracking URL (Optional - auto-generated if left blank)</label>
+                  <input type="url" id="ful-url" class="admin-input" placeholder="https://..." value="${order.trackingUrl || ''}">
+                </div>
+
+                <div class="admin-form-group">
                   <label class="admin-label" for="ful-note">Internal Status Update Note</label>
                   <input type="text" id="ful-note" class="admin-input" placeholder="e.g. Dispatched via premium surface courier">
                 </div>
@@ -492,9 +497,16 @@ window.MB_ADMIN_VIEWS['order-detail'] = {
       const nextStatus = e.currentTarget.dataset.nextStatus;
       if (!nextStatus) return;
 
+      const carrier = document.getElementById('ful-carrier')?.value.trim() || order.trackingCarrier || 'Blue Dart Express';
+      const trackingNumber = document.getElementById('ful-tracking')?.value.trim() || order.trackingNumber || '';
+      const trackingUrl = document.getElementById('ful-url')?.value.trim() || order.trackingUrl || '';
+
       try {
         await service.updateOrderStatus(order.orderNumber, nextStatus, {
-          note: `Order transitioned to ${nextStatus} via one-click status flow.`
+          carrier,
+          trackingNumber,
+          trackingUrl,
+          note: `Order transitioned to ${nextStatus} via quick status flow.`
         });
         window.MB_ADMIN_SHELL.showToast(`Order #${order.orderNumber} updated to ${nextStatus}`, 'success');
         window.MB_ADMIN_VIEWS['order-detail'].render(container, params);
@@ -530,12 +542,14 @@ window.MB_ADMIN_VIEWS['order-detail'] = {
       const newStatus = document.getElementById('ful-status').value;
       const carrier = document.getElementById('ful-carrier').value.trim();
       const trackingNumber = document.getElementById('ful-tracking').value.trim();
+      const trackingUrl = document.getElementById('ful-url')?.value.trim() || '';
       const note = document.getElementById('ful-note').value.trim();
 
       try {
         await service.updateOrderStatus(order.orderNumber, newStatus, {
           carrier,
           trackingNumber,
+          trackingUrl,
           note: note || `Fulfillment status changed to ${newStatus}`
         });
         window.MB_ADMIN_SHELL.showToast(`Order #${order.orderNumber} fulfillment updated`, 'success');
