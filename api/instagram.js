@@ -104,11 +104,13 @@ function parseInstagramPosts(html) {
                 if (cmUrl) carouselImages.push(cmUrl);
               });
             }
+            const shortcode = node.code || node.pk;
+            const safeImg = shortcode ? ('/api/instagram-image?code=' + shortcode) : (img || carouselImages[0] || '');
             return {
-              id: `ig-live-${node.pk || node.id || idx + 1}`,
+              id: 'ig-live-' + (node.pk || node.id || idx + 1),
               pk: node.pk,
-              url: node.seo_canonical_url || `https://www.instagram.com/p/${node.code || node.pk}/`,
-              img: img || carouselImages[0] || '',
+              url: node.seo_canonical_url || ('https://www.instagram.com/p/' + (shortcode || 'marshbarbary') + '/'),
+              img: safeImg,
               carouselImages,
               caption: (node.caption?.text || '').replace(/\n+/g, ' ').trim(),
               active: true
